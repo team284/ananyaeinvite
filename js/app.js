@@ -375,28 +375,27 @@ let toranN=0;function toran(colA,colB){let s='';const W=400;const u=++toranN;
 /* Positions are percentages of the illustration (1136×1408), so they hold at every screen size. */
 function sceneFrame(key,layers){
   const s=CONFIG.scenes[key];
-  return `<div class="scene-frame"><figure class="scene-fig" id="sc-${key}">
-    <img src="${esc(s.src)}" alt="${esc(s.alt)}" width="1136" height="1408" decoding="async">
+  return `<div class="scene-frame"><figure class="scene-fig" id="sc-${key}" style="aspect-ratio:${s.w}/${s.h}">
+    <img src="${esc(s.src)}" alt="${esc(s.alt)}" width="${s.w}" height="${s.h}" decoding="async">
     ${layers}</figure></div>`;
 }
 function mehendiLayers(){
   const k=CONFIG.groom[0];
   // a fresh henna stroke that keeps being drawn just behind the cone tip (viewBox matches the image)
-  return `<svg class="sc-svg" viewBox="0 0 1136 1408" preserveAspectRatio="none" aria-hidden="true">
-      <path class="fresh" pathLength="1" d="M560 720 C590 700 610 690 640 688 C652 687 660 676 668 662"/>
-      <path class="fresh f2" pathLength="1" d="M600 760 C618 748 626 732 640 722"/>
+  return `<svg class="sc-svg" viewBox="0 0 1100 1063" preserveAspectRatio="none" aria-hidden="true">
+      <path class="fresh" pathLength="1" d="M628 566 C640 552 652 556 650 566 C648 576 636 574 640 562 C646 548 662 544 671 537"/>
     </svg>
-    <span class="glint" style="left:59%;top:47%"></span>
-    <button class="kspot" id="kSpot" type="button" style="left:24.5%;top:52%" aria-label="The hidden initial"><span>${esc(k)}</span></button>`;
+    <span class="glint" style="left:61%;top:50.5%"></span>
+    <button class="kspot" id="kSpot" type="button" style="left:48%;top:62%" aria-label="The hidden initial"><span>${esc(k)}</span></button>`;
 }
 function sangeetLayers(){
   return `<span class="lights" aria-hidden="true"></span>
     <button class="sc-hit" id="dhol" type="button" aria-label="Play the dhol"></button>
-    <span class="ripple" id="ripple" style="left:30%;top:84%" aria-hidden="true"></span>`;
+    <span class="ripple" id="ripple" style="left:18%;top:86%" aria-hidden="true"></span>`;
 }
 function vivahLayers(){
-  return `<canvas class="agni-cv" id="agniCv" style="left:38%;top:44%;width:28%;height:28%" aria-hidden="true"></canvas>
-    <span class="fireglow" id="fireGlow" style="left:52%;top:64%" aria-hidden="true"></span>
+  return `<canvas class="agni-cv" id="agniCv" style="left:34%;top:50%;width:26%;height:24%" aria-hidden="true"></canvas>
+    <span class="fireglow" id="fireGlow" style="left:47%;top:66%" aria-hidden="true"></span>
     <button class="sc-hit" id="agni" type="button" aria-label="Tap the sacred fire to take a phera"></button>`;
 }
 
@@ -405,7 +404,7 @@ $('acts').innerHTML=CONFIG.events.map((e,i)=>{
   const tm=fmt(e.start,{hour:'numeric',minute:'2-digit',hour12:true}).toUpperCase();
   const cal=gcal(`${CONFIG.bride} & ${CONFIG.groom}: ${e.en}`,e.start,e.hours,`${e.place}, ${CONFIG.venue}`);
   let art='',note='';
-  if(e.key==='mehendi'){art=sceneFrame('mehendi',mehendiLayers());note=`Legend says the groom's initial hides in the bride's mehendi. Can you find ${esc(CONFIG.groom)}'s "${esc(CONFIG.groom[0])}" in her finished hand?`;}
+  if(e.key==='mehendi'){art=sceneFrame('mehendi',mehendiLayers());note=`Legend says the groom's initial hides in the bride's mehendi. Can you find ${esc(CONFIG.groom)}'s "${esc(CONFIG.groom[0])}" in her palm?`;}
   if(e.key==='sangeet'){art=sceneFrame('sangeet',sangeetLayers());note='Tap the dhol to start the night. Turn your sound on.';}
   if(e.key==='vivah'){art=sceneFrame('vivah',vivahLayers())+`<div class="diyas" id="diyas" aria-hidden="true"></div><p class="phera-count" id="pc">PHERA 0 OF 7</p>`;note='Tap the sacred fire to walk the seven pheras with them.';}
   return `<section class="act act-${e.key}" aria-label="${esc(e.en)}">${toran(e.key==='vivah'?'#8c2a34':'#b8404c',e.key==='vivah'?'#ecbcb4':'#f4cfc7')}
@@ -432,7 +431,7 @@ $('acts').innerHTML=CONFIG.events.map((e,i)=>{
     note.textContent=`Found it. ${CONFIG.bride}'s mehendi hides ${CONFIG.groom}'s initial, just like the old tradition.`;
     const[x,y]=centerOf(spot);burst(x,y,46,'spark');});
   fig.addEventListener('click',()=>{if(found)return;misses++;fig.classList.remove('nope');void fig.offsetWidth;fig.classList.add('nope');
-    note.textContent=misses<2?'Not there. Look closely at the hand that is already finished.':misses<4?'Warmer. Try the middle of her left palm.':'Hint: just below the big motif on her left palm.';
+    note.textContent=misses<2?'Not there. Look closely at the mehendi on her palm.':misses<4?'Warmer. Try below the big flowers on her palm.':'Hint: near the centre of her palm, just above her fingers.';
     if(misses>=4)spot.classList.add('hint');});
 })();
 

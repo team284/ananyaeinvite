@@ -1,5 +1,5 @@
 /* Offline cache for the invite. Bump VERSION whenever you change any file. */
-const VERSION = 'invite-v5';
+const VERSION = 'invite-v6';
 const SHELL = [
   './', 'index.html', 'css/style.css', 'js/config.js', 'js/app.js', 'manifest.webmanifest',
   'photos/events/mehendi.jpg', 'photos/events/sangeet.jpg', 'photos/events/vivah.jpg',
