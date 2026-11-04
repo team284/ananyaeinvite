@@ -24,6 +24,12 @@ window.CONFIG = {
     {cap:"The day he asked", src:"", hue:[354,75]},
     {cap:"Home", src:"", hue:[10,354]}
   ],
+  /* Illustrations for the three functions (1136×1408, portrait). */
+  scenes:{
+    mehendi:{src:"photos/events/mehendi.jpg", alt:"A mehendi artist's hand drawing henna on the bride's palms, her chooda on a velvet cushion"},
+    sangeet:{src:"photos/events/sangeet.jpg", alt:"A drummer's hands playing the dhol while the bride's mehendi hands dance behind"},
+    vivah:{src:"photos/events/vivah.jpg", alt:"The bride's hand in the groom's, tied with the gathbandhan above the sacred fire"}
+  },
   events:[
     {key:"mehendi", hi:"मेहंदी", en:"Mehendi", act:"Act I", tag:"Rang laayegi mehendi",
      start:"2027-02-12T16:00:00+05:30", hours:5, place:"The Garden Courtyard",

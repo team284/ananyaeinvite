@@ -1,7 +1,8 @@
 /* Offline cache for the invite. Bump VERSION whenever you change any file. */
-const VERSION = 'invite-v4';
+const VERSION = 'invite-v5';
 const SHELL = [
   './', 'index.html', 'css/style.css', 'js/config.js', 'js/app.js', 'manifest.webmanifest',
+  'photos/events/mehendi.jpg', 'photos/events/sangeet.jpg', 'photos/events/vivah.jpg',
   'icons/favicon.svg', 'icons/icon-192.png', 'icons/icon-512.png', 'icons/apple-touch-icon.png',
   'fonts/pinyon-script-latin-400-normal.woff2',
   'fonts/cinzel-latin-400-normal.woff2', 'fonts/cinzel-latin-500-normal.woff2', 'fonts/cinzel-latin-600-normal.woff2',
