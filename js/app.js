@@ -1,0 +1,580 @@
+/* Wedding invite app. Edit couple details in js/config.js, not here. */
+/* ---------------- helpers ---------------- */
+const $=id=>document.getElementById(id);
+const esc=s=>String(s).replace(/[&<>"]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m]));
+const IST={timeZone:'Asia/Kolkata'};
+const RM=matchMedia('(prefers-reduced-motion: reduce)').matches;
+const utc=d=>d.toISOString().replace(/[-:]/g,'').replace(/\.\d{3}/,'');
+const gcal=(t,iso,h,loc)=>{const s=new Date(iso),e=new Date(s.getTime()+h*36e5);return 'https://calendar.google.com/calendar/render?'+new URLSearchParams({action:'TEMPLATE',text:t,dates:`${utc(s)}/${utc(e)}`,location:loc,details:`${CONFIG.bride} & ${CONFIG.groom}'s wedding`});};
+const maps='https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(CONFIG.mapsQuery);
+const fmt=(iso,o)=>new Date(iso).toLocaleString('en-IN',{...IST,...o});
+let seed=11;const rnd=()=>(seed=(seed*16807)%2147483647)/2147483647;
+
+/* ---------------- textures (canvas → data URL) ---------------- */
+function tex(w,h,draw){const c=document.createElement('canvas');c.width=w;c.height=h;const x=c.getContext('2d');draw(x,w,h);return c.toDataURL();}
+(function(){
+  const r=document.documentElement.style;
+  r.setProperty('--noise',`url(${tex(220,220,(x,w,h)=>{const d=x.createImageData(w,h);for(let i=0;i<d.data.length;i+=4){const v=Math.random()*255;d.data[i]=d.data[i+1]=d.data[i+2]=v;d.data[i+3]=Math.random()*16;}x.putImageData(d,0,0);})})`);
+  r.setProperty('--paper-tex',`url(${tex(240,240,(x,w,h)=>{for(let i=0;i<2600;i++){x.fillStyle=`rgba(${Math.random()>.5?'120,80,30':'255,255,255'},${Math.random()*.08})`;x.fillRect(Math.random()*w,Math.random()*h,1+Math.random()*2,1);}x.strokeStyle='rgba(102,25,33,.05)';for(let i=0;i<40;i++){x.beginPath();const a=Math.random()*w,b=Math.random()*h;x.moveTo(a,b);x.quadraticCurveTo(a+Math.random()*30,b+Math.random()*10,a+Math.random()*40,b+Math.random()*20);x.stroke();}})})`);
+  r.setProperty('--wood-tex',`url(${tex(120,300,(x,w,h)=>{x.fillStyle='#4a1218';x.fillRect(0,0,w,h);for(let i=0;i<70;i++){const X=Math.random()*w,amp=2+Math.random()*5,f=.01+Math.random()*.03,dark=Math.random()>.45;x.strokeStyle=dark?`rgba(30,10,2,${.15+Math.random()*.3})`:`rgba(190,110,50,${.08+Math.random()*.16})`;x.lineWidth=.6+Math.random()*1.6;x.beginPath();for(let y=0;y<=h;y+=6){const xx=X+Math.sin(y*f+i)*amp;y?x.lineTo(xx,y):x.moveTo(xx,y);}x.stroke();}})})`);
+  r.setProperty('--stone-tex',`url(${tex(160,160,(x,w,h)=>{const d=x.createImageData(w,h);for(let i=0;i<d.data.length;i+=4){const v=Math.random()>.5?255:60;d.data[i]=v;d.data[i+1]=v*.8;d.data[i+2]=v*.6;d.data[i+3]=Math.random()*26;}x.putImageData(d,0,0);})})`);
+  r.setProperty('--marble-tex',`url(${tex(200,220,(x,w,h)=>{x.strokeStyle='rgba(177,150,82,.18)';for(let i=0;i<7;i++){x.lineWidth=.5+Math.random()*1.2;x.beginPath();let X=Math.random()*w,Y=0;x.moveTo(X,Y);while(Y<h){X+=(Math.random()-.5)*26;Y+=12+Math.random()*16;x.lineTo(X,Y);}x.stroke();}})})`);
+  const dm=`<svg xmlns='http://www.w3.org/2000/svg' width='84' height='84' viewBox='0 0 84 84'><g fill='none' stroke='%23d9a845' stroke-opacity='.10' stroke-width='1'><path d='M42 14c8 6 8 18 0 24c-8-6-8-18 0-24z'/><path d='M42 38c-6 4-14 4-18-2M42 38c6 4 14 4 18-2'/><circle cx='42' cy='44' r='2'/><path d='M0 0c6 4 6 10 0 14M84 0c-6 4-6 10 0 14M0 70c6 4 6 10 0 14M84 70c-6 4-6 10 0 14'/></g><g fill='%23d9a845' fill-opacity='.10'><circle cx='0' cy='42' r='1.6'/><circle cx='84' cy='42' r='1.6'/><circle cx='42' cy='0' r='1.6'/><circle cx='42' cy='84' r='1.6'/></g></svg>`;
+  r.setProperty('--damask',`url("data:image/svg+xml,${dm.replace(/#/g,'%23').replace(/</g,'%3C').replace(/>/g,'%3E').replace(/"/g,"'")}")`);
+})();
+
+/* ---------------- FX canvas (sparkles / petals / embers) ---------------- */
+const fx=$('fx'),fctx=fx.getContext('2d');let parts=[],fxOn=false;
+function sizeFx(){const d=Math.min(2,devicePixelRatio||1);fx.width=innerWidth*d;fx.height=innerHeight*d;fctx.setTransform(d,0,0,d,0,0);}
+sizeFx();addEventListener('resize',sizeFx);
+function burst(x,y,n,kind){
+  if(RM)return;
+  const gold=['#edddb5','#c9b788','#b89f61','#fff6d8'],pet=['#b79e5e','#b9a163','#c4af7b','#c1303e','#da7c6e'];
+  for(let i=0;i<n;i++){const a=Math.random()*Math.PI*2,s=kind==='rain'?0:(1.5+Math.random()*4.5);
+    parts.push({x:kind==='rain'?Math.random()*innerWidth:x,y:kind==='rain'?-20-Math.random()*innerHeight*.5:y,vx:Math.cos(a)*s,vy:kind==='rain'?1.2+Math.random()*2.2:Math.sin(a)*s-2,
+      g:kind==='rain'?0:.08,life:0,max:kind==='rain'?260:90+Math.random()*50,r:kind==='spark'?1+Math.random()*2.2:3+Math.random()*4,
+      rot:Math.random()*6,vr:(Math.random()-.5)*.15,c:(kind==='spark'?gold:pet)[Math.random()*5|0]||gold[0],k:kind,sw:Math.random()*6});}
+  if(!fxOn){fxOn=true;requestAnimationFrame(fxLoop);}
+}
+function fxLoop(){
+  fctx.clearRect(0,0,innerWidth,innerHeight);
+  parts=parts.filter(p=>p.life<p.max&&p.y<innerHeight+30);
+  for(const p of parts){p.life++;p.vy+=p.g;p.vx*=.985;if(p.k==='rain'){p.sw+=.04;p.x+=Math.sin(p.sw)*.8;}p.x+=p.vx;p.y+=p.vy;p.rot+=p.vr;
+    const a=Math.min(1,(p.max-p.life)/30);fctx.save();fctx.globalAlpha=a;fctx.translate(p.x,p.y);fctx.rotate(p.rot);fctx.fillStyle=p.c;
+    if(p.k==='spark'){fctx.shadowColor=p.c;fctx.shadowBlur=8;fctx.beginPath();const r=p.r*2.2;fctx.moveTo(0,-r);fctx.quadraticCurveTo(0,0,r,0);fctx.quadraticCurveTo(0,0,0,r);fctx.quadraticCurveTo(0,0,-r,0);fctx.quadraticCurveTo(0,0,0,-r);fctx.fill();}
+    else{fctx.beginPath();fctx.ellipse(0,0,p.r,p.r*.55,0,0,6.283);fctx.fill();fctx.globalAlpha=a*.35;fctx.fillStyle='#000';fctx.beginPath();fctx.ellipse(p.r*.2,0,p.r*.5,p.r*.12,0,0,6.283);fctx.fill();}
+    fctx.restore();}
+  if(parts.length)requestAnimationFrame(fxLoop);else{fxOn=false;fctx.clearRect(0,0,innerWidth,innerHeight);}
+}
+const centerOf=el=>{const r=el.getBoundingClientRect();return[r.left+r.width/2,r.top+r.height/2];};
+
+/* ---------------- shapes ---------------- */
+function archPath(cx,w,spring,bottom,n=5,k=.62){
+  const xl=cx-w/2,xr=cx+w/2,r=w,pts=[];
+  for(let i=0;i<=n;i++){const a=Math.PI-(Math.PI/3)*(i/n);pts.push([xr+r*Math.cos(a),spring-r*Math.sin(a)]);}
+  for(let i=1;i<=n;i++){const a=Math.PI/3-(Math.PI/3)*(i/n);pts.push([xl+r*Math.cos(a),spring-r*Math.sin(a)]);}
+  let d=`M${xl} ${bottom} L${xl} ${spring}`;
+  for(let i=1;i<pts.length;i++){const[x0,y0]=pts[i-1],[x1,y1]=pts[i];const cr=Math.hypot(x1-x0,y1-y0)*k;d+=` A${cr.toFixed(2)} ${cr.toFixed(2)} 0 0 1 ${x1.toFixed(2)} ${y1.toFixed(2)}`;}
+  return d+` L${xr} ${bottom} Z`;
+}
+function flamePath(x,y,h,w){return `M${x} ${y-h} C${x+w*.55} ${y-h*.62} ${x+w*.62} ${y-h*.22} ${x} ${y} C${x-w*.62} ${y-h*.22} ${x-w*.55} ${y-h*.62} ${x} ${y-h}Z`;}
+function waxSeal(svg,initials,id){
+  let d='';const N=28;for(let i=0;i<=N;i++){const a=i/N*Math.PI*2,r=44+(Math.sin(i*2.7)+Math.sin(i*5.3))*1.6;const x=50+Math.cos(a)*r,y=50+Math.sin(a)*r;d+=(i?'L':'M')+x.toFixed(1)+' '+y.toFixed(1);}
+  svg.innerHTML=`<defs><radialGradient id="${id}w" cx=".38" cy=".32" r=".8"><stop offset="0" stop-color="#cf404e"/><stop offset=".45" stop-color="#8c232d"/><stop offset="1" stop-color="#411015"/></radialGradient>
+  <radialGradient id="${id}r" cx=".5" cy=".5" r=".5"><stop offset=".7" stop-color="#6c1a23"/><stop offset="1" stop-color="#af2b38"/></radialGradient></defs>
+  <path d="${d}Z" fill="url(#${id}w)"/>
+  <circle cx="50" cy="50" r="31" fill="url(#${id}r)"/>
+  <circle cx="50" cy="50" r="31" fill="none" stroke="#4e1319" stroke-width="1.6"/>
+  <circle cx="50.8" cy="50.8" r="27" fill="none" stroke="rgba(235,186,179,.25)" stroke-width="1"/>
+  ${Array.from({length:16},(_,i)=>{const a=i/16*Math.PI*2;return `<circle cx="${(50+Math.cos(a)*36.5).toFixed(1)}" cy="${(50+Math.sin(a)*36.5).toFixed(1)}" r="1.3" fill="#5c171e"/>`}).join('')}
+  <text x="51" y="58.6" text-anchor="middle" font-family="Cinzel,Georgia,serif" font-size="21" fill="rgba(237,193,187,.35)">${esc(initials)}</text>
+  <text x="50" y="58" text-anchor="middle" font-family="Cinzel,Georgia,serif" font-size="21" fill="#50141a">${esc(initials)}</text>
+  <ellipse cx="36" cy="30" rx="13" ry="7" fill="#fff" opacity=".18" transform="rotate(-30 36 30)"/>`;
+}
+
+/* ================= 1 · SCENE ================= */
+(function(){
+  const svg=$('sceneSvg');let k=0,niches='';
+  const niche=(x,y)=>{const dl=(.5+k*.055).toFixed(2);const fd=(k*.23%1.4).toFixed(2);k++;
+    return `<path class="t f-niche" d="M${x-8} ${y+13} L${x-8} ${y-1} Q${x-8} ${y-12} ${x} ${y-16} Q${x+8} ${y-12} ${x+8} ${y-1} L${x+8} ${y+13} Z"/>
+    <path d="M${x-8} ${y+13} L${x-8} ${y-1} Q${x-8} ${y-12} ${x} ${y-16}" fill="none" stroke="#000" stroke-opacity=".5" stroke-width="1.4"/>
+    <path d="M${x} ${y-16} Q${x+8} ${y-12} ${x+8} ${y-1} L${x+8} ${y+13}" fill="none" stroke="#fff" stroke-opacity=".12" stroke-width="1"/>
+    <g class="nl" style="transition-delay:${dl}s"><circle cx="${x}" cy="${y+3}" r="15" fill="url(#ng)"/>
+      <ellipse cx="${x}" cy="${y+11}" rx="5" ry="1.8" fill="#a98e4b"/><ellipse cx="${x}" cy="${y+10.4}" rx="3.6" ry="1" fill="#421015"/>
+      <path class="nl-f" style="animation-delay:-${fd}s" d="${flamePath(x+2.4,y+9.6,11,4.6)}" fill="url(#flg)"/></g>`;};
+  for(let y=150;y<=590;y+=40){niches+=niche(42,y)+niche(358,y);}
+  for(let x=40;x<=360;x+=40){niches+=niche(x,674);}
+  const bevel=(d,w)=>`<path d="${d}" fill="none" stroke="#000" stroke-opacity=".45" stroke-width="${w+1}" transform="translate(1.6 1.8)"/><path d="${d}" fill="none" stroke="#fff" stroke-opacity=".22" stroke-width="${w}" transform="translate(-1 -1)"/><path class="t s-carve" d="${d}" stroke-width="${w}"/>`;
+  const rosette=(x,y)=>`<g>${bevel(`M${x} ${y} m-15 0 a15 15 0 1 0 30 0 a15 15 0 1 0 -30 0`,1.2)}${Array.from({length:8},(_,i)=>`<path class="t s-carve" stroke-width="1" d="M${x} ${y} L${(x+Math.cos(i*Math.PI/4)*12).toFixed(1)} ${(y+Math.sin(i*Math.PI/4)*12).toFixed(1)}"/>`).join('')}<circle class="t s-carve" cx="${x}" cy="${y}" r="4" stroke-width="1"/></g>`;
+  // diya on the ledge (clay)
+  const dots=Array.from({length:13},(_,i)=>{const t=i/12;const x=158+t*76;const y=607+Math.sin(t*Math.PI)*9;return `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="1.5" fill="#d3c49d"/>`;}).join('');
+  const petals=Array.from({length:6},(_,i)=>{const x=166+i*12;const y=614+Math.sin((i+.5)/6*Math.PI)*7;return `<path d="M${x} ${y} q3 -4 6 0 q-3 4 -6 0z" fill="#f0e2c0" opacity=".85"/>`;}).join('');
+  svg.innerHTML=`<defs>
+    <pattern id="jali" width="20" height="20" patternUnits="userSpaceOnUse">
+      <circle class="t s-carve" cx="10" cy="10" r="6.5" stroke-width=".8" opacity=".5"/>
+      <path class="t s-carve" d="M10 3.5 Q13 10 10 16.5 Q7 10 10 3.5Z" stroke-width=".6" opacity=".4"/>
+      <circle class="t s-carve" cx="0" cy="0" r="3" stroke-width=".8" opacity=".45"/><circle class="t s-carve" cx="20" cy="0" r="3" stroke-width=".8" opacity=".45"/>
+      <circle class="t s-carve" cx="0" cy="20" r="3" stroke-width=".8" opacity=".45"/><circle class="t s-carve" cx="20" cy="20" r="3" stroke-width=".8" opacity=".45"/>
+    </pattern>
+    <pattern id="petal" width="12" height="12" patternUnits="userSpaceOnUse"><path class="t s-carve" d="M6 0 Q10 6 6 12 Q2 6 6 0Z" stroke-width=".8" opacity=".85"/></pattern>
+    <pattern id="grain" width="160" height="160" patternUnits="userSpaceOnUse"><image href="${getComputedStyle(document.documentElement).getPropertyValue('--stone-tex').slice(4,-1).replace(/"/g,'')}" width="160" height="160"/></pattern>
+    <linearGradient id="inner" x1="0" y1="0" x2="0" y2="1"><stop class="t st1" offset="0"/><stop class="t st2" offset="1"/></linearGradient>
+    <radialGradient id="ng"><stop offset="0" stop-color="#ffd27a" stop-opacity=".85"/><stop offset=".4" stop-color="#ff9a3a" stop-opacity=".3"/><stop offset="1" stop-color="#ff7a1a" stop-opacity="0"/></radialGradient>
+    <linearGradient id="flg" x1="0" y1="1" x2="0" y2="0"><stop offset="0" stop-color="#7a8cff" stop-opacity=".7"/><stop offset=".12" stop-color="#ffb347"/><stop offset=".45" stop-color="#ffe08a"/><stop offset=".8" stop-color="#ff9a2a"/><stop offset="1" stop-color="#ff5a0a" stop-opacity="0"/></linearGradient>
+    <radialGradient id="wash" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#ffb04a" stop-opacity=".6"/><stop offset=".35" stop-color="#ff8a2a" stop-opacity=".25"/><stop offset="1" stop-color="#ff6a1a" stop-opacity="0"/></radialGradient>
+    <radialGradient id="vig" cx=".5" cy=".45" r=".75"><stop offset=".55" stop-color="#000" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".65"/></radialGradient>
+    <radialGradient id="clay" cx=".35" cy=".25" r=".9"><stop offset="0" stop-color="#c2ad77"/><stop offset=".35" stop-color="#bc2f3d"/><stop offset=".75" stop-color="#711c24"/><stop offset="1" stop-color="#380e12"/></radialGradient>
+    <linearGradient id="rim" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#d34f5c"/><stop offset="1" stop-color="#81202a"/></linearGradient>
+    <radialGradient id="oil" cx=".55" cy=".4" r=".7"><stop offset="0" stop-color="#c4b07d"/><stop offset=".5" stop-color="#741d26"/><stop offset="1" stop-color="#2a0a0d"/></radialGradient>
+    <radialGradient id="fo" cx=".5" cy=".7" r=".6"><stop offset="0" stop-color="#ffcf6a" stop-opacity=".95"/><stop offset=".45" stop-color="#ff8a2a" stop-opacity=".45"/><stop offset="1" stop-color="#ff5a0a" stop-opacity="0"/></radialGradient>
+    <linearGradient id="fb" x1="0" y1="1" x2="0" y2="0"><stop offset="0" stop-color="#3a5cff" stop-opacity=".85"/><stop offset=".1" stop-color="#ff9a2e"/><stop offset=".35" stop-color="#ffc54d"/><stop offset=".7" stop-color="#ff8a1e"/><stop offset="1" stop-color="#ff4a00" stop-opacity="0"/></linearGradient>
+    <linearGradient id="fc" x1="0" y1="1" x2="0" y2="0"><stop offset="0" stop-color="#fff" stop-opacity=".6"/><stop offset=".3" stop-color="#fffbe6"/><stop offset="1" stop-color="#ffe9a0" stop-opacity="0"/></linearGradient>
+    <linearGradient id="lit" x1="1" y1="0" x2="0" y2="0"><stop offset="0" stop-color="#ffb35a" stop-opacity=".55"/><stop offset=".6" stop-color="#ff8a2a" stop-opacity="0"/></linearGradient>
+    <linearGradient id="gtext" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fff6dc"/><stop offset=".35" stop-color="#e6cf98"/><stop offset=".6" stop-color="#fff2d0"/><stop offset="1" stop-color="#b8996a"/></linearGradient>
+    <filter id="soft" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation=".7"/></filter>
+    <filter id="big" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="8"/></filter>
+    <clipPath id="opn"><path d="${archPath(200,196,340,620,6)}"/></clipPath>
+  </defs>
+  <rect class="t f-wall" width="400" height="700"/>
+  <rect width="400" height="700" fill="url(#jali)"/>
+  <rect width="400" height="700" fill="url(#grain)" style="mix-blend-mode:overlay"/>
+  <rect x="22" y="104" width="40" height="516" class="t f-wall2"/><rect x="338" y="104" width="40" height="516" class="t f-wall2"/>
+  ${bevel('M22 104 H62 V620 H22 Z',1.2)}${bevel('M338 104 H378 V620 H338 Z',1.2)}
+  ${rosette(80,128)}${rosette(320,128)}
+  <path class="t f-wall2" d="${archPath(200,236,340,620,6)}"/>
+  <path d="${archPath(200,236,340,620,6)}" fill="url(#petal)"/>
+  ${bevel(archPath(200,236,340,620,6),1.8)}
+  ${bevel(archPath(200,218,340,620,6),1)}
+  <path d="${archPath(200,196,340,620,6)}" fill="url(#inner)"/>
+  <g clip-path="url(#opn)"><path d="${archPath(200,196,340,620,6)}" fill="none" stroke="#000" stroke-opacity=".75" stroke-width="26" filter="url(#big)"/></g>
+  ${bevel(archPath(200,196,340,620,6),1.6)}
+  <circle id="wash" class="lightwash" cx="259" cy="560" r="230" fill="url(#wash)"/>
+  ${niches}
+  <rect class="t f-marble" x="0" y="620" width="400" height="16"/>
+  <path d="M0 626 C60 622 90 632 150 627 S300 622 400 628" stroke="#a88e4b" stroke-opacity=".25" fill="none"/>
+  <rect class="t f-marble2" x="0" y="636" width="400" height="5"/>
+  <rect x="0" y="641" width="400" height="59" fill="#000" opacity=".25"/>
+  <rect width="400" height="700" fill="url(#vig)" pointer-events="none"/>
+
+  <g class="pre">
+    <text x="200" y="62" text-anchor="middle" font-family="Pinyon Script,cursive" font-size="36" fill="url(#gtext)">You're invited</text>
+    <text x="200" y="86" text-anchor="middle" font-family="Cinzel,serif" font-size="8.5" letter-spacing="3" fill="#efe1be">TO A WEDDING IN ${esc(CONFIG.city.toUpperCase())}</text>
+  </g>
+  <g class="wel" style="transition-delay:1.2s">
+    <text x="200" y="300" text-anchor="middle" font-family="Cinzel,serif" font-size="8.5" letter-spacing="3" fill="#efe1be">THE FAMILIES INVITE YOU TO</text>
+    <text x="200" y="356" text-anchor="middle" font-family="Tiro Devanagari Hindi,serif" font-size="40" fill="url(#gtext)">शुभ विवाह</text>
+  </g>
+  <g class="wel" style="transition-delay:1.8s;color:#cfbe94">
+    <use href="#ornament" x="135" y="376" width="130" height="18"/>
+    <text x="200" y="420" text-anchor="middle" font-family="Cormorant Garamond,serif" font-style="italic" font-size="14" fill="#f2e6c7">a celebration of love,</text>
+    <text x="200" y="438" text-anchor="middle" font-family="Cormorant Garamond,serif" font-style="italic" font-size="14" fill="#f2e6c7">by the lake in ${esc(CONFIG.city)}</text>
+    <text x="200" y="476" text-anchor="middle" font-family="Cinzel,serif" font-size="9" letter-spacing="3.2" fill="#cfbe94">FEBRUARY ${esc(CONFIG.mainDate.year)}</text>
+  </g>
+
+  <!-- the diya -->
+  <ellipse cx="200" cy="622" rx="58" ry="5" fill="#000" opacity=".35" filter="url(#soft)"/>
+  <ellipse class="lightwash" cx="235" cy="622" rx="90" ry="8" fill="#ffb35a" opacity=".5" filter="url(#soft)"/>
+  <path d="M150 596 C150 613 170 627 196 627 C216 627 232 619 241 607 L264 591 C254 589 242 592 233 595 Z" fill="url(#clay)"/>
+  <path class="lightwash" d="M150 596 C150 613 170 627 196 627 C216 627 232 619 241 607 L264 591 C254 589 242 592 233 595 Z" fill="url(#lit)"/>
+  <path d="M158 604 C163 615 176 622 192 623" stroke="#ffd2a8" stroke-opacity=".35" stroke-width="2.2" fill="none" stroke-linecap="round" filter="url(#soft)"/>
+  <path d="M156 606 C170 619 214 622 236 605" stroke="#c9b686" stroke-width=".9" fill="none" opacity=".9"/>
+  ${dots}${petals}
+  <ellipse cx="192" cy="596" rx="42" ry="6.5" fill="url(#rim)"/>
+  <ellipse cx="191.5" cy="596.8" rx="36" ry="4.6" fill="url(#oil)"/>
+  <ellipse cx="183" cy="595.6" rx="10" ry="1.2" fill="#fff6d8" opacity=".45"/>
+  <path d="M233 595 L264 591 L240 598 Z" fill="#9f2733"/>
+  <path d="M222 597.5 Q244 595 258 590.6" stroke="#f4ead0" stroke-width="2.6" fill="none" stroke-linecap="round"/>
+  <path d="M222 597.5 Q244 595 258 590.6" stroke="#c6b281" stroke-width="1" fill="none" stroke-linecap="round" opacity=".6"/>
+  <circle cx="258.6" cy="590.3" r="1.8" fill="#23080b"/>
+  <g id="flame">
+    <ellipse cx="259" cy="572" rx="34" ry="44" fill="url(#fo)" opacity=".9"/>
+    <g id="flameShape">
+      <path d="${flamePath(259,591,50,15)}" fill="url(#fb)" filter="url(#soft)"/>
+      <path d="${flamePath(259,590,30,8)}" fill="url(#fc)"/>
+      <ellipse cx="259" cy="587" rx="3.4" ry="4.2" fill="#4a6aff" opacity=".55" filter="url(#soft)"/>
+    </g>
+  </g>`;
+})();
+/* realistic flicker */
+(function(){
+  const fs=$('flameShape'),wash=$('wash');let t=0,lit=false;
+  $('tap').addEventListener('click',()=>{
+    const sc=$('scene');if(sc.classList.contains('lit'))return;
+    sc.classList.add('lit');lit=true;$('pill').innerHTML='Scroll down <span>⌄</span>';
+    const r=$('scene').getBoundingClientRect();burst(r.left+r.width*.648,r.top+r.height*.83,26,'spark');
+  });
+  function f(){t+=.016;
+    if(lit&&!RM){const n=Math.sin(t*9.1)*.5+Math.sin(t*13.7+1)*.3+Math.sin(t*23.3+2)*.2+(Math.random()-.5)*.35;
+      const sy=1+n*.07,sx=1-n*.04,sk=Math.sin(t*5.3)*3+Math.sin(t*11.1)*1.5;
+      fs.setAttribute('transform',`translate(259 591) skewX(${sk.toFixed(2)}) scale(${sx.toFixed(3)} ${sy.toFixed(3)}) translate(-259 -591)`);
+      wash.setAttribute('opacity',(.86+n*.1).toFixed(3));}
+    requestAnimationFrame(f);}
+  requestAnimationFrame(f);
+})();
+
+/* ================= 2 · ENVELOPE ================= */
+let guest='';try{const h=decodeURIComponent(location.hash.slice(1));if(h)guest=h.replace(/-/g,' ').replace(/\b\w/g,c=>c.toUpperCase());}catch(e){}
+if(guest)$('addr').textContent=guest;
+const ini=`${CONFIG.bride[0]}${CONFIG.groom[0]}`;
+waxSeal($('sealSvg'),ini,'s1');waxSeal($('sealEnd'),ini,'s2');
+function openEnvelope(){
+  const env=$('env');if(env.classList.contains('open'))return;
+  const [sx,sy]=centerOf($('seal'));burst(sx,sy,18,'petal');
+  env.classList.add('open');$('envHint').hidden=true;
+  setTimeout(()=>{
+    $('envStage').classList.add('done');
+    setTimeout(()=>{
+      $('envStage').hidden=true;
+      const nm=(s,d)=>esc(s);
+      const card=$('namesCard');card.hidden=false;
+      card.innerHTML=`<p class="ga fadein" style="margin-top:30px">॥ श्री गणेशाय नमः ॥</p>
+        <p class="lede fadein" style="animation-delay:.3s">With the blessings of our elders, we request the pleasure of your company at the wedding of</p>
+        <p class="nm" style="animation-delay:.7s">${nm(CONFIG.bride,.7)}</p>
+        <p class="rel fadein" style="animation-delay:1.4s">Daughter of</p><p class="par fadein" style="animation-delay:1.5s">${esc(CONFIG.brideParents)}</p>
+        <p class="amp fadein" style="animation-delay:1.8s">संग</p>
+        <p class="nm" style="animation-delay:2.1s">${nm(CONFIG.groom,2.1)}</p>
+        <p class="rel fadein" style="animation-delay:2.7s">Son of</p><p class="par fadein" style="animation-delay:2.8s">${esc(CONFIG.groomParents)}</p>`;
+      const [cx,cy]=centerOf(card);burst(cx,cy-40,60,'spark');
+    },650);
+  },2100);
+}
+$('seal').addEventListener('click',openEnvelope);
+
+/* ================= 3 · DATE ================= */
+const dparts=[["Day",CONFIG.mainDate.day],["Month",CONFIG.mainDate.month],["Year",CONFIG.mainDate.year]];
+$('tiles').innerHTML=dparts.map(([l,v])=>`<div class="tile"><div class="tile-in"><span class="v${v.length>4?' sm':''}">${esc(v)}</span><canvas tabindex="0" aria-label="Scratch to reveal the ${l.toLowerCase()}, or press Enter"></canvas></div><span class="tile-cap">${l.toUpperCase()}</span></div>`).join('');
+const mainEv=CONFIG.events[CONFIG.events.length-1];
+$('whenLine').textContent=CONFIG.mainDate.line;$('whenSub').textContent=CONFIG.mainDate.sub;
+$('whenCal').href=gcal(`${CONFIG.bride} & ${CONFIG.groom}: ${mainEv.en}`,mainEv.start,mainEv.hours,CONFIG.venue);
+let revealed=0;
+function foil(cv){
+  const r=cv.getBoundingClientRect(),d=Math.min(2,devicePixelRatio||1);cv.width=Math.max(1,r.width*d);cv.height=Math.max(1,r.height*d);
+  const x=cv.getContext('2d');x.setTransform(d,0,0,d,0,0);const w=r.width,h=r.height;
+  const g=x.createLinearGradient(0,0,w,h);[[0,'#ecdbb0'],[.22,'#ab904c'],[.42,'#f3e8cd'],[.6,'#998145'],[.8,'#d6c8a4'],[1,'#7a1e27']].forEach(s=>g.addColorStop(...s));
+  x.fillStyle=g;x.fillRect(0,0,w,h);
+  for(let i=0;i<w*h/10;i++){x.fillStyle=`rgba(${Math.random()>.5?'255,250,230':'90,55,5'},${Math.random()*.16})`;x.fillRect(Math.random()*w,Math.random()*h,1,1);}
+  x.strokeStyle='rgba(255,255,255,.18)';x.lineWidth=1;for(let i=-h;i<w;i+=7){x.beginPath();x.moveTo(i,0);x.lineTo(i+h,h);x.stroke();}
+  x.strokeStyle='rgba(81,20,26,.55)';x.strokeRect(6.5,6.5,w-13,h-13);
+  x.fillStyle='rgba(81,20,26,.6)';x.font=`600 ${Math.round(w*.12)}px Cinzel, serif`;x.textAlign='center';x.textBaseline='middle';x.fillText('✦',w/2,h/2);
+  cv.dataset.w=w;
+}
+function scratched(cv){const d=cv.getContext('2d').getImageData(0,0,cv.width,cv.height).data;let c=0,t=0;for(let i=3;i<d.length;i+=80){t++;if(d[i]<20)c++;}return c/t;}
+function tileDone(cv){if(cv.classList.contains('done'))return;cv.classList.add('done');revealed++;const[x,y]=centerOf(cv);burst(x,y,16,'spark');
+  if(revealed===3){$('when').hidden=false;$('dateHint').hidden=true;}}
+document.querySelectorAll('.tile canvas').forEach(cv=>{
+  foil(cv);let down=false,last=null,m=0;
+  const pt=e=>{const r=cv.getBoundingClientRect();return[e.clientX-r.left,e.clientY-r.top];};
+  const sc=p=>{const x=cv.getContext('2d');x.globalCompositeOperation='destination-out';x.lineCap='round';x.lineWidth=Math.max(20,+cv.dataset.w*.24);x.beginPath();x.moveTo(...(last||p));x.lineTo(...p);x.stroke();x.globalCompositeOperation='source-over';last=p;if(++m%6===0&&scratched(cv)>.45)tileDone(cv);};
+  cv.addEventListener('pointerdown',e=>{down=true;last=null;cv.setPointerCapture(e.pointerId);sc(pt(e));});
+  cv.addEventListener('pointermove',e=>{if(down)sc(pt(e));});
+  ['pointerup','pointercancel'].forEach(n=>cv.addEventListener(n,()=>{down=false;last=null;if(scratched(cv)>.3)tileDone(cv);}));
+  cv.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();tileDone(cv);}});
+});
+addEventListener('resize',()=>document.querySelectorAll('.tile canvas:not(.done)').forEach(foil));
+
+/* ================= 4 · STORY POSTCARDS ================= */
+const ART={
+  delhi:()=>`<svg viewBox="0 0 320 200" preserveAspectRatio="xMidYMid slice"><defs>
+    <linearGradient id="dsky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#50141a"/><stop offset=".55" stop-color="#a22834"/><stop offset="1" stop-color="#c9b686"/></linearGradient>
+    <linearGradient id="dst" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#b9a165"/><stop offset=".5" stop-color="#d4c59f"/><stop offset="1" stop-color="#9b8346"/></linearGradient>
+    <radialGradient id="dfire"><stop offset="0" stop-color="#ffd27a" stop-opacity=".9"/><stop offset="1" stop-color="#ff7a1a" stop-opacity="0"/></radialGradient></defs>
+    <rect width="320" height="200" fill="url(#dsky)"/>
+    ${Array.from({length:20},()=>`<circle cx="${rnd()*320}" cy="${rnd()*80}" r="${rnd()*.9+.3}" fill="#fff" opacity="${.3+rnd()*.5}"/>`).join('')}
+    <rect y="168" width="320" height="32" fill="#2a1a2a"/>
+    <path d="M0 172 L320 172" stroke="#c9b686" stroke-opacity=".4"/>
+    <g><rect x="110" y="160" width="100" height="10" fill="#82202a"/>
+      <rect x="118" y="72" width="84" height="90" fill="url(#dst)"/>
+      <path d="M140 162 V112 A20 20 0 0 1 180 112 V162 Z" fill="#5c171e"/>
+      <path d="M140 112 A20 20 0 0 1 180 112" fill="none" stroke="#6c1b23" stroke-width="2"/>
+      <rect x="114" y="60" width="92" height="14" fill="#cab789"/><rect x="114" y="60" width="92" height="2" fill="#eddcb3"/>
+      <rect x="126" y="50" width="68" height="10" fill="#c3ae79"/>
+      <path d="M140 50 Q160 34 180 50 Z" fill="#bba367"/>
+      <text x="160" y="69.5" text-anchor="middle" font-family="Cinzel,serif" font-size="5.6" fill="#6c1b23" letter-spacing="1">INDIA</text>
+      <rect x="122" y="82" width="12" height="70" fill="#000" opacity=".06"/><rect x="186" y="82" width="12" height="70" fill="#000" opacity=".1"/></g>
+    ${[40,280].map(x=>`<line x1="${x}" y1="170" x2="${x}" y2="120" stroke="#1b1020" stroke-width="2"/><circle cx="${x}" cy="118" r="9" fill="url(#dfire)"/><circle cx="${x}" cy="118" r="2.4" fill="#fff2c4"/>`).join('')}
+    <circle cx="70" cy="168" r="30" fill="url(#dfire)"/>
+    <path d="M58 172 L82 172 L76 166 L64 166Z" fill="#2e0b0f"/>
+    <path d="${flamePath(66,168,20,9)}" fill="#ff8a2a"/><path d="${flamePath(73,169,26,10)}" fill="#ffb347"/><path d="${flamePath(71,169,14,5)}" fill="#fff0b0"/>
+    ${Array.from({length:8},(_,i)=>`<circle cx="${62+rnd()*18}" cy="${130-rnd()*30}" r="1" fill="#ffd27a" opacity="${.4+rnd()*.5}"/>`).join('')}
+    </svg>`,
+  mumbai:()=>`<svg viewBox="0 0 320 200" preserveAspectRatio="xMidYMid slice"><defs>
+    <linearGradient id="msky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#300c0f"/><stop offset=".65" stop-color="#7e1f29"/><stop offset="1" stop-color="#d24b59"/></linearGradient>
+    <linearGradient id="msea" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#5d171e"/><stop offset="1" stop-color="#24080b"/></linearGradient>
+    <linearGradient id="mst" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#bda76e"/><stop offset=".5" stop-color="#e9d4a1"/><stop offset="1" stop-color="#a08747"/></linearGradient></defs>
+    <rect width="320" height="200" fill="url(#msky)"/>
+    <circle cx="262" cy="40" r="13" fill="#f5edd7"/><circle cx="268" cy="36" r="12" fill="#58161c" opacity=".9"/>
+    ${Array.from({length:22},()=>`<circle cx="${rnd()*320}" cy="${rnd()*90}" r="${rnd()*.9+.3}" fill="#fff" opacity="${.3+rnd()*.6}"/>`).join('')}
+    <rect y="146" width="320" height="54" fill="url(#msea)"/>
+    <g><rect x="96" y="80" width="128" height="68" fill="url(#mst)"/>
+      <path d="M140 148 V108 Q160 86 180 108 V148Z" fill="#711c24"/>
+      <path d="M108 148 V124 Q116 114 124 124 V148Z" fill="#711c24"/><path d="M196 148 V124 Q204 114 212 124 V148Z" fill="#711c24"/>
+      <rect x="96" y="76" width="128" height="6" fill="#d3c49e"/>
+      ${[96,128,180,212].map(x=>`<rect x="${x}" y="52" width="12" height="28" fill="#cbb98c"/><path d="M${x-1} 52 Q${x+6} 38 ${x+13} 52Z" fill="#d3c49e"/><line x1="${x+6}" y1="42" x2="${x+6}" y2="36" stroke="#d3c49e"/>`).join('')}
+      <rect x="140" y="64" width="40" height="12" fill="#cfbf95"/>
+      ${Array.from({length:9},(_,i)=>`<rect x="${142+i*4.2}" y="67" width="2" height="7" fill="#82202a"/>`).join('')}
+      ${Array.from({length:12},(_,i)=>`<circle cx="${100+i*11}" cy="79" r="1.2" fill="#ffe3a0"/>`).join('')}</g>
+    <g opacity=".35" transform="translate(0 296) scale(1 -1)"><rect x="96" y="148" width="128" height="10" fill="#e9d4a1"/></g>
+    <path d="M0 150 Q160 138 320 150" stroke="none" fill="none"/>
+    ${Array.from({length:30},(_,i)=>{const x=i*11;const y=150-Math.sin(i/29*Math.PI)*4;return `<circle cx="${x}" cy="${y}" r="1.1" fill="#ffd98a"/>`;}).join('')}
+    ${Array.from({length:12},(_,i)=>`<rect x="${10+i*26+rnd()*8}" y="${158+(i%4)*9}" width="${10+rnd()*12}" height="1" fill="#ffd98a" opacity=".45"/>`).join('')}
+    <path d="M40 176 L74 176 L68 182 L46 182Z" fill="#26090c"/><line x1="57" y1="176" x2="57" y2="160" stroke="#26090c"/><circle cx="57" cy="163" r="2" fill="#ffcf6a"/>
+    </svg>`,
+  udaipur:()=>`<svg viewBox="0 0 320 200" preserveAspectRatio="xMidYMid slice"><defs>
+    <linearGradient id="usky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#83202a"/><stop offset=".5" stop-color="#d87566"/><stop offset="1" stop-color="#ffd08a"/></linearGradient>
+    <linearGradient id="ulake" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#c9b687"/><stop offset=".4" stop-color="#9c2732"/><stop offset="1" stop-color="#4c1318"/></linearGradient>
+    <radialGradient id="usun"><stop offset="0" stop-color="#fff2c4"/><stop offset=".5" stop-color="#ffd27a"/><stop offset="1" stop-color="#ff9a5a" stop-opacity="0"/></radialGradient></defs>
+    <rect width="320" height="200" fill="url(#usky)"/>
+    <circle cx="210" cy="128" r="40" fill="url(#usun)"/><circle cx="210" cy="128" r="14" fill="#fff4cf"/>
+    <path d="M0 132 L40 110 L80 124 L130 102 L180 120 L230 106 L280 120 L320 108 L320 136 L0 136Z" fill="#6e1b23" opacity=".55"/>
+    <rect y="134" width="320" height="66" fill="url(#ulake)"/>
+    <g fill="#f3e8cc"><rect x="8" y="92" width="120" height="44"/><rect x="40" y="78" width="56" height="16"/>
+      ${[16,40,64,88,112].map(x=>`<rect x="${x}" y="82" width="10" height="10"/><path d="M${x-2} 82 Q${x+5} 72 ${x+12} 82Z"/>`).join('')}
+      <path d="M58 78 Q68 60 78 78Z"/></g>
+    ${Array.from({length:3},(_,r)=>Array.from({length:10},(_,i)=>`<path d="M${14+i*11} ${106+r*10} v-4 a2.5 2.5 0 0 1 5 0 v4z" fill="#c4b07c"/>`).join('')).join('')}
+    <g opacity=".35"><rect x="8" y="136" width="120" height="22" fill="#f3e8cc"/></g>
+    ${Array.from({length:8},(_,i)=>`<rect x="${190+rnd()*40}" y="${140+i*7}" width="${10+rnd()*24}" height="1.2" fill="#fff2c4" opacity="${.7-i*.07}"/>`).join('')}
+    <g transform="translate(150 158)"><path d="M-30 0 Q0 10 30 0 L24 6 Q0 13 -24 6Z" fill="#310c10"/><path d="M-22 0 L-22 -14 Q0 -24 22 -14 L22 0" fill="none" stroke="#310c10" stroke-width="1.5"/>
+      <circle cx="-6" cy="-10" r="3.4" fill="#310c10"/><path d="M-10 0 Q-6 -8 -2 0Z" fill="#310c10"/>
+      <circle cx="6" cy="-11" r="3.4" fill="#310c10"/><path d="M2 0 Q6 -9 10 0Z" fill="#310c10"/>
+      <path d="M0 -24 l2 4 4 1 -4 1 -2 4 -2 -4 -4 -1 4 -1z" fill="#fff4cf"/></g>
+    </svg>`
+};
+function postmark(city,yr){return `<svg class="pmark" viewBox="0 0 80 80" aria-hidden="true"><defs><path id="pm${city}" d="M40 40 m-27 0 a27 27 0 1 1 54 0 a27 27 0 1 1 -54 0"/></defs>
+  <circle cx="40" cy="40" r="34" fill="none" stroke="#59161d" stroke-width="1.4"/><circle cx="40" cy="40" r="20" fill="none" stroke="#59161d" stroke-width="1"/>
+  <text font-family="Cinzel,serif" font-size="8" letter-spacing="2" fill="#59161d"><textPath href="#pm${city}">${esc(city.toUpperCase())} · ${esc(city.toUpperCase())} ·</textPath></text>
+  <text x="40" y="44" text-anchor="middle" font-family="Cinzel,serif" font-size="9" fill="#59161d">${esc(yr)}</text>
+  ${[0,1,2,3].map(i=>`<path d="M74 ${30+i*6} q8 -3 16 0 t16 0" stroke="#59161d" fill="none" stroke-width="1"/>`).join('')}</svg>`;}
+const stack=$('stack');let order=CONFIG.story.map((_,i)=>i);
+stack.innerHTML=CONFIG.story.map((s,i)=>`<article class="pc" data-i="${i}" tabindex="0" aria-label="${esc(s.city)}, ${esc(s.when)}. Tap for the next postcard.">
+  <div class="pc-art">${ART[s.art]()}</div>
+  <div class="stamp"><div style="background:${s.stamp}"><b>${esc(s.city[0])}</b>${esc(s.city.toUpperCase())}<br>${esc(s.when.match(/\d{4}/)[0])}</div></div>
+  ${postmark(s.city,s.when.match(/\d{4}/)[0])}
+  <div class="pc-body"><p class="pc-yr">${esc(s.when)}</p><p class="pc-city">${esc(s.city)}</p><p class="txt">${esc(s.text)}</p></div>
+  <div class="pc-foot"><span>Chapter ${i+1} of ${CONFIG.story.length}</span><span>Next →</span></div></article>`).join('');
+$('route').innerHTML=CONFIG.story.map((s,i)=>`${i?'<span class="leg" aria-hidden="true"></span>':''}<button type="button" data-i="${i}" aria-label="Show ${esc(s.city)}"><i></i>${esc(s.city.toUpperCase())}</button>`).join('');
+function layout(){const cards=[...stack.children];order.forEach((ci,p)=>{const c=cards[ci];c.style.zIndex=10-p;c.style.transform=`translateY(${p*12}px) scale(${1-p*.05}) rotate(${[0,-3,3][p]||0}deg)`;c.style.opacity=p>2?0:1;c.style.pointerEvents=p?'none':'auto';});
+  document.querySelectorAll('#route button').forEach(b=>b.classList.toggle('on',+b.dataset.i===order[0]));}
+let busy=false;
+function nextCard(){if(busy)return;busy=true;const top=stack.children[order[0]];top.classList.add('fly');
+  setTimeout(()=>{order.push(order.shift());top.style.transition='none';top.classList.remove('fly');layout();requestAnimationFrame(()=>requestAnimationFrame(()=>{top.style.transition='';busy=false;}));},420);}
+function goTo(i){if(order[0]===i)return;order=[i,...order.filter(x=>x!==i)];layout();}
+[...stack.children].forEach(c=>{let x0=null;
+  c.addEventListener('pointerdown',e=>{x0=e.clientX;});
+  c.addEventListener('pointerup',e=>{if(x0===null)return;const dx=e.clientX-x0;x0=null;if(Math.abs(dx)>30||Math.abs(dx)<8)nextCard();});
+  c.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();nextCard();}});
+});
+$('route').addEventListener('click',e=>{const b=e.target.closest('button');if(b)goTo(+b.dataset.i);});
+layout();
+
+/* ================= 5 · JHAROKHA WINDOWS ================= */
+function bokeh(h1,h2){return tex(300,430,(x,w,h)=>{const g=x.createLinearGradient(0,0,0,h);g.addColorStop(0,`hsl(${h2} 45% 16%)`);g.addColorStop(.6,`hsl(${h1} 45% 34%)`);g.addColorStop(1,`hsl(354 60% 12%)`);x.fillStyle=g;x.fillRect(0,0,w,h);
+  for(let i=0;i<46;i++){const r=6+Math.random()*30,X=Math.random()*w,Y=Math.random()*h*.8;const c=x.createRadialGradient(X,Y,0,X,Y,r);const hh=Math.random()>.5?8:43;c.addColorStop(0,`hsla(${hh} 70% 82% / ${.25+Math.random()*.35})`);c.addColorStop(.75,`hsla(${hh} 65% 78% / ${.12+Math.random()*.15})`);c.addColorStop(1,`hsla(${hh} 65% 78% / 0)`);x.fillStyle=c;x.beginPath();x.arc(X,Y,r,0,7);x.fill();}
+  x.fillStyle='rgba(20,6,4,.75)';x.beginPath();x.ellipse(w*.42,h*.78,w*.13,h*.26,0,0,7);x.fill();x.beginPath();x.arc(w*.42,h*.48,w*.075,0,7);x.fill();
+  x.beginPath();x.ellipse(w*.6,h*.8,w*.14,h*.26,0,0,7);x.fill();x.beginPath();x.arc(w*.6,h*.5,w*.078,0,7);x.fill();});}
+$('wins').innerHTML=CONFIG.photos.map((p,i)=>`<div class="win" id="w${i}">
+  <button class="win-btn" type="button" aria-label="Open the window: ${esc(p.cap)}">
+    <div class="opening">
+      <div class="ph" style="background-image:url(${p.src?esc(p.src):bokeh(p.hue[0],p.hue[1])})">${p.src?'':`<span class="ph-tag">YOUR PHOTO HERE</span>`}</div>
+      <p class="ph-cap">${esc(p.cap)}</p>
+      <div class="shut l"><i></i><i></i></div><div class="shut r"><i></i><i></i></div>
+    </div>
+  </button><div class="sill" aria-hidden="true"></div></div>`).join('');
+document.querySelectorAll('.win').forEach(w=>w.querySelector('.win-btn').addEventListener('click',()=>{const o=!w.classList.contains('open');w.classList.toggle('open',o);if(o){const[x,y]=centerOf(w);burst(x,y-40,14,'petal');}}));
+
+/* ================= 6 · ACTS ================= */
+let toranN=0;function toran(colA,colB){let s='';const W=400;const u=++toranN;
+  s+=`<path d="M0 8 Q100 18 200 8 T400 8" stroke="#5a692b" stroke-width="2" fill="none"/>`;
+  for(let x=8;x<W;x+=20){const len=3+((x/20)%3===0?3:(x/20)%2?1:2);const yb=8+Math.sin(x/400*Math.PI*2)*5+5;
+    s+=`<line x1="${x}" y1="${yb}" x2="${x}" y2="${yb+len*9}" stroke="#6f1b24" stroke-width=".6"/>`;
+    for(let j=0;j<len;j++){const c=j%2?colB:colA;s+=`<circle cx="${x}" cy="${yb+5+j*9}" r="5" fill="url(#mg${c===colA?'a':'b'}${u})"/>`;}
+    s+=`<path d="M${x+10} ${yb-2} q6 10 0 22 q-6 -12 0 -22z" fill="#657730" stroke="#485522" stroke-width=".5"/>`;}
+  return `<svg class="toran" viewBox="0 0 400 70" preserveAspectRatio="none" aria-hidden="true"><defs>
+    <radialGradient id="mga${u}" cx=".4" cy=".35" r=".7"><stop offset="0" stop-color="#ffd36a"/><stop offset=".6" stop-color="${colA}"/><stop offset="1" stop-color="#61181f"/></radialGradient>
+    <radialGradient id="mgb${u}" cx=".4" cy=".35" r=".7"><stop offset="0" stop-color="#fff0a0"/><stop offset=".6" stop-color="${colB}"/><stop offset="1" stop-color="#6c1b23"/></radialGradient></defs>${s}</svg>`;}
+function mandala(){
+  const P=[];const henna='#6b1a22';
+  const rot=(d,n,off=0)=>Array.from({length:n},(_,i)=>`<path class="m-path" pathLength="1" d="${d}" transform="rotate(${(i*360/n+off).toFixed(2)})"/>`).join('');
+  P.push(`<circle class="m-path" pathLength="1" r="9"/><circle class="m-path" pathLength="1" r="15"/>`);
+  P.push(Array.from({length:12},(_,i)=>{const a=i/12*Math.PI*2;return `<circle cx="${(Math.cos(a)*21).toFixed(1)}" cy="${(Math.sin(a)*21).toFixed(1)}" r="1.8" fill="${henna}" stroke="none"/>`;}).join(''));
+  P.push(rot('M0 -25 C15 -36 15 -52 0 -64 C-15 -52 -15 -36 0 -25Z',8));
+  P.push(rot('M0 -31 L0 -56',8));
+  P.push(rot('M0 -40 C6 -44 6 -50 0 -54 C-6 -50 -6 -44 0 -40Z',8,22.5));
+  P.push(`<circle class="m-path" pathLength="1" r="68"/>`);
+  P.push(rot('M0 -70 C6 -76 6 -84 0 -90 C-6 -84 -6 -76 0 -70Z',16,11.25));
+  let sc='';for(let i=0;i<24;i++){const a0=i/24*Math.PI*2,a1=(i+1)/24*Math.PI*2;sc+=`${i?'':`M${(Math.cos(a0)*94).toFixed(1)} ${(Math.sin(a0)*94).toFixed(1)}`} A12 12 0 0 1 ${(Math.cos(a1)*94).toFixed(1)} ${(Math.sin(a1)*94).toFixed(1)}`;}
+  P.push(`<path class="m-path" pathLength="1" d="${sc}"/>`);
+  P.push(Array.from({length:36},(_,i)=>{const a=i/36*Math.PI*2;return `<circle cx="${(Math.cos(a)*104).toFixed(1)}" cy="${(Math.sin(a)*104).toFixed(1)}" r="1.5" fill="${henna}" stroke="none"/>`;}).join(''));
+  P.push(rot('M0 -112 C18 -116 24 -134 10 -142 C-2 -148 -14 -138 -8 -128 C-4 -122 4 -124 2 -130',8,0));
+  P.push(rot('M-4 -116 C2 -122 8 -128 6 -136',8,0));
+  P.push(`<circle class="m-path" pathLength="1" r="148" stroke-dasharray=".004 .01"/>`);
+  return `<svg viewBox="-160 -160 320 320" id="mandala" role="img" aria-label="Mehendi pattern with a hidden initial">
+    <defs><radialGradient id="palm" cx=".45" cy=".4" r=".7"><stop offset="0" stop-color="#ecdbaf"/><stop offset=".7" stop-color="#ccba8d"/><stop offset="1" stop-color="#b9a165"/></radialGradient></defs>
+    <circle r="156" fill="url(#palm)"/><circle r="156" fill="none" stroke="#bfa972" stroke-width="2"/>
+    <g fill="none" stroke="${henna}" stroke-width="1.5" stroke-linecap="round">${P.join('')}</g>
+    <g transform="rotate(67.5) translate(0 -126) rotate(-67.5)"><text id="hiddenK" x="0" y="4" text-anchor="middle" font-family="Cinzel,serif" font-size="12" fill="${henna}" style="pointer-events:none">${esc(CONFIG.groom[0])}</text>
+      <circle id="kHit" r="22" fill="transparent" style="cursor:pointer"/></g>
+  </svg>`;}
+function dholSVG(){return `<svg viewBox="0 0 300 190" aria-hidden="true"><defs>
+  <linearGradient id="dbody" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#b69c5c"/><stop offset=".35" stop-color="#9c2732"/><stop offset=".75" stop-color="#60181f"/><stop offset="1" stop-color="#360d11"/></linearGradient>
+  <linearGradient id="dhead" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#cab88a"/><stop offset=".5" stop-color="#f4ead1"/><stop offset="1" stop-color="#d4c59f"/></linearGradient>
+  <linearGradient id="dbr" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff6dc"/><stop offset=".5" stop-color="#d9bd85"/><stop offset="1" stop-color="#8a7046"/></linearGradient></defs>
+  <path d="M40 40 Q150 -4 260 40" stroke="#b52d3b" stroke-width="6" fill="none"/><path d="M40 40 Q150 -4 260 40" stroke="#bda66d" stroke-width="1.5" fill="none" stroke-dasharray="4 4"/>
+  <path d="M54 52 Q150 34 246 52 L246 150 Q150 168 54 150Z" fill="url(#dbody)"/>
+  <path d="M54 60 Q150 44 246 60" stroke="#fff" stroke-opacity=".18" stroke-width="5" fill="none"/>
+  ${(()=>{let z='M62 58';for(let i=0;i<=12;i++){const x=62+i*15;z+=` L${x} ${i%2?146:58}`;}return `<path d="${z}" stroke="#f0e3c2" stroke-width="2.2" fill="none" stroke-linejoin="round"/>`;})()}
+  ${Array.from({length:12},(_,i)=>`<circle cx="${69+i*15}" cy="${100+(i%2?-6:6)}" r="2.4" fill="#e9eef5" stroke="#db7d6e" stroke-width=".6"/>`).join('')}
+  <rect x="54" y="54" width="192" height="6" fill="url(#dbr)" opacity=".9"/><rect x="54" y="142" width="192" height="6" fill="url(#dbr)" opacity=".9"/>
+  <ellipse cx="54" cy="101" rx="20" ry="52" fill="#411015"/><ellipse cx="54" cy="101" rx="16" ry="47" fill="url(#dhead)"/><ellipse cx="54" cy="101" rx="9" ry="28" fill="#000" opacity=".06"/>
+  <ellipse cx="246" cy="101" rx="20" ry="52" fill="#411015"/><ellipse cx="246" cy="101" rx="16" ry="47" fill="url(#dhead)"/>
+  <path d="M10 20 Q34 50 52 98" stroke="#55151b" stroke-width="5" fill="none" stroke-linecap="round"/><path d="M10 20 Q34 50 52 98" stroke="#a78d4b" stroke-width="1.5" fill="none"/>
+  <line x1="292" y1="30" x2="248" y2="96" stroke="#d1c198" stroke-width="3" stroke-linecap="round"/>
+  <ellipse cx="150" cy="178" rx="110" ry="8" fill="#000" opacity=".35"/></svg>`;}
+function mandapSVG(){
+  const garland=(x1,y1,x2,y2,sag)=>{let s='';for(let i=0;i<=16;i++){const t=i/16,x=x1+(x2-x1)*t,y=y1+(y2-y1)*t+Math.sin(t*Math.PI)*sag;s+=`<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="4.2" fill="url(#${i%2?'mga2':'mgb2'})"/>`;}return s;};
+  const pillar=(x,w,top,h)=>`<rect x="${x}" y="${top}" width="${w}" height="${h}" fill="url(#gp)"/><rect x="${x-3}" y="${top+h-8}" width="${w+6}" height="8" fill="url(#gp)"/><rect x="${x-3}" y="${top}" width="${w+6}" height="6" fill="url(#gp)"/>
+    ${Array.from({length:6},(_,i)=>`<rect x="${x}" y="${top+16+i*22}" width="${w}" height="2.4" fill="#5d171e" opacity=".5"/>`).join('')}`;
+  return `<svg viewBox="0 0 320 300" aria-hidden="true"><defs>
+   <linearGradient id="gp" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#9c8050"/><stop offset=".45" stop-color="#fff6dc"/><stop offset=".6" stop-color="#e6cf98"/><stop offset="1" stop-color="#8a7046"/></linearGradient>
+   <linearGradient id="can" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#d04553"/><stop offset="1" stop-color="#7a1e27"/></linearGradient>
+   <radialGradient id="mga2" cx=".4" cy=".35" r=".7"><stop offset="0" stop-color="#ffd36a"/><stop offset=".6" stop-color="#b29855"/><stop offset="1" stop-color="#61181f"/></radialGradient>
+   <radialGradient id="mgb2" cx=".4" cy=".35" r=".7"><stop offset="0" stop-color="#fff0a0"/><stop offset=".6" stop-color="#b9a163"/><stop offset="1" stop-color="#6c1b23"/></radialGradient>
+   <radialGradient id="ag" cx=".5" cy=".6" r=".5"><stop offset="0" stop-color="#ffd27a" stop-opacity=".8"/><stop offset="1" stop-color="#ff6a1a" stop-opacity="0"/></radialGradient>
+   <linearGradient id="kund" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#a48a49"/><stop offset="1" stop-color="#4e1319"/></linearGradient></defs>
+   <ellipse cx="160" cy="262" rx="150" ry="30" fill="#efe1be" opacity=".12"/>
+   <g fill="none" stroke="#cdbb8f" stroke-opacity=".5">${[130,100,70].map(r=>`<ellipse cx="160" cy="262" rx="${r}" ry="${r*.2}"/>`).join('')}</g>
+   ${Array.from({length:16},(_,i)=>{const a=i/16*Math.PI*2;return `<circle cx="${(160+Math.cos(a)*115).toFixed(1)}" cy="${(262+Math.sin(a)*23).toFixed(1)}" r="3" fill="${['#d04553','#b9a163','#ffffff','#7f953c'][i%4]}" opacity=".8"/>`;}).join('')}
+   ${pillar(64,10,96,150)}${pillar(246,10,96,150)}
+   ${pillar(30,15,84,176)}${pillar(275,15,84,176)}
+   <path d="M18 86 Q160 6 302 86 L302 96 Q160 30 18 96Z" fill="url(#can)"/>
+   <path d="M18 96 ${Array.from({length:14},(_,i)=>{const x=18+(i+1)*(284/14);return `Q${(x-10).toFixed(1)} 112 ${x.toFixed(1)} 96`;}).join(' ')}" fill="#a12834" stroke="#bda66d" stroke-width="1.2"/>
+   <path d="M18 86 Q160 6 302 86" fill="none" stroke="#bda66d" stroke-width="2"/>
+   <path d="M150 34 Q160 14 170 34Z" fill="url(#gp)"/><circle cx="160" cy="16" r="5" fill="url(#gp)"/>
+   ${garland(30,104,160,104,30)}${garland(160,104,290,104,30)}
+   ${garland(38,140,38,250,0).replace(/r="4.2"/g,'r="3.4"')}${garland(282,140,282,250,0).replace(/r="4.2"/g,'r="3.4"')}
+   <g id="phRing"><ellipse cx="160" cy="236" rx="78" ry="18" fill="none" stroke="#ecdaae" stroke-opacity=".25" stroke-dasharray="3 5"/>
+     <ellipse id="phProg" cx="160" cy="236" rx="78" ry="18" fill="none" stroke="#ffd56a" stroke-width="2.2" pathLength="7" stroke-dasharray="0 7" style="transition:stroke-dasharray .9s ease"/></g>
+   <circle cx="160" cy="210" r="60" fill="url(#ag)" id="agniGlow"/>
+   <path d="M128 232 L192 232 L184 252 L136 252Z" fill="url(#kund)"/><rect x="124" y="226" width="72" height="8" fill="url(#gp)"/>
+   <g class="agni"><path d="${flamePath(150,228,34,16)}" fill="#ff7a1a"/><path d="${flamePath(170,228,40,18)}" fill="#ffb347"/><path d="${flamePath(160,228,52,20)}" fill="#ffd56a"/></g>
+   <path d="${flamePath(160,228,24,8)}" fill="#fff6d8" opacity=".85"/>
+   ${[100,220].map(x=>`<path d="M${x-10} 250 Q${x-14} 232 ${x} 230 Q${x+14} 232 ${x+10} 250Z" fill="url(#gp)"/><rect x="${x-5}" y="222" width="10" height="8" fill="url(#gp)"/>
+     <path d="M${x} 222 q-10 -6 -12 -14 M${x} 222 q10 -6 12 -14 M${x} 222 v-14" stroke="#657730" stroke-width="3" fill="none" stroke-linecap="round"/><circle cx="${x}" cy="207" r="5" fill="#9b8346"/>`).join('')}
+   <g id="couple"><circle id="c1" cx="238" cy="236" r="4.5" fill="#ffe7a8"/><circle id="c2" cx="230" cy="244" r="4.5" fill="#eab6ae"/></g>
+  </svg>`;}
+$('acts').innerHTML=CONFIG.events.map((e,i)=>{
+  const day=fmt(e.start,{weekday:'long',day:'numeric',month:'long'});
+  const tm=fmt(e.start,{hour:'numeric',minute:'2-digit',hour12:true}).toUpperCase();
+  const cal=gcal(`${CONFIG.bride} & ${CONFIG.groom}: ${e.en}`,e.start,e.hours,`${e.place}, ${CONFIG.venue}`);
+  let art='',note='';
+  if(e.key==='mehendi'){art=`<div class="art" id="mArt">${mandala()}</div>`;note=`Legend says the groom's initial hides in the bride's mehendi. Find ${esc(CONFIG.groom)}'s "${esc(CONFIG.groom[0])}".`;}
+  if(e.key==='sangeet'){art=`<div class="stage" id="stage"><span class="beam b1"></span><span class="beam b2"></span><span class="beam b3"></span>${Array.from({length:14},()=>`<span class="spark" style="left:${(rnd()*92+4).toFixed(1)}%;top:${(rnd()*55+3).toFixed(1)}%;animation-delay:-${(rnd()*2).toFixed(2)}s"></span>`).join('')}<button class="dhol" id="dhol" type="button" aria-label="Play the dhol">${dholSVG()}</button></div>`;note='Tap the dhol to start the night. Turn your sound on.';}
+  if(e.key==='vivah'){art=`<div class="art"><button class="mandap-btn" id="mandap" type="button" aria-label="Tap the sacred fire to take a phera">${mandapSVG()}</button></div><p class="phera-count" id="pc">PHERA 0 OF 7</p>`;note='Tap the sacred fire to walk the seven pheras with them.';}
+  return `<section class="act act-${e.key}" aria-label="${esc(e.en)}">${toran(e.key==='vivah'?'#8c2a34':'#b8404c',e.key==='vivah'?'#ecbcb4':'#f4cfc7')}
+   <div class="inner">
+    <p class="act-no">${esc(e.act)} · ${esc(day.toUpperCase())}</p>
+    <p class="act-hi foil">${esc(e.hi)}</p>
+    <p class="act-en">${esc(e.en.toUpperCase())}</p>
+    <p class="act-tag">${esc(e.tag)}</p>
+    <div class="act-when"><b>${esc(tm)} ONWARDS</b><span>${esc(e.place)}, ${esc(CONFIG.venue.split(',')[0])}</span></div>
+    <p class="act-copy">${esc(e.copy)}</p>
+    ${art}
+    <p class="play-note" id="note-${e.key}" aria-live="polite">${note}</p>
+    <div class="dress"><div><small>DRESS CODE</small><p>${esc(e.dress)}</p></div><span class="dots">${e.sw.map(c=>`<i style="background:${c}"></i>`).join('')}</span></div>
+    <a class="btn" href="${cal}" target="_blank" rel="noopener">Add to calendar</a>
+   </div></section>`;
+}).join('');
+
+/* mehendi: draw on view + hidden initial */
+(function(){
+  const art=$('mArt');if(!art)return;
+  if('IntersectionObserver' in window&&!RM){const io=new IntersectionObserver(es=>{es.forEach(en=>{if(en.isIntersecting){art.classList.add('drawn');io.disconnect();}});},{threshold:.35});io.observe(art);}
+  const svg=$('mandala');let found=false,misses=0;
+  $('kHit').addEventListener('click',ev=>{ev.stopPropagation();if(found)return;found=true;art.classList.add('found');
+    $('note-mehendi').textContent=`Found it. ${CONFIG.bride}'s mehendi hides ${CONFIG.groom}'s initial, just like the old tradition.`;const[x,y]=centerOf($('kHit'));burst(x,y,40,'spark');});
+  svg.addEventListener('click',()=>{if(found)return;misses++;$('note-mehendi').textContent=misses<3?'Not there. Look closer, between the outer paisleys.':'Hint: try the paisley at the lower right.';});
+})();
+
+/* sangeet: synthesised dhol */
+(function(){
+  const b=$('dhol');if(!b)return;let ac=null,hits=0;
+  const ctx=()=>{if(!ac){const C=window.AudioContext||window.webkitAudioContext;if(!C)return null;ac=new C();}if(ac.state==='suspended')ac.resume();return ac;};
+  function bass(a,t){const o=a.createOscillator(),g=a.createGain();o.type='sine';o.frequency.setValueAtTime(120,t);o.frequency.exponentialRampToValueAtTime(46,t+.3);g.gain.setValueAtTime(.0001,t);g.gain.exponentialRampToValueAtTime(.9,t+.006);g.gain.exponentialRampToValueAtTime(.0008,t+.5);o.connect(g).connect(a.destination);o.start(t);o.stop(t+.55);}
+  function slap(a,t){const n=a.sampleRate*.14,buf=a.createBuffer(1,n,a.sampleRate),d=buf.getChannelData(0);for(let i=0;i<n;i++)d[i]=(Math.random()*2-1)*Math.pow(1-i/n,3);
+    const s=a.createBufferSource();s.buffer=buf;const f=a.createBiquadFilter();f.type='bandpass';f.frequency.value=2200;f.Q.value=1.4;const g=a.createGain();g.gain.value=.55;s.connect(f).connect(g).connect(a.destination);s.start(t);
+    const o=a.createOscillator(),og=a.createGain();o.frequency.setValueAtTime(420,t);o.frequency.exponentialRampToValueAtTime(260,t+.08);og.gain.setValueAtTime(.25,t);og.gain.exponentialRampToValueAtTime(.001,t+.1);o.connect(og).connect(a.destination);o.start(t);o.stop(t+.12);}
+  b.addEventListener('click',()=>{
+    const st=$('stage');hits++;
+    try{const a=ctx();if(a){const t=a.currentTime+.02;[[0,'b'],[.15,'s'],[.3,'s'],[.45,'b'],[.6,'s'],[.68,'b'],[.83,'s']].forEach(([d,k])=>k==='b'?bass(a,t+d):slap(a,t+d));}}catch(e){}
+    [0,150,300,450,600,680,830].forEach(d=>setTimeout(()=>{b.classList.add('boom');st.classList.add('hit');setTimeout(()=>{b.classList.remove('boom');st.classList.remove('hit');},90);},d));
+    const[x,y]=centerOf(b);burst(x,y-30,24,'spark');
+    $('note-sangeet').textContent=hits<3?'Dha, ge, na, ti! Again?':hits<6?'The baraat would be proud.':`${hits} beats. You are officially on the Sangeet list.`;
+  });
+})();
+
+/* vivah: seven pheras */
+(function(){
+  const m=$('mandap');if(!m)return;let n=0,ang=0,raf=0;
+  const vows=['For nourishment, and a home that is never short of food.','For strength, in body and in mind.','For prosperity, earned honestly and shared.','For love and respect for each other’s families.','For children, and the joy they bring.','For health, and a long life together.','For friendship and loyalty, forever.'];
+  const c1=$('c1'),c2=$('c2');
+  const place=a=>{c1.setAttribute('cx',(160+Math.cos(a)*78).toFixed(1));c1.setAttribute('cy',(236+Math.sin(a)*18).toFixed(1));c2.setAttribute('cx',(160+Math.cos(a-.22)*78).toFixed(1));c2.setAttribute('cy',(236+Math.sin(a-.22)*18).toFixed(1));};
+  place(0);
+  m.addEventListener('click',()=>{
+    if(n>=7){n=0;$('phProg').style.strokeDasharray='0 7';$('pc').textContent='PHERA 0 OF 7';$('note-vivah').textContent='Tap the sacred fire to walk the seven pheras with them.';return;}
+    n++;$('phProg').style.strokeDasharray=`${n} 7`;$('pc').textContent=`PHERA ${n} OF 7`;
+    $('note-vivah').textContent=n<7?`${['First','Second','Third','Fourth','Fifth','Sixth'][n-1]} phera. ${vows[n-1]}`:`Seventh phera. ${vows[6]} Saat phere complete.`;
+    const from=ang,to=ang+Math.PI*2,t0=performance.now();cancelAnimationFrame(raf);
+    const step=t=>{const p=Math.min(1,(t-t0)/(RM?1:1100)),e=p<.5?2*p*p:1-Math.pow(-2*p+2,2)/2;ang=from+(to-from)*e;place(ang);if(p<1)raf=requestAnimationFrame(step);};raf=requestAnimationFrame(step);
+    const[x,y]=centerOf(m);burst(x,y,n<7?10:0,'spark');if(n===7)burst(0,0,140,'rain');
+  });
+})();
+
+/* ================= 7 · COUNTDOWN ================= */
+const first=CONFIG.events[0],T=new Date(first.start).getTime();
+$('cdUntil').textContent=`until the ${first.en}, on ${fmt(first.start,{weekday:'long',day:'numeric',month:'long'})}`;
+function tick(){const s=Math.max(0,Math.floor((T-Date.now())/1000));$('cdD').textContent=Math.floor(s/86400);$('cdH').textContent=String(Math.floor(s%86400/3600)).padStart(2,'0');$('cdM').textContent=String(Math.floor(s%3600/60)).padStart(2,'0');$('cdS').textContent=String(s%60).padStart(2,'0');}
+tick();setInterval(tick,1000);
+
+/* ================= 8 · VENUE ================= */
+(function(){
+  const wl=200;let win='',dom='',lights='';
+  const blocks=[[36,146,100],[136,112,128],[264,146,100]];
+  blocks.forEach(([bx,by,bw],bi)=>{
+    for(let row=by+14;row<wl-10;row+=24){for(let x=bx+9;x<bx+bw-8;x+=15){win+=`<path d="M${x} ${row+13}V${row+5}a3.6 3.6 0 0 1 7.2 0V${row+13}Z" fill="url(#vw)" opacity="${.7+rnd()*.3}"/>`;}}
+    const n=bi===1?3:2;for(let k=0;k<n;k++){const cx=bx+bw*(k+1)/(n+1);dom+=`<rect x="${cx-9}" y="${by-14}" width="18" height="14" fill="#ecdcb2"/><path d="M${cx-11} ${by-14}a11 11 0 0 1 22 0Z" fill="#f2e6c9"/><line x1="${cx}" y1="${by-25}" x2="${cx}" y2="${by-32}" stroke="#f2e6c9" stroke-width="1.4"/>`;}
+    for(let x=bx;x<=bx+bw;x+=5)lights+=`<circle cx="${x}" cy="${by+1}" r="1.1" fill="#ffe1a0"/>`;
+  });
+  const b=`<g>${blocks.map(([bx,by,bw])=>`<rect x="${bx}" y="${by}" width="${bw}" height="${wl-by}" fill="url(#vs)"/>`).join('')}${dom}${win}${lights}</g>`;
+  $('palace').innerHTML=`<defs>
+    <linearGradient id="vsky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#24090b"/><stop offset=".7" stop-color="#53141b"/><stop offset="1" stop-color="#90232e"/></linearGradient>
+    <linearGradient id="vlake" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#431015"/><stop offset="1" stop-color="#07050f"/></linearGradient>
+    <linearGradient id="vs" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#efe0bb"/><stop offset="1" stop-color="#bba469"/></linearGradient>
+    <linearGradient id="vw" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff1b8"/><stop offset="1" stop-color="#bda76e"/></linearGradient>
+    <radialGradient id="vmoon"><stop offset="0" stop-color="#fff8e0"/><stop offset=".3" stop-color="#fff2c8" stop-opacity=".5"/><stop offset="1" stop-color="#fff2c8" stop-opacity="0"/></radialGradient>
+    <filter id="vb"><feGaussianBlur stdDeviation="1.4 3"/></filter></defs>
+    <rect width="400" height="${wl}" fill="url(#vsky)"/>
+    ${Array.from({length:60},()=>`<circle cx="${rnd()*400}" cy="${rnd()*120}" r="${rnd()*.9+.2}" fill="#fff" opacity="${.3+rnd()*.6}"/>`).join('')}
+    <circle cx="320" cy="52" r="40" fill="url(#vmoon)"/><circle cx="320" cy="52" r="11" fill="#fff8e6"/>
+    <path d="M0 200 L0 160 L50 138 L100 156 L160 128 L220 150 L280 132 L340 152 L400 140 L400 200Z" fill="#340c10"/>
+    <rect y="${wl}" width="400" height="100" fill="url(#vlake)"/>
+    ${b}
+    <g transform="translate(0 ${wl*2}) scale(1 -1)" opacity=".45" filter="url(#vb)">${b}</g>
+    ${Array.from({length:16},(_,i)=>`<rect class="shimmer" style="animation-delay:-${(rnd()*3).toFixed(2)}s" x="${30+rnd()*340}" y="${wl+6+rnd()*80}" width="${8+rnd()*22}" height="1.2" fill="#ffd98a"/>`).join('')}
+    <g transform="translate(90 262)"><path d="M-26 0 Q0 8 26 0 L20 6 Q0 11 -20 6Z" fill="#0d0814"/><line x1="0" y1="0" x2="0" y2="-14" stroke="#0d0814" stroke-width="1.2"/><circle cx="0" cy="-15" r="2.4" fill="#ffd27a"/><circle cx="0" cy="-15" r="8" fill="#ffd27a" opacity=".2"/></g>`;
+})();
+$('city').textContent=CONFIG.city;$('vname').textContent=CONFIG.venue;$('vaddr').textContent=CONFIG.address;$('mapBtn').href=maps;
+const ICON={plane:'<svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.3"><path d="M4 18l24-8-3 4-9 3-3 8-2 1 1-7-6 1z"/><path d="M4 18l3 3"/></svg>',
+  train:'<svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.3"><rect x="8" y="4" width="16" height="19" rx="4"/><path d="M8 14h16M12 27l-3 3M20 27l3 3M12 19h.01M20 19h.01"/><path d="M11 23l-1 4h12l-1-4"/></svg>',
+  stay:'<svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.3"><path d="M6 28V12q10-10 20 0v16"/><path d="M12 28v-8a4 4 0 0 1 8 0v8M3 28h26"/><circle cx="16" cy="11" r="1.2"/></svg>'};
+$('travel').innerHTML=CONFIG.travel.map(([k,h,t])=>`<div>${ICON[k]}<p><b>${esc(h)}</b>${esc(t)}</p></div>`).join('');
+
+/* ================= 9 · FAMILIES / RSVP / END ================= */
+$('elders').innerHTML=CONFIG.elders.map(n=>`<p>${esc(n)}</p>`).join('')+`<p style="font-family:var(--f-body);font-style:italic;letter-spacing:0;font-size:1.05rem;color:var(--muted);margin-top:10px">and the whole Kapoor and Malhotra parivaar, eager to see you</p>`;
+$('families').textContent=CONFIG.families;$('sign').textContent=`${CONFIG.bride} & ${CONFIG.groom}`;
+$('rsvpBy').textContent=CONFIG.rsvpBy;if(guest)$('famName').value=guest;
+const counts=CONFIG.events.map(()=>2);
+$('ctrs').innerHTML=CONFIG.events.map((e,i)=>`<div class="ctr"><div><b>${esc(e.en)}</b><span>${esc(fmt(e.start,{weekday:'short',day:'numeric',month:'short'}))}</span></div>
+  <div class="stp"><button type="button" data-i="${i}" data-d="-1" aria-label="One fewer for ${esc(e.en)}">−</button><output id="o${i}">2</output><button type="button" data-i="${i}" data-d="1" aria-label="One more for ${esc(e.en)}">+</button></div></div>`).join('');
+$('ctrs').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;const i=+b.dataset.i;counts[i]=Math.max(0,Math.min(20,counts[i]+ +b.dataset.d));$('o'+i).textContent=counts[i];upd();});
+const reply=()=>{const f=$('famName').value.trim()||'Our family',n=$('note').value.trim();return `Namaste! RSVP for ${CONFIG.bride} & ${CONFIG.groom}'s wedding\nFamily: ${f}\n\n${CONFIG.events.map((e,i)=>`${e.en}: ${counts[i]?counts[i]+' coming':'Sorry, can\'t make it'}`).join('\n')}${n?`\n\nNote: ${n}`:''}`;};
+function upd(){$('wa').href=`https://wa.me/${CONFIG.whatsapp}?text=${encodeURIComponent(reply())}`;}
+['famName','note'].forEach(id=>$(id).addEventListener('input',upd));upd();
+$('rsvpForm').addEventListener('submit',e=>e.preventDefault());
+$('copy').addEventListener('click',()=>{const t=reply();const ok=()=>{$('copied').hidden=false;setTimeout(()=>$('copied').hidden=true,3000);};
+  const fb=()=>{$('note').value=t;$('note').select();$('copied').textContent='Reply placed in the note box and selected. Copy it from there.';ok();};
+  try{navigator.clipboard.writeText(t).then(ok,fb);}catch(e){fb();}});
+
+/* ================= APP: install + offline ================= */
+(function(){
+  const box=$('install'),btn=$('installBtn'),tip=$('installTip');
+  const standalone=matchMedia('(display-mode: standalone)').matches||navigator.standalone===true;
+  if(standalone||!box)return;
+  let deferred=null;
+  addEventListener('beforeinstallprompt',e=>{e.preventDefault();deferred=e;box.hidden=false;btn.hidden=false;});
+  btn&&btn.addEventListener('click',async()=>{if(!deferred)return;deferred.prompt();try{await deferred.userChoice;}catch(e){}deferred=null;box.hidden=true;});
+  addEventListener('appinstalled',()=>{box.hidden=true;});
+  const ios=/iphone|ipad|ipod/i.test(navigator.userAgent)&&!window.MSStream;
+  if(ios){box.hidden=false;tip.textContent='To keep this invite on your phone, tap Share, then "Add to Home Screen".';}
+})();
+if('serviceWorker' in navigator&&(location.protocol==='https:'||location.hostname==='localhost'||location.hostname==='127.0.0.1')){
+  addEventListener('load',()=>{navigator.serviceWorker.register('sw.js').catch(()=>{});});
+}
