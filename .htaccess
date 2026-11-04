@@ -7,3 +7,10 @@
   Header set Cache-Control "public, max-age=31536000"
 </FilesMatch>
 AddType application/manifest+json .webmanifest
+
+# Serve text as UTF-8 (fixes symbols like · and – showing as Â·)
+AddDefaultCharset UTF-8
+# Keep project notes private: only the invite itself is public
+<FilesMatch "\.(md|txt)$|^\.git">
+  Require all denied
+</FilesMatch>

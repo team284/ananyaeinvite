@@ -1,5 +1,5 @@
 /* Offline cache for the invite. Bump VERSION whenever you change any file. */
-const VERSION = 'invite-v1';
+const VERSION = 'invite-v2';
 const SHELL = [
   './', 'index.html', 'css/style.css', 'js/config.js', 'js/app.js', 'manifest.webmanifest',
   'icons/favicon.svg', 'icons/icon-192.png', 'icons/icon-512.png', 'icons/apple-touch-icon.png',
