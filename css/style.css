@@ -209,11 +209,10 @@ h2.title{font-family:var(--f-script);font-weight:400;font-size:3rem;line-height:
 .act-mehendi{background:radial-gradient(120% 60% at 50% 18%,#60702e 0%,#3a441b 50%,#1f240f 100%)}
 .act-mehendi .act-tag{color:#bfa972}
 .act-mehendi .play-note{color:#eedeb7}
-.m-path{stroke-dasharray:1;stroke-dashoffset:0}
-.drawn .m-path{animation:draw 2.6s ease forwards}
-@keyframes draw{from{stroke-dashoffset:1}to{stroke-dashoffset:0}}
-#hiddenK{transition:fill .5s ease,filter .5s ease}
-.found #hiddenK{fill:#ffd56a;filter:drop-shadow(0 0 6px #ffcf5a)}
+.hn-fill{fill:#3a0b12;fill-opacity:1}
+#kMark{transition:filter .5s ease}
+.found #kMark{filter:drop-shadow(0 0 4px #f6e3b4) drop-shadow(0 0 8px #f6e3b4)}
+#artist{will-change:transform}
 
 .act-sangeet{background:radial-gradient(100% 50% at 50% 40%,#5b161d 0%,#320c10 55%,#170507 100%)}
 .act-sangeet .act-tag{color:#e49f94}

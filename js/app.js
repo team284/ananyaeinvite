@@ -371,29 +371,111 @@ let toranN=0;function toran(colA,colB){let s='';const W=400;const u=++toranN;
   return `<svg class="toran" viewBox="0 0 400 70" preserveAspectRatio="none" aria-hidden="true"><defs>
     <radialGradient id="mga${u}" cx=".4" cy=".35" r=".7"><stop offset="0" stop-color="#ffd36a"/><stop offset=".6" stop-color="${colA}"/><stop offset="1" stop-color="#61181f"/></radialGradient>
     <radialGradient id="mgb${u}" cx=".4" cy=".35" r=".7"><stop offset="0" stop-color="#fff0a0"/><stop offset=".6" stop-color="${colB}"/><stop offset="1" stop-color="#6c1b23"/></radialGradient></defs>${s}</svg>`;}
-function mandala(){
-  const P=[];const henna='#6b1a22';
-  const rot=(d,n,off=0)=>Array.from({length:n},(_,i)=>`<path class="m-path" pathLength="1" d="${d}" transform="rotate(${(i*360/n+off).toFixed(2)})"/>`).join('');
-  P.push(`<circle class="m-path" pathLength="1" r="9"/><circle class="m-path" pathLength="1" r="15"/>`);
-  P.push(Array.from({length:12},(_,i)=>{const a=i/12*Math.PI*2;return `<circle cx="${(Math.cos(a)*21).toFixed(1)}" cy="${(Math.sin(a)*21).toFixed(1)}" r="1.8" fill="${henna}" stroke="none"/>`;}).join(''));
-  P.push(rot('M0 -25 C15 -36 15 -52 0 -64 C-15 -52 -15 -36 0 -25Z',8));
-  P.push(rot('M0 -31 L0 -56',8));
-  P.push(rot('M0 -40 C6 -44 6 -50 0 -54 C-6 -50 -6 -44 0 -40Z',8,22.5));
-  P.push(`<circle class="m-path" pathLength="1" r="68"/>`);
-  P.push(rot('M0 -70 C6 -76 6 -84 0 -90 C-6 -84 -6 -76 0 -70Z',16,11.25));
-  let sc='';for(let i=0;i<24;i++){const a0=i/24*Math.PI*2,a1=(i+1)/24*Math.PI*2;sc+=`${i?'':`M${(Math.cos(a0)*94).toFixed(1)} ${(Math.sin(a0)*94).toFixed(1)}`} A12 12 0 0 1 ${(Math.cos(a1)*94).toFixed(1)} ${(Math.sin(a1)*94).toFixed(1)}`;}
-  P.push(`<path class="m-path" pathLength="1" d="${sc}"/>`);
-  P.push(Array.from({length:36},(_,i)=>{const a=i/36*Math.PI*2;return `<circle cx="${(Math.cos(a)*104).toFixed(1)}" cy="${(Math.sin(a)*104).toFixed(1)}" r="1.5" fill="${henna}" stroke="none"/>`;}).join(''));
-  P.push(rot('M0 -112 C18 -116 24 -134 10 -142 C-2 -148 -14 -138 -8 -128 C-4 -122 4 -124 2 -130',8,0));
-  P.push(rot('M-4 -116 C2 -122 8 -128 6 -136',8,0));
-  P.push(`<circle class="m-path" pathLength="1" r="148" stroke-dasharray=".004 .01"/>`);
-  return `<svg viewBox="-160 -160 320 320" id="mandala" role="img" aria-label="Mehendi pattern with a hidden initial">
-    <defs><radialGradient id="palm" cx=".45" cy=".4" r=".7"><stop offset="0" stop-color="#ecdbaf"/><stop offset=".7" stop-color="#ccba8d"/><stop offset="1" stop-color="#b9a165"/></radialGradient></defs>
-    <circle r="156" fill="url(#palm)"/><circle r="156" fill="none" stroke="#bfa972" stroke-width="2"/>
-    <g fill="none" stroke="${henna}" stroke-width="1.5" stroke-linecap="round">${P.join('')}</g>
-    <g transform="rotate(67.5) translate(0 -126) rotate(-67.5)"><text id="hiddenK" x="0" y="4" text-anchor="middle" font-family="Cinzel,serif" font-size="12" fill="${henna}" style="pointer-events:none">${esc(CONFIG.groom[0])}</text>
-      <circle id="kHit" r="22" fill="transparent" style="cursor:pointer"/></g>
-  </svg>`;}
+/* ---------- Mehendi: the artist's hand applies henna to the bride's palm ---------- */
+const HENNA='#3a0b12';
+const THUMB={x:112,y:252,a:-58,L:70,w:31};
+const FINGERS=[ // base x, base y, angle (deg), length, width
+  {x:126,y:160,a:-13,L:92,w:29},
+  {x:156,y:154,a:-3,L:104,w:30},
+  {x:186,y:158,a:8,L:94,w:28},
+  {x:212,y:174,a:20,L:72,w:24}
+];
+function rotPt(f,lx,ly){const r=f.a*Math.PI/180;return[f.x+lx*Math.cos(r)-ly*Math.sin(r),f.y+lx*Math.sin(r)+ly*Math.cos(r)];}
+function mehndiArt(){
+  const fingers=FINGERS.map(f=>`<g transform="translate(${f.x} ${f.y}) rotate(${f.a})">
+      <rect x="${-f.w/2}" y="${-f.L}" width="${f.w}" height="${f.L+26}" rx="${f.w/2}" fill="url(#skinF)"/>
+      <rect x="${-f.w/2+3}" y="${-f.L+3}" width="${f.w*.32}" height="${f.L*.8}" rx="${f.w*.16}" fill="#fff" opacity=".1"/>
+      <path d="M${-f.w*.32} ${-f.L*.36} q${f.w*.32} ${3} ${f.w*.64} 0 M${-f.w*.3} ${-f.L*.68} q${f.w*.3} 2.5 ${f.w*.6} 0" stroke="#9a5a3a" stroke-opacity=".38" stroke-width="1.1" fill="none"/>
+    </g>`).join('');
+  const bangles=Array.from({length:7},(_,i)=>{const y=318+i*11,rose=i%2===0;
+    return `<ellipse cx="158" cy="${y}" rx="${50+i*.6}" ry="9" fill="${rose?'url(#bgR)':'url(#bgI)'}"/>
+      <ellipse cx="158" cy="${y-2.4}" rx="${44+i*.6}" ry="4.4" fill="none" stroke="#fff" stroke-opacity="${rose?.28:.55}" stroke-width="1.1"/>
+      ${rose?Array.from({length:9},(_,k)=>`<circle cx="${(116+k*10.5).toFixed(1)}" cy="${(y+Math.sin((k/8)*Math.PI)*5-1).toFixed(1)}" r="1.1" fill="#f6e3b4"/>`).join(''):''}`;}).join('');
+  /* henna strokes, drawn in this order by the cone */
+  const H=[];
+  // palm flower
+  H.push({d:'M160 218 m-8 0 a8 8 0 1 0 16 0 a8 8 0 1 0 -16 0'});
+  let pet='';for(let i=0;i<8;i++){const a=i/8*Math.PI*2-Math.PI/2,a2=a+Math.PI/8,a0=a-Math.PI/8;
+    const p0=[160+Math.cos(a0)*12,218+Math.sin(a0)*12],tip=[160+Math.cos(a)*30,218+Math.sin(a)*30],p1=[160+Math.cos(a2)*12,218+Math.sin(a2)*12];
+    pet+=`${i?'L':'M'}${p0[0].toFixed(1)} ${p0[1].toFixed(1)} Q${(160+Math.cos(a0)*28).toFixed(1)} ${(218+Math.sin(a0)*28).toFixed(1)} ${tip[0].toFixed(1)} ${tip[1].toFixed(1)} Q${(160+Math.cos(a2)*28).toFixed(1)} ${(218+Math.sin(a2)*28).toFixed(1)} ${p1[0].toFixed(1)} ${p1[1].toFixed(1)} `;}
+  H.push({d:pet});
+  H.push({d:'M160 218 m-38 0 a38 38 0 1 0 76 0 a38 38 0 1 0 -76 0',dash:'1.6 4.4'});
+  // vine to the wrist with leaves
+  H.push({d:'M160 256 C150 270 170 282 158 300'});
+  H.push({d:'M156 266 q-12 -2 -16 -12 q10 0 16 12 M162 280 q12 -1 16 -11 q-10 0 -16 11 M157 292 q-10 2 -14 -6'});
+  // lace band at the wrist
+  H.push({d:'M126 300 Q133 306 140 300 Q147 306 154 300 Q161 306 168 300 Q175 306 182 300 Q189 306 194 300'});
+  H.push({d:'M127 293 L193 293',dash:'1.4 4'});
+  // paisley at the thumb mound
+  H.push({d:'M118 236 C104 230 102 212 114 206 C124 202 130 214 122 220 C118 223 114 218 117 215'});
+  H.push({d:'M120 246 q8 6 18 4',dash:'1.4 4'});
+  // fingers: bands and caps (in finger-local coordinates)
+  [...FINGERS,THUMB].forEach((f,i)=>{
+    const ln=(x1,y1,x2,y2)=>{const a=rotPt(f,x1,y1),b=rotPt(f,x2,y2);return `M${a[0].toFixed(1)} ${a[1].toFixed(1)} L${b[0].toFixed(1)} ${b[1].toFixed(1)}`;};
+    const w=f.w*.42;
+    H.push({d:ln(-w,-f.L*.22,w,-f.L*.22)+' '+ln(-w,-f.L*.28,w,-f.L*.28)});
+    H.push({d:ln(-w,-f.L*.5,w,-f.L*.5),dash:'1.4 3.6'});
+    // scalloped line under the cap
+    const s0=rotPt(f,-w,-f.L*.74);let sc=`M${s0[0].toFixed(1)} ${s0[1].toFixed(1)}`;
+    for(let k=1;k<=3;k++){const p=rotPt(f,-w+k*(2*w/3),-f.L*.74),c=rotPt(f,-w+(k-.5)*(2*w/3),-f.L*.74+5);sc+=` Q${c[0].toFixed(1)} ${c[1].toFixed(1)} ${p[0].toFixed(1)} ${p[1].toFixed(1)}`;}
+    H.push({d:sc});
+    // filled fingertip cap
+    const r=f.w/2-2.5,cy=-f.L+f.w/2+1,a=rotPt(f,-r,cy+r*.75),b=rotPt(f,r,cy+r*.75);
+    H.push({d:`M${a[0].toFixed(1)} ${a[1].toFixed(1)} A${r} ${r} 0 1 1 ${b[0].toFixed(1)} ${b[1].toFixed(1)} Z`,fill:true});
+  });
+  const henna=H.map((h,i)=>`<path class="hn${h.fill?' hn-fill':''}" data-i="${i}" d="${h.d}" ${h.dash?`stroke-dasharray="${h.dash}" data-dots="1"`:''}/>`).join('');
+  const k=CONFIG.groom[0];
+  return `<svg viewBox="0 0 340 400" id="mehndiSvg" role="img" aria-label="A mehendi artist's hand applying henna to the bride's palm">
+  <defs>
+    <radialGradient id="skinP" cx=".45" cy=".38" r=".75"><stop offset="0" stop-color="#f3cba6"/><stop offset=".6" stop-color="#e2a87c"/><stop offset="1" stop-color="#c58458"/></radialGradient>
+    <linearGradient id="skinF" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#e4ac80"/><stop offset=".45" stop-color="#f1c49c"/><stop offset="1" stop-color="#c98a5e"/></linearGradient>
+    <linearGradient id="skinW" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#c98a5e"/><stop offset=".5" stop-color="#eab78d"/><stop offset="1" stop-color="#bf7f54"/></linearGradient>
+    <linearGradient id="skinA" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#d9996c"/><stop offset=".5" stop-color="#c88458"/><stop offset="1" stop-color="#a86a42"/></linearGradient>
+    <linearGradient id="bgR" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#c24a56"/><stop offset=".5" stop-color="#8c2a34"/><stop offset="1" stop-color="#4a0f18"/></linearGradient>
+    <linearGradient id="bgI" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff6dc"/><stop offset=".5" stop-color="#e6cf98"/><stop offset="1" stop-color="#a88a58"/></linearGradient>
+    <linearGradient id="cone" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#cdb27c"/><stop offset=".45" stop-color="#fff6dc"/><stop offset="1" stop-color="#b8996a"/></linearGradient>
+    <linearGradient id="slv" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ecbcb4"/><stop offset="1" stop-color="#c98f88"/></linearGradient>
+    <filter id="hsh" x="-30%" y="-30%" width="160%" height="160%"><feDropShadow dx="-6" dy="10" stdDeviation="7" flood-color="#000" flood-opacity=".38"/></filter>
+    <filter id="wet"><feGaussianBlur stdDeviation=".25"/></filter>
+  </defs>
+  <ellipse cx="165" cy="392" rx="120" ry="10" fill="#000" opacity=".25"/>
+  <g id="brideHand" filter="url(#hsh)">
+    <path d="M120 400 L124 298 Q158 288 192 298 L196 400 Z" fill="url(#skinW)"/>
+    <g transform="translate(${THUMB.x} ${THUMB.y}) rotate(${THUMB.a})"><rect x="${-THUMB.w/2}" y="${-THUMB.L}" width="${THUMB.w}" height="${THUMB.L+40}" rx="${THUMB.w/2}" fill="url(#skinF)"/><path d="M${-THUMB.w*.32} ${-THUMB.L*.45} q${THUMB.w*.32} 3 ${THUMB.w*.64} 0" stroke="#9a5a3a" stroke-opacity=".38" stroke-width="1.1" fill="none"/></g>
+    ${fingers}
+    <path d="M122 308 C106 280 98 240 102 200 C104 176 116 160 134 157 L204 161 C222 165 230 182 229 202 C228 240 218 276 196 308 Z" fill="url(#skinP)"/>
+    <path d="M104 236 C112 214 126 202 142 200" stroke="#9a5a3a" stroke-opacity=".28" stroke-width="1.2" fill="none"/>
+    <path d="M132 200 C160 190 196 192 222 206" stroke="#9a5a3a" stroke-opacity=".25" stroke-width="1.2" fill="none"/>
+    <path d="M140 222 C150 250 146 278 136 300" stroke="#9a5a3a" stroke-opacity=".22" stroke-width="1.1" fill="none"/>
+    ${bangles}
+    <g fill="none" stroke="${HENNA}" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" filter="url(#wet)">${henna}</g>
+    <g id="kMark" transform="translate(172 248) rotate(-14)" opacity="0">
+      <text x="0" y="4" text-anchor="middle" font-family="Cinzel,serif" font-size="11" font-weight="600" fill="${HENNA}">${esc(k)}</text>
+    </g>
+    <circle id="kHit" cx="172" cy="246" r="20" fill="transparent" style="cursor:pointer"/>
+  </g>
+  <g id="artist" filter="url(#hsh)" transform="translate(250 120)">
+    <path d="M86 -132 L116 -94 L260 -190 L222 -256 Z" fill="url(#slv)"/>
+    <path d="M86 -132 L116 -94" stroke="#f6e3b4" stroke-width="7"/>
+    <path d="M90 -126 L112 -98" stroke="#8c2a34" stroke-width="1.4" stroke-dasharray="2 3"/>
+    <ellipse cx="96" cy="-110" rx="13" ry="7" transform="rotate(-52 96 -110)" fill="url(#bgI)"/>
+    <ellipse cx="74" cy="-94" rx="31" ry="21" transform="rotate(-38 74 -94)" fill="url(#skinA)"/>
+    <path d="M86 -96 L66 -76 L58 -66" stroke="#a86a42" stroke-width="14" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+    <path d="M86 -96 L66 -76 L58 -66" stroke="url(#skinA)" stroke-width="11" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+    <g id="coneG"><path d="M0 0 L46 -84 L64 -72 Z" fill="url(#cone)"/>
+      <path d="M14 -24 L32 -12 M24 -42 L44 -30 M34 -60 L54 -48" stroke="#8c2a34" stroke-width="2" opacity=".7"/>
+      <path d="M0 0 L6 -11 L10 -8 Z" fill="${HENNA}"/>
+      <path d="M46 -84 Q56 -94 64 -72" fill="#e6cf98"/></g>
+    <path d="M78 -108 L54 -90 L42 -76" stroke="#a86a42" stroke-width="14" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+    <path d="M78 -108 L54 -90 L42 -76" stroke="url(#skinA)" stroke-width="11" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+    <path d="M56 -116 L40 -98 L36 -86" stroke="#a86a42" stroke-width="15" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+    <path d="M56 -116 L40 -98 L36 -86" stroke="url(#skinA)" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+    <ellipse cx="38" cy="-88" rx="4" ry="2.6" transform="rotate(-50 38 -88)" fill="#f6d5c0" opacity=".55"/>
+    <ellipse cx="44" cy="-78" rx="3.6" ry="2.4" transform="rotate(-40 44 -78)" fill="#f6d5c0" opacity=".5"/>
+  </g>
+  </svg>`;
+}
+
 function dholSVG(){return `<svg viewBox="0 0 300 190" aria-hidden="true"><defs>
   <linearGradient id="dbody" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#b69c5c"/><stop offset=".35" stop-color="#9c2732"/><stop offset=".75" stop-color="#60181f"/><stop offset="1" stop-color="#360d11"/></linearGradient>
   <linearGradient id="dhead" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#cab88a"/><stop offset=".5" stop-color="#f4ead1"/><stop offset="1" stop-color="#d4c59f"/></linearGradient>
@@ -446,7 +528,7 @@ $('acts').innerHTML=CONFIG.events.map((e,i)=>{
   const tm=fmt(e.start,{hour:'numeric',minute:'2-digit',hour12:true}).toUpperCase();
   const cal=gcal(`${CONFIG.bride} & ${CONFIG.groom}: ${e.en}`,e.start,e.hours,`${e.place}, ${CONFIG.venue}`);
   let art='',note='';
-  if(e.key==='mehendi'){art=`<div class="art" id="mArt">${mandala()}</div>`;note=`Legend says the groom's initial hides in the bride's mehendi. Find ${esc(CONFIG.groom)}'s "${esc(CONFIG.groom[0])}".`;}
+  if(e.key==='mehendi'){art=`<div class="art" id="mArt">${mehndiArt()}<button class="btn line" id="mReplay" type="button" hidden style="margin-top:10px">Watch it again</button></div>`;note=`Watch the mehendi go on ${esc(CONFIG.bride)}'s hand, then find ${esc(CONFIG.groom)}'s initial hidden in it.`;}
   if(e.key==='sangeet'){art=`<div class="stage" id="stage"><span class="beam b1"></span><span class="beam b2"></span><span class="beam b3"></span>${Array.from({length:14},()=>`<span class="spark" style="left:${(rnd()*92+4).toFixed(1)}%;top:${(rnd()*55+3).toFixed(1)}%;animation-delay:-${(rnd()*2).toFixed(2)}s"></span>`).join('')}<button class="dhol" id="dhol" type="button" aria-label="Play the dhol">${dholSVG()}</button></div>`;note='Tap the dhol to start the night. Turn your sound on.';}
   if(e.key==='vivah'){art=`<div class="art"><button class="mandap-btn" id="mandap" type="button" aria-label="Tap the sacred fire to take a phera">${mandapSVG()}</button></div><p class="phera-count" id="pc">PHERA 0 OF 7</p>`;note='Tap the sacred fire to walk the seven pheras with them.';}
   return `<section class="act act-${e.key}" aria-label="${esc(e.en)}">${toran(e.key==='vivah'?'#8c2a34':'#b8404c',e.key==='vivah'?'#ecbcb4':'#f4cfc7')}
@@ -464,14 +546,45 @@ $('acts').innerHTML=CONFIG.events.map((e,i)=>{
    </div></section>`;
 }).join('');
 
-/* mehendi: draw on view + hidden initial */
+/* mehendi: the artist's cone traces the henna, then the groom's initial is hidden in it */
 (function(){
   const art=$('mArt');if(!art)return;
-  if('IntersectionObserver' in window&&!RM){const io=new IntersectionObserver(es=>{es.forEach(en=>{if(en.isIntersecting){art.classList.add('drawn');io.disconnect();}});},{threshold:.35});io.observe(art);}
-  const svg=$('mandala');let found=false,misses=0;
-  $('kHit').addEventListener('click',ev=>{ev.stopPropagation();if(found)return;found=true;art.classList.add('found');
-    $('note-mehendi').textContent=`Found it. ${CONFIG.bride}'s mehendi hides ${CONFIG.groom}'s initial, just like the old tradition.`;const[x,y]=centerOf($('kHit'));burst(x,y,40,'spark');});
-  svg.addEventListener('click',()=>{if(found)return;misses++;$('note-mehendi').textContent=misses<3?'Not there. Look closer, between the outer paisleys.':'Hint: try the paisley at the lower right.';});
+  const svg=$('mehndiSvg'),artist=$('artist'),kMark=$('kMark'),note=$('note-mehendi');
+  const paths=[...svg.querySelectorAll('.hn')];
+  const REST=[262,118],AWAY=[300,70];let pos=REST.slice(),run=0,done=false,found=false,misses=0;
+  paths.forEach(p=>{p._L=p.getTotalLength();});
+  const setArtist=(x,y,wob=0)=>{pos=[x,y];artist.setAttribute('transform',`translate(${x.toFixed(1)} ${y.toFixed(1)}) rotate(${wob.toFixed(2)})`);};
+  const tween=(ms,fn,id)=>new Promise(res=>{const t0=performance.now();const f=t=>{if(id!==run)return res(false);const k=Math.min(1,(t-t0)/ms);fn(k,t);k<1?requestAnimationFrame(f):res(true);};requestAnimationFrame(f);});
+  const ease=k=>k<.5?2*k*k:1-Math.pow(-2*k+2,2)/2;
+  const showAll=()=>{paths.forEach(p=>{p.style.strokeDasharray='';p.style.strokeDashoffset='';p.style.opacity=1;if(p.classList.contains('hn-fill'))p.style.fillOpacity=1;});kMark.setAttribute('opacity','.92');};
+  const hideAll=()=>paths.forEach(p=>{if(p.dataset.dots){p.style.opacity=0;}else{p.style.opacity=1;p.style.strokeDasharray=p._L;p.style.strokeDashoffset=p._L;}if(p.classList.contains('hn-fill'))p.style.fillOpacity=0;});
+  async function moveTo(x,y,ms,id){const [x0,y0]=pos;return tween(ms,k=>{const e=ease(k);setArtist(x0+(x-x0)*e,y0+(y-y0)*e-Math.sin(k*Math.PI)*10);},id);}
+  async function play(){
+    const id=++run;done=false;found=false;art.classList.remove('found');kMark.setAttribute('opacity','0');
+    note.textContent=`The mehendi artist is at work on ${CONFIG.bride}'s hand…`;
+    if(RM){showAll();setArtist(...AWAY);finish();return;}
+    hideAll();setArtist(...REST);
+    for(const p of paths){
+      const s=p.getPointAtLength(0);if(!await moveTo(s.x,s.y,Math.min(180,40+Math.hypot(s.x-pos[0],s.y-pos[1])*1.1),id))return;
+      const dur=Math.max(90,p._L*2.7);
+      const ok=await tween(dur,(k,t)=>{const l=p._L*k,q=p.getPointAtLength(l);
+        if(p.dataset.dots)p.style.opacity=Math.min(1,k*1.4);else p.style.strokeDashoffset=p._L*(1-k);
+        setArtist(q.x,q.y,Math.sin(t/90)*1.4);},id);
+      if(!ok)return;
+      if(p.classList.contains('hn-fill'))await tween(120,k=>{p.style.fillOpacity=k;},id);
+    }
+    await tween(300,k=>{kMark.setAttribute('opacity',(k*.92).toFixed(2));},id);
+    await moveTo(...AWAY,500,id);
+    finish();
+  }
+  function finish(){done=true;note.textContent=`Legend says the groom's initial hides in the bride's mehendi. Can you find ${CONFIG.groom}'s "${CONFIG.groom[0]}"?`;$('mReplay').hidden=false;}
+  $('kHit').addEventListener('click',ev=>{ev.stopPropagation();if(!done||found)return;found=true;art.classList.add('found');
+    note.textContent=`Found it. ${CONFIG.bride}'s mehendi hides ${CONFIG.groom}'s initial, just like the old tradition.`;const[x,y]=centerOf($('kHit'));burst(x,y,40,'spark');});
+  svg.addEventListener('click',()=>{if(!done||found)return;misses++;note.textContent=misses<3?'Not there. Look closer at the vine in the middle of her palm.':'Hint: just beside the vine, below the flower.';});
+  $('mReplay').addEventListener('click',()=>{$('mReplay').hidden=true;play();});
+  showAll();setArtist(...AWAY);
+  if('IntersectionObserver' in window){const io=new IntersectionObserver(es=>{es.forEach(en=>{if(en.isIntersecting){io.disconnect();$('mReplay').hidden=true;play();}});},{threshold:.45});io.observe(art);}
+  else finish();
 })();
 
 /* sangeet: synthesised dhol */
