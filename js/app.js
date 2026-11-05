@@ -163,12 +163,13 @@ function waxSeal(svg,initials,id){
       <rect x="136" y="340" width="128" height="150" fill="url(#parch)"/>
       <rect x="136" y="340" width="128" height="150" fill="url(#grain)" opacity=".5" style="mix-blend-mode:multiply"/>
       <path d="M142 346 H258 V484 H142 Z" fill="none" stroke="#8c2a34" stroke-opacity=".45" stroke-width=".8"/>
-      <text x="200" y="374" text-anchor="middle" font-family="Pinyon Script,cursive" font-size="16.5" fill="#5c1520">A little ritual first</text>
-      <use href="#ornament" x="165" y="380" width="70" height="10" style="color:#8c2a34"/>
-      <text x="200" y="408" text-anchor="middle" font-family="Cormorant Garamond,serif" font-style="italic" font-size="11" fill="#3a0b12">Your invitation stays sealed</text>
-      <text x="200" y="423" text-anchor="middle" font-family="Cormorant Garamond,serif" font-style="italic" font-size="11.5" fill="#3a0b12">until the diya is lit.</text>
-      <text x="200" y="442" text-anchor="middle" font-family="Cormorant Garamond,serif" font-style="italic" font-size="10.5" fill="#3a0b12">Tap the diya below to light it.</text>
-      <text x="200" y="468" text-anchor="middle" font-family="Cinzel,serif" font-size="6.5" letter-spacing="2" fill="#8c2a34">TAP THE DIYA</text>
+      <text x="200" y="372" text-anchor="middle" font-family="Pinyon Script,cursive" font-size="15" fill="#5c1520">With your blessings</text>
+      <use href="#ornament" x="165" y="378" width="70" height="10" style="color:#8c2a34"/>
+      <text x="200" y="403" text-anchor="middle" font-family="Cormorant Garamond,serif" font-style="italic" font-size="10.5" fill="#3a0b12">Light this diya in the name</text>
+      <text x="200" y="417" text-anchor="middle" font-family="Cormorant Garamond,serif" font-style="italic" font-size="10.5" fill="#3a0b12">of ${esc(CONFIG.bride)} &amp; ${esc(CONFIG.groom)},</text>
+      <text x="200" y="431" text-anchor="middle" font-family="Cormorant Garamond,serif" font-style="italic" font-size="10.5" fill="#3a0b12">and send the couple</text>
+      <text x="200" y="445" text-anchor="middle" font-family="Cormorant Garamond,serif" font-style="italic" font-size="10.5" fill="#3a0b12">your blessings.</text>
+      <text x="200" y="468" text-anchor="middle" font-family="Cinzel,serif" font-size="6.5" letter-spacing="2" fill="#8c2a34">TAP TO BLESS</text>
       <path d="M196 474 L200 480 L204 474" fill="none" stroke="#8c2a34" stroke-width="1"/>
     </g>
     <g class="rod-b"><rect x="128" y="486" width="144" height="11" rx="5.5" fill="url(#rod)"/><circle cx="126" cy="491.5" r="6.5" fill="url(#knob)"/><circle cx="274" cy="491.5" r="6.5" fill="url(#knob)"/></g>
@@ -229,7 +230,7 @@ function waxSeal(svg,initials,id){
   const moveTo=(x,y,ms,r)=>{const x0=mx,y0=my,r0=rot,r1=r==null?rot:r;return tween(ms,k=>{const e=ease(k);mx=x0+(x-x0)*e;my=y0+(y-y0)*e;rot=r0+(r1-r0)*e;place();});};
   const toScreen=(x,y)=>{const r=sc.getBoundingClientRect();return[r.left+x/400*r.width,r.top+y/700*r.height];};
   function lightDiya(){
-    sc.classList.add('lit');lit=true;$('pill').innerHTML='Scroll down <span>⌄</span>';
+    sc.classList.add('lit');lit=true;$('pill').innerHTML='Blessings received · Scroll <span>⌄</span>';
     const[x,y]=toScreen(259,580);burst(x,y,26,'spark');unlock();
   }
   async function strike(){
