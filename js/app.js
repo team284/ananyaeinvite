@@ -152,6 +152,31 @@ function waxSeal(svg,initials,id){
     <text x="200" y="494" text-anchor="middle" font-family="Cinzel,serif" font-size="8.5" letter-spacing="3" fill="#cfbe94">FEBRUARY ${esc(CONFIG.mainDate.year)}</text>
   </g>
 
+  <!-- after lighting: a bandhanwar of roses with swinging bells, and a welcome -->
+  <g class="wel bandh" style="transition-delay:.5s">${(()=>{
+    let s=`<defs>
+      <radialGradient id="rsA" cx=".38" cy=".32" r=".75"><stop offset="0" stop-color="#e98a93"/><stop offset=".55" stop-color="#8c2a34"/><stop offset="1" stop-color="#3a0b12"/></radialGradient>
+      <radialGradient id="rsB" cx=".38" cy=".32" r=".75"><stop offset="0" stop-color="#fff0ec"/><stop offset=".55" stop-color="#ecbcb4"/><stop offset="1" stop-color="#b9787a"/></radialGradient>
+      <linearGradient id="bell" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#9c8050"/><stop offset=".45" stop-color="#fff6dc"/><stop offset=".7" stop-color="#e6cf98"/><stop offset="1" stop-color="#8a7046"/></linearGradient></defs>`;
+    const rose=(x,y,r,k)=>`<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="${r}" fill="url(#rs${k})"/><path d="M${(x-r*.5).toFixed(1)} ${(y-r*.1).toFixed(1)} q${(r*.5).toFixed(1)} ${(-r*.6).toFixed(1)} ${r.toFixed(1)} 0 M${(x-r*.35).toFixed(1)} ${(y+r*.25).toFixed(1)} q${(r*.35).toFixed(1)} ${(-r*.4).toFixed(1)} ${(r*.7).toFixed(1)} 0" stroke="${k==='A'?'#3a0b12':'#b9787a'}" stroke-opacity=".55" stroke-width=".7" fill="none"/>`;
+    const leaf=(x,y,a)=>`<path transform="translate(${x} ${y}) rotate(${a})" d="M0 0 q5 7 0 16 q-5 -9 0 -16z" fill="#5b6b2c" stroke="#3e4a1c" stroke-width=".5"/>`;
+    const pts=[0,100,200,300,400];
+    // swags of roses between the hanging points
+    for(let i=0;i<4;i++){const x0=pts[i],x1=pts[i+1];for(let k=0;k<=13;k++){const t=k/13,x=x0+(x1-x0)*t,y=8+Math.sin(t*Math.PI)*34;s+=rose(x,y,5.4,k%2?'A':'B');}}
+    // leaf clusters and hanging strands with bells
+    pts.forEach((x,i)=>{s+=leaf(x-6,4,-40)+leaf(x+6,4,40)+leaf(x,6,0);
+      const len=(i===2)?2:(i===0||i===4)?5:4,xx=i===0?8:i===4?392:x;
+      s+=`<g class="bell" style="transform-origin:${xx}px 10px;animation-delay:-${(i*.37).toFixed(2)}s">
+        <line x1="${xx}" y1="10" x2="${xx}" y2="${16+len*10}" stroke="#cdb27c" stroke-width=".8"/>`;
+      for(let k=0;k<len;k++)s+=rose(xx,18+k*10,3.8,k%2?'B':'A');
+      const by=18+len*10;
+      s+=`<path d="M${xx-5} ${by+9} Q${xx-5} ${by} ${xx} ${by} Q${xx+5} ${by} ${xx+5} ${by+9} Z" fill="url(#bell)"/><rect x="${xx-6}" y="${by+8.5}" width="12" height="1.6" rx=".8" fill="#cdb27c"/><circle cx="${xx}" cy="${by+11.5}" r="1.5" fill="#e6cf98"/></g>`;});
+    return s;})()}
+    <ellipse cx="200" cy="108" rx="96" ry="26" fill="#24080e" opacity=".55" filter="url(#big)"/>
+    <text x="200" y="106" text-anchor="middle" font-family="Tiro Devanagari Hindi,serif" font-size="22" fill="url(#gtext)">॥ स्वागतम् ॥</text>
+    <text x="200" y="124" text-anchor="middle" font-family="Cormorant Garamond,serif" font-style="italic" font-size="12.5" fill="#f2e6c7">thank you for your blessings</text>
+  </g>
+
   <!-- the scroll: tells guests to light the diya -->
   <g class="scrollp" id="scrollp">
     <defs>

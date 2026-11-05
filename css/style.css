@@ -81,6 +81,8 @@ html.locked,html.locked body{overflow:hidden;height:100%;overscroll-behavior:non
 .rod-b{animation:rodb 1.5s cubic-bezier(.3,.7,.3,1) .4s both}
 @keyframes unfurl{from{transform:scaleY(.02)}to{transform:none}}
 @keyframes rodb{from{transform:translateY(-148px)}to{transform:none}}
+.bell{animation:swing 3.2s ease-in-out infinite alternate}
+@keyframes swing{from{transform:rotate(-5deg)}to{transform:rotate(5deg)}}
 .pre{transition:opacity .9s ease}
 .lit .pre{opacity:0}
 .wel{opacity:0;transition:opacity 1.4s ease}
