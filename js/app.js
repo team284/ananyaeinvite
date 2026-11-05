@@ -552,5 +552,8 @@ $('copy').addEventListener('click',()=>{const t=reply();const ok=()=>{$('copied'
   if(ios){box.hidden=false;tip.textContent='To keep this invite on your phone, tap Share, then "Add to Home Screen".';}
 })();
 if('serviceWorker' in navigator&&(location.protocol==='https:'||location.hostname==='localhost'||location.hostname==='127.0.0.1')){
-  addEventListener('load',()=>{navigator.serviceWorker.register('sw.js').catch(()=>{});});
+  addEventListener('load',()=>{navigator.serviceWorker.register('sw.js',{updateViaCache:'none'}).then(r=>r.update()).catch(()=>{});});
+  // When a newer version of the invite takes over, reload once so the guest sees it straight away.
+  let reloaded=false;const hadController=!!navigator.serviceWorker.controller;
+  navigator.serviceWorker.addEventListener('controllerchange',()=>{if(!hadController||reloaded)return;reloaded=true;location.reload();});
 }

@@ -1,5 +1,5 @@
-/* Offline cache for the invite. Bump VERSION whenever you change any file. */
-const VERSION = 'invite-v6';
+/* Offline cache for the invite: network first, cache only when offline. Bump VERSION when files change. */
+const VERSION = 'invite-v7';
 const SHELL = [
   './', 'index.html', 'css/style.css', 'js/config.js', 'js/app.js', 'manifest.webmanifest',
   'photos/events/mehendi.jpg', 'photos/events/sangeet.jpg', 'photos/events/vivah.jpg',
@@ -20,15 +20,14 @@ self.addEventListener('activate', e => {
 self.addEventListener('fetch', e => {
   const req = e.request;
   if (req.method !== 'GET' || new URL(req.url).origin !== location.origin) return;
-  // Pages: network first so edits show up, cache as fallback when offline.
-  if (req.mode === 'navigate') {
-    e.respondWith(fetch(req).then(r => { caches.open(VERSION).then(c => c.put('index.html', r.clone())); return r; })
-      .catch(() => caches.match('index.html')));
-    return;
-  }
-  // Everything else (css, js, fonts, photos): cache first, then fill the cache.
-  e.respondWith(caches.match(req).then(hit => hit || fetch(req).then(r => {
-    if (r.ok) { const copy = r.clone(); caches.open(VERSION).then(c => c.put(req, copy)); }
-    return r;
-  })));
+  // Always try the network first (revalidating with the server), so guests see the latest
+  // version of the invite. The cache is only used when the phone is offline.
+  e.respondWith(
+    fetch(req, { cache: 'no-cache' })
+      .then(r => {
+        if (r.ok) { const copy = r.clone(); caches.open(VERSION).then(c => c.put(req.mode === 'navigate' ? 'index.html' : req, copy)); }
+        return r;
+      })
+      .catch(() => caches.match(req.mode === 'navigate' ? 'index.html' : req).then(hit => hit || caches.match(req)))
+  );
 });

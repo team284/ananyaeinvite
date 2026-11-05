@@ -1,9 +1,9 @@
 # Always fetch the latest page, settings and offline worker, so edits show up right away
-<FilesMatch "(index\.html|sw\.js|manifest\.webmanifest|config\.js)$">
+<FilesMatch "(\.html|sw\.js|manifest\.webmanifest|\.js|\.css)$">
   Header set Cache-Control "no-cache"
 </FilesMatch>
 # Fonts and icons rarely change: cache them for a year
-<FilesMatch "\.(woff2|png|svg|jpg)$">
+<FilesMatch "\.(woff2|png|svg)$">
   Header set Cache-Control "public, max-age=31536000"
 </FilesMatch>
 AddType application/manifest+json .webmanifest
@@ -14,3 +14,4 @@ AddDefaultCharset UTF-8
 <FilesMatch "\.(md|txt)$|^\.git">
   Require all denied
 </FilesMatch>
+
