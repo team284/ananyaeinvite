@@ -74,6 +74,13 @@ h2.title{font-family:var(--f-script);font-weight:400;font-size:3rem;line-height:
 .lit .lightwash{opacity:1}
 #flame{opacity:0;transition:opacity .4s}
 .lit #flame{opacity:1}
+html.locked,html.locked body{overflow:hidden;height:100%;overscroll-behavior:none}
+.scrollp{transform-box:view-box;transform-origin:200px 336px;transition:transform .8s cubic-bezier(.6,0,.4,1),opacity .6s ease .35s}
+.lit .scrollp,.striking .scrollp{transform:scaleY(.06);opacity:0}
+.unfurl{transform-box:view-box;transform-origin:200px 340px;animation:unfurl 1.5s cubic-bezier(.3,.7,.3,1) .4s both}
+.rod-b{animation:rodb 1.5s cubic-bezier(.3,.7,.3,1) .4s both}
+@keyframes unfurl{from{transform:scaleY(.02)}to{transform:none}}
+@keyframes rodb{from{transform:translateY(-148px)}to{transform:none}}
 .pre{transition:opacity .9s ease}
 .lit .pre{opacity:0}
 .wel{opacity:0;transition:opacity 1.4s ease}

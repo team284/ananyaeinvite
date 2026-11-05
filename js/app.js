@@ -141,14 +141,38 @@ function waxSeal(svg,initials,id){
     <text x="200" y="86" text-anchor="middle" font-family="Cinzel,serif" font-size="8.5" letter-spacing="3" fill="#efe1be">TO A WEDDING IN ${esc(CONFIG.city.toUpperCase())}</text>
   </g>
   <g class="wel" style="transition-delay:1.2s">
-    <text x="200" y="300" text-anchor="middle" font-family="Cinzel,serif" font-size="8.5" letter-spacing="3" fill="#efe1be">THE FAMILIES INVITE YOU TO</text>
-    <text x="200" y="356" text-anchor="middle" font-family="Tiro Devanagari Hindi,serif" font-size="40" fill="url(#gtext)">शुभ विवाह</text>
+    <text x="200" y="318" text-anchor="middle" font-family="Cinzel,serif" font-size="8" letter-spacing="2.6" fill="#efe1be">THE FAMILIES</text>
+    <text x="200" y="332" text-anchor="middle" font-family="Cinzel,serif" font-size="8" letter-spacing="2.6" fill="#efe1be">INVITE YOU TO</text>
+    <text x="200" y="384" text-anchor="middle" font-family="Tiro Devanagari Hindi,serif" font-size="34" fill="url(#gtext)">शुभ विवाह</text>
   </g>
   <g class="wel" style="transition-delay:1.8s;color:#cfbe94">
-    <use href="#ornament" x="135" y="376" width="130" height="18"/>
-    <text x="200" y="420" text-anchor="middle" font-family="Cormorant Garamond,serif" font-style="italic" font-size="14" fill="#f2e6c7">a celebration of love,</text>
-    <text x="200" y="438" text-anchor="middle" font-family="Cormorant Garamond,serif" font-style="italic" font-size="14" fill="#f2e6c7">by the lake in ${esc(CONFIG.city)}</text>
-    <text x="200" y="476" text-anchor="middle" font-family="Cinzel,serif" font-size="9" letter-spacing="3.2" fill="#cfbe94">FEBRUARY ${esc(CONFIG.mainDate.year)}</text>
+    <use href="#ornament" x="145" y="398" width="110" height="16"/>
+    <text x="200" y="440" text-anchor="middle" font-family="Cormorant Garamond,serif" font-style="italic" font-size="13" fill="#f2e6c7">a celebration of love,</text>
+    <text x="200" y="457" text-anchor="middle" font-family="Cormorant Garamond,serif" font-style="italic" font-size="13" fill="#f2e6c7">by the lake in ${esc(CONFIG.city)}</text>
+    <text x="200" y="494" text-anchor="middle" font-family="Cinzel,serif" font-size="8.5" letter-spacing="3" fill="#cfbe94">FEBRUARY ${esc(CONFIG.mainDate.year)}</text>
+  </g>
+
+  <!-- the scroll: tells guests to light the diya -->
+  <g class="scrollp" id="scrollp">
+    <defs>
+      <linearGradient id="parch" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#d9bd85"/><stop offset=".12" stop-color="#f6e3b4"/><stop offset=".5" stop-color="#fbf0d2"/><stop offset=".88" stop-color="#f6e3b4"/><stop offset="1" stop-color="#d2b47a"/></linearGradient>
+      <linearGradient id="rod" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff6dc"/><stop offset=".45" stop-color="#e6cf98"/><stop offset="1" stop-color="#9c8050"/></linearGradient>
+      <radialGradient id="knob" cx=".35" cy=".35" r=".7"><stop offset="0" stop-color="#fff6dc"/><stop offset=".5" stop-color="#cdb27c"/><stop offset="1" stop-color="#6e5530"/></radialGradient>
+    </defs>
+    <g class="unfurl">
+      <rect x="136" y="340" width="128" height="150" fill="url(#parch)"/>
+      <rect x="136" y="340" width="128" height="150" fill="url(#grain)" opacity=".5" style="mix-blend-mode:multiply"/>
+      <path d="M142 346 H258 V484 H142 Z" fill="none" stroke="#8c2a34" stroke-opacity=".45" stroke-width=".8"/>
+      <text x="200" y="374" text-anchor="middle" font-family="Pinyon Script,cursive" font-size="16.5" fill="#5c1520">A little ritual first</text>
+      <use href="#ornament" x="165" y="380" width="70" height="10" style="color:#8c2a34"/>
+      <text x="200" y="408" text-anchor="middle" font-family="Cormorant Garamond,serif" font-style="italic" font-size="11" fill="#3a0b12">Your invitation stays sealed</text>
+      <text x="200" y="423" text-anchor="middle" font-family="Cormorant Garamond,serif" font-style="italic" font-size="11.5" fill="#3a0b12">until the diya is lit.</text>
+      <text x="200" y="442" text-anchor="middle" font-family="Cormorant Garamond,serif" font-style="italic" font-size="10.5" fill="#3a0b12">Tap the diya below to light it.</text>
+      <text x="200" y="468" text-anchor="middle" font-family="Cinzel,serif" font-size="6.5" letter-spacing="2" fill="#8c2a34">TAP THE DIYA</text>
+      <path d="M196 474 L200 480 L204 474" fill="none" stroke="#8c2a34" stroke-width="1"/>
+    </g>
+    <g class="rod-b"><rect x="128" y="486" width="144" height="11" rx="5.5" fill="url(#rod)"/><circle cx="126" cy="491.5" r="6.5" fill="url(#knob)"/><circle cx="274" cy="491.5" r="6.5" fill="url(#knob)"/></g>
+    <rect x="128" y="331" width="144" height="11" rx="5.5" fill="url(#rod)"/><circle cx="126" cy="336.5" r="6.5" fill="url(#knob)"/><circle cx="274" cy="336.5" r="6.5" fill="url(#knob)"/>
   </g>
 
   <!-- the diya -->
@@ -173,25 +197,72 @@ function waxSeal(svg,initials,id){
       <path d="${flamePath(259,590,30,8)}" fill="url(#fc)"/>
       <ellipse cx="259" cy="587" rx="3.4" ry="4.2" fill="#4a6aff" opacity=".55" filter="url(#soft)"/>
     </g>
+  </g>
+  <!-- the matchstick -->
+  <g id="match" opacity="0">
+    <defs>
+      <linearGradient id="stick" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#c9a86a"/><stop offset=".5" stop-color="#f3dfb2"/><stop offset="1" stop-color="#b8935a"/></linearGradient>
+      <radialGradient id="mhead" cx=".35" cy=".3" r=".75"><stop offset="0" stop-color="#d4606a"/><stop offset=".5" stop-color="#8c2a34"/><stop offset="1" stop-color="#3a0b12"/></radialGradient>
+    </defs>
+    <rect x="-2.3" y="3" width="4.6" height="150" rx="1.4" fill="url(#stick)"/>
+    <ellipse id="mHead" cx="0" cy="0" rx="4.8" ry="6.2" fill="url(#mhead)"/>
+    <g id="mFlame" opacity="0">
+      <ellipse cx="0" cy="-12" rx="16" ry="22" fill="url(#fo)" opacity=".8"/>
+      <g id="mFlameShape"><path d="${flamePath(0,-1,26,9)}" fill="url(#fb)" filter="url(#soft)"/><path d="${flamePath(0,-2,14,4.5)}" fill="url(#fc)"/></g>
+    </g>
   </g>`;
 })();
-/* realistic flicker */
+/* lighting the diya: scroll is locked until a matchstick lights the wick */
 (function(){
-  const fs=$('flameShape'),wash=$('wash');let t=0,lit=false;
-  $('tap').addEventListener('click',()=>{
-    const sc=$('scene');if(sc.classList.contains('lit'))return;
+  const fs=$('flameShape'),wash=$('wash'),sc=$('scene'),match=$('match'),mFlame=$('mFlame'),mfs=$('mFlameShape'),mHead=$('mHead');
+  let t=0,lit=false,busy=false,matchLit=false;
+  const root=document.documentElement;
+  const stopScroll=e=>{if(!lit)e.preventDefault();};
+  const keys=e=>{if(!lit&&['ArrowDown','PageDown',' ','End','ArrowUp','PageUp','Home'].includes(e.key)&&e.target.id!=='tap')e.preventDefault();};
+  function lock(){root.classList.add('locked');addEventListener('touchmove',stopScroll,{passive:false});addEventListener('wheel',stopScroll,{passive:false});addEventListener('keydown',keys);scrollTo(0,0);}
+  function unlock(){root.classList.remove('locked');removeEventListener('touchmove',stopScroll);removeEventListener('wheel',stopScroll);removeEventListener('keydown',keys);}
+  lock();
+  const tween=(ms,fn)=>new Promise(res=>{const t0=performance.now();const f=n=>{const k=Math.min(1,(n-t0)/ms);fn(k);k<1?requestAnimationFrame(f):res();};requestAnimationFrame(f);});
+  const ease=k=>k<.5?2*k*k:1-Math.pow(-2*k+2,2)/2;
+  let mx=380,my=720,rot=-48;
+  const place=()=>match.setAttribute('transform',`translate(${mx.toFixed(1)} ${my.toFixed(1)}) rotate(${rot.toFixed(1)})`);
+  const moveTo=(x,y,ms,r)=>{const x0=mx,y0=my,r0=rot,r1=r==null?rot:r;return tween(ms,k=>{const e=ease(k);mx=x0+(x-x0)*e;my=y0+(y-y0)*e;rot=r0+(r1-r0)*e;place();});};
+  const toScreen=(x,y)=>{const r=sc.getBoundingClientRect();return[r.left+x/400*r.width,r.top+y/700*r.height];};
+  function lightDiya(){
     sc.classList.add('lit');lit=true;$('pill').innerHTML='Scroll down <span>⌄</span>';
-    const r=$('scene').getBoundingClientRect();burst(r.left+r.width*.648,r.top+r.height*.83,26,'spark');
-  });
+    const[x,y]=toScreen(259,580);burst(x,y,26,'spark');unlock();
+  }
+  async function strike(){
+    if(busy||lit)return;busy=true;
+    if(RM){lightDiya();return;}
+    sc.classList.add('striking');
+    place();match.setAttribute('opacity','1');
+    await moveTo(332,652,520,-52);                 // match comes in, beside the ledge
+    await moveTo(306,628,150,-44);                 // a quick strike
+    matchLit=true;mFlame.setAttribute('opacity','1');
+    {const[x,y]=toScreen(306,622);burst(x,y,14,'spark');}
+    await tween(260,k=>{mFlame.setAttribute('transform',`scale(${(.3+k*.7).toFixed(2)})`);});
+    await moveTo(262,601,620,-46);                 // flame to the wick
+    await tween(240,()=>{});
+    lightDiya();
+    await tween(320,()=>{});
+    await moveTo(330,660,600,-56);                 // pull the match away
+    await tween(380,k=>{mFlame.setAttribute('transform',`scale(${(1-k).toFixed(2)})`);mFlame.setAttribute('opacity',(1-k).toFixed(2));});
+    matchLit=false;mHead.setAttribute('fill','#2b1a14');
+    await tween(450,k=>{match.setAttribute('opacity',(1-k).toFixed(2));});
+  }
+  $('tap').addEventListener('click',strike);
   function f(){t+=.016;
-    if(lit&&!RM){const n=Math.sin(t*9.1)*.5+Math.sin(t*13.7+1)*.3+Math.sin(t*23.3+2)*.2+(Math.random()-.5)*.35;
-      const sy=1+n*.07,sx=1-n*.04,sk=Math.sin(t*5.3)*3+Math.sin(t*11.1)*1.5;
-      fs.setAttribute('transform',`translate(259 591) skewX(${sk.toFixed(2)}) scale(${sx.toFixed(3)} ${sy.toFixed(3)}) translate(-259 -591)`);
-      wash.setAttribute('opacity',(.86+n*.1).toFixed(3));}
+    if(!RM){
+      if(lit){const n=Math.sin(t*9.1)*.5+Math.sin(t*13.7+1)*.3+Math.sin(t*23.3+2)*.2+(Math.random()-.5)*.35;
+        const sy=1+n*.07,sx=1-n*.04,sk=Math.sin(t*5.3)*3+Math.sin(t*11.1)*1.5;
+        fs.setAttribute('transform',`translate(259 591) skewX(${sk.toFixed(2)}) scale(${sx.toFixed(3)} ${sy.toFixed(3)}) translate(-259 -591)`);
+        wash.setAttribute('opacity',(.86+n*.1).toFixed(3));}
+      if(matchLit){const m=Math.sin(t*14)*.08+(Math.random()-.5)*.1;mfs.setAttribute('transform',`skewX(${(Math.sin(t*7)*4).toFixed(2)}) scale(${(1-m*.5).toFixed(3)} ${(1+m).toFixed(3)})`);}
+    }
     requestAnimationFrame(f);}
   requestAnimationFrame(f);
 })();
-
 /* ================= 2 · ENVELOPE ================= */
 let guest='';try{const h=decodeURIComponent(location.hash.slice(1));if(h)guest=h.replace(/-/g,' ').replace(/\b\w/g,c=>c.toUpperCase());}catch(e){}
 if(guest)$('addr').textContent=guest;
