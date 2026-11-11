@@ -422,19 +422,23 @@ function postmark(city,yr){return `<svg class="pmark" viewBox="0 0 80 80" aria-h
   <text x="40" y="44" text-anchor="middle" font-family="Cinzel,serif" font-size="9" fill="#59161d">${esc(yr)}</text>
   ${[0,1,2,3].map(i=>`<path d="M74 ${30+i*6} q8 -3 16 0 t16 0" stroke="#59161d" fill="none" stroke-width="1"/>`).join('')}</svg>`;}
 const stack=$('stack');let order=CONFIG.story.map((_,i)=>i);
-stack.innerHTML=CONFIG.story.map((s,i)=>`<article class="pc" data-i="${i}" tabindex="0" aria-label="${esc(s.city)}, ${esc(s.when)}. Tap for the next postcard.">
+stack.innerHTML=CONFIG.story.map((s,i)=>`<article class="pc" data-i="${i}" tabindex="0" aria-label="${esc(s.city)}, ${esc(s.when)}.${i<CONFIG.story.length-1?' Tap for the next postcard.':''}">
   <div class="pc-art">${ART[s.art]()}</div>
   <div class="stamp"><div style="background:${s.stamp}"><b>${esc(s.city[0])}</b>${esc(s.city.toUpperCase())}<br>${esc(s.when.match(/\d{4}/)[0])}</div></div>
   ${postmark(s.city,s.when.match(/\d{4}/)[0])}
   <div class="pc-body"><p class="pc-yr">${esc(s.when)}</p><p class="pc-city">${esc(s.city)}</p><p class="txt">${esc(s.text)}</p></div>
-  <div class="pc-foot"><span>Chapter ${i+1} of ${CONFIG.story.length}</span><span>Next →</span></div></article>`).join('');
+  <div class="pc-foot"><span>Chapter ${i+1} of ${CONFIG.story.length}</span><span>${i<CONFIG.story.length-1?'Next →':'The story continues…'}</span></div></article>`).join('');
 $('route').innerHTML=CONFIG.story.map((s,i)=>`${i?'<span class="leg" aria-hidden="true"></span>':''}<button type="button" data-i="${i}" aria-label="Show ${esc(s.city)}"><i></i>${esc(s.city.toUpperCase())}</button>`).join('');
 function layout(){const cards=[...stack.children];order.forEach((ci,p)=>{const c=cards[ci];c.style.zIndex=10-p;c.style.transform=`translateY(${p*12}px) scale(${1-p*.05}) rotate(${[0,-3,3][p]||0}deg)`;c.style.opacity=p>2?0:1;c.style.pointerEvents=p?'none':'auto';});
   document.querySelectorAll('#route button').forEach(b=>b.classList.toggle('on',+b.dataset.i===order[0]));}
 let busy=false;
-function nextCard(){if(busy)return;busy=true;const top=stack.children[order[0]];top.classList.add('fly');
-  setTimeout(()=>{order.push(order.shift());top.style.transition='none';top.classList.remove('fly');layout();requestAnimationFrame(()=>requestAnimationFrame(()=>{top.style.transition='';busy=false;}));},420);}
-function goTo(i){if(order[0]===i)return;order=[i,...order.filter(x=>x!==i)];layout();}
+const LAST=CONFIG.story.length-1;
+function storyEnd(){const h=$('storyHint');if(h)h.textContent=order[0]===LAST?`The next chapter begins in ${CONFIG.story[LAST].city}`:'Tap or swipe the postcard';}
+function nextCard(){if(busy)return;
+  if(order[0]===LAST){const top=stack.children[LAST];top.classList.remove('nope');void top.offsetWidth;top.classList.add('nope');const[x,y]=centerOf(top);burst(x,y,18,'spark');return;}
+  busy=true;const top=stack.children[order[0]];top.classList.add('fly');
+  setTimeout(()=>{order.push(order.shift());top.style.transition='none';top.classList.remove('fly');layout();storyEnd();requestAnimationFrame(()=>requestAnimationFrame(()=>{top.style.transition='';busy=false;}));},420);}
+function goTo(i){if(order[0]===i)return;order=[...CONFIG.story.keys()].slice(i).concat([...CONFIG.story.keys()].slice(0,i));layout();storyEnd();}
 [...stack.children].forEach(c=>{let x0=null;
   c.addEventListener('pointerdown',e=>{x0=e.clientX;});
   c.addEventListener('pointerup',e=>{if(x0===null)return;const dx=e.clientX-x0;x0=null;if(Math.abs(dx)>30||Math.abs(dx)<8)nextCard();});
