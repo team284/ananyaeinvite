@@ -59,11 +59,11 @@ h2.title{font-family:var(--f-script);font-weight:400;font-size:3rem;line-height:
 
 /* ================= SCENE ================= */
 .scene{position:relative;width:100%;aspect-ratio:400/700;overflow:hidden;background:#300c0f;
-  --wall:#24080e;--wall2:#2e0b13;--carve:#6e2c36;--niche:#12040a;--marble:#8f7f66;--marble2:#5e4e3e;--in1:#140508;--in2:#050102;}
-.scene.lit{--wall:#8c2a34;--wall2:#9a3440;--carve:#f6e3b4;--niche:#2a0a10;--marble:#f6e3b4;--marble2:#cdb27c;--in1:#24080e;--in2:#0a0204;}
+  --wall:#140407;--line:#5e3a36;--marble:#4a3a2e;--marble2:#2a1e18;--in1:#0b0204;--in2:#030001;}
+.scene.lit{--wall:#22070c;--line:#e6cf98;--marble:#ead8b2;--marble2:#a88a58;--in1:#1e070b;--in2:#070203;}
 .scene svg{position:absolute;inset:0;width:100%;height:100%;display:block}
-.t{transition:fill 2.2s ease .2s,stroke 2.2s ease .2s,stop-color 2.2s ease .2s}
-.f-wall{fill:var(--wall)}.f-wall2{fill:var(--wall2)}.f-niche{fill:var(--niche)}.f-marble{fill:var(--marble)}.f-marble2{fill:var(--marble2)}
+.t{transition:fill 2.4s ease .2s,stroke 2.4s ease .2s,stop-color 2.4s ease .2s}
+.f-wall{fill:var(--wall)}.s-line{stroke:var(--line);fill:none}.f-wall2{fill:var(--wall2)}.f-niche{fill:var(--niche)}.f-marble{fill:var(--marble)}.f-marble2{fill:var(--marble2)}
 .s-carve{stroke:var(--carve);fill:none}
 .st1{stop-color:var(--in1)}.st2{stop-color:var(--in2)}
 .nl{opacity:0;transition:opacity .8s ease}
@@ -81,6 +81,9 @@ html.locked,html.locked body{overflow:hidden;height:100%;overscroll-behavior:non
 .rod-b{animation:rodb 1.5s cubic-bezier(.3,.7,.3,1) .4s both}
 @keyframes unfurl{from{transform:scaleY(.02)}to{transform:none}}
 @keyframes rodb{from{transform:translateY(-148px)}to{transform:none}}
+.hang{animation:hangsway 5s ease-in-out infinite alternate;transform-box:view-box}
+.hang:nth-of-type(2n){animation-delay:-2.5s}
+@keyframes hangsway{from{transform:rotate(-.6deg)}to{transform:rotate(.6deg)}}
 .bell{animation:swing 3.2s ease-in-out infinite alternate}
 @keyframes swing{from{transform:rotate(-5deg)}to{transform:rotate(5deg)}}
 .pre{transition:opacity .9s ease}

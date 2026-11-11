@@ -114,30 +114,38 @@ const SCENE=(()=>{const wide=innerWidth>=900;const W=wide?Math.max(400,Math.min(
     <linearGradient id="fc" x1="0" y1="1" x2="0" y2="0"><stop offset="0" stop-color="#fff" stop-opacity=".6"/><stop offset=".3" stop-color="#fffbe6"/><stop offset="1" stop-color="#ffe9a0" stop-opacity="0"/></linearGradient>
     <linearGradient id="lit" x1="1" y1="0" x2="0" y2="0"><stop offset="0" stop-color="#ffb35a" stop-opacity=".55"/><stop offset=".6" stop-color="#ff8a2a" stop-opacity="0"/></linearGradient>
     <linearGradient id="gtext" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fff6dc"/><stop offset=".35" stop-color="#e6cf98"/><stop offset=".6" stop-color="#fff2d0"/><stop offset="1" stop-color="#b8996a"/></linearGradient>
+    <radialGradient id="roseglow" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#8c2a34" stop-opacity=".55"/><stop offset=".55" stop-color="#5c1520" stop-opacity=".25"/><stop offset="1" stop-color="#3a0b12" stop-opacity="0"/></radialGradient>
+    <linearGradient id="brassH" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#8a7046"/><stop offset=".5" stop-color="#f6e3b4"/><stop offset="1" stop-color="#8a7046"/></linearGradient>
     <filter id="soft" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation=".7"/></filter>
     <filter id="big" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="8"/></filter>
     <clipPath id="opn"><path d="${archPath(200,196,340,620,6)}"/></clipPath>
   </defs>
   <rect class="t f-wall" x="${-E}" width="${W}" height="700"/>
-  <rect x="${-E}" width="${W}" height="700" fill="url(#jali)"/>
-  <rect x="${-E}" width="${W}" height="700" fill="url(#grain)" style="mix-blend-mode:overlay"/>
-  ${side}
-  <rect x="22" y="104" width="40" height="516" class="t f-wall2"/><rect x="338" y="104" width="40" height="516" class="t f-wall2"/>
-  ${bevel('M22 104 H62 V620 H22 Z',1.2)}${bevel('M338 104 H378 V620 H338 Z',1.2)}
-  ${rosette(80,128)}${rosette(320,128)}
-  <path class="t f-wall2" d="${archPath(200,236,340,620,6)}"/>
-  <path d="${archPath(200,236,340,620,6)}" fill="url(#petal)"/>
-  ${bevel(archPath(200,236,340,620,6),1.8)}
-  ${bevel(archPath(200,218,340,620,6),1)}
+  <rect x="${-E}" width="${W}" height="700" fill="url(#grain)" style="mix-blend-mode:overlay" opacity=".35"/>
+  <circle class="lightwash" cx="200" cy="560" r="470" fill="url(#roseglow)"/>
+  <path class="t s-line" d="${archPath(200,236,340,620,6)}" stroke-width="1"/>
+  <path class="t s-line" d="${archPath(200,222,340,620,6)}" stroke-width=".5" opacity=".55"/>
   <path d="${archPath(200,196,340,620,6)}" fill="url(#inner)"/>
-  <g clip-path="url(#opn)"><path d="${archPath(200,196,340,620,6)}" fill="none" stroke="#000" stroke-opacity=".75" stroke-width="26" filter="url(#big)"/></g>
-  ${bevel(archPath(200,196,340,620,6),1.6)}
+  <g clip-path="url(#opn)"><path d="${archPath(200,196,340,620,6)}" fill="none" stroke="#000" stroke-opacity=".7" stroke-width="26" filter="url(#big)"/></g>
+  <path class="t s-line" d="${archPath(200,196,340,620,6)}" stroke-width="1.3"/>
   <circle id="wash" class="lightwash" cx="259" cy="560" r="230" fill="url(#wash)"/>
-  ${niches}
-  <rect class="t f-marble" x="${-E}" y="620" width="${W}" height="16"/>
-  <path d="M0 626 C60 622 90 632 150 627 S300 622 400 628" stroke="#a88e4b" stroke-opacity=".25" fill="none"/>
-  <rect class="t f-marble2" x="${-E}" y="636" width="${W}" height="5"/>
-  <rect x="${-E}" y="641" width="${W}" height="59" fill="#000" opacity=".25"/>
+  <g class="hang" style="transform-origin:48px -10px">
+    <line x1="48" y1="-10" x2="48" y2="196" stroke="#a88a58" stroke-width=".8" opacity=".6"/>
+    <path d="M37 200 Q48 196 59 200 L56 210 Q48 216 40 210 Z" fill="url(#brassH)"/>
+    <path d="M42 210 Q48 222 54 210" fill="url(#brassH)"/>
+    <g class="nl" style="transition-delay:.9s"><circle cx="48" cy="192" r="26" fill="url(#ng)"/>
+      <path class="nl-f" d="${flamePath(48,199,13,5)}" fill="url(#flg)"/></g>
+  </g>
+  <g class="hang" style="transform-origin:352px -10px;animation-delay:-2.5s">
+    <line x1="352" y1="-10" x2="352" y2="196" stroke="#a88a58" stroke-width=".8" opacity=".6"/>
+    <path d="M341 200 Q352 196 363 200 L360 210 Q352 216 344 210 Z" fill="url(#brassH)"/>
+    <path d="M346 210 Q352 222 358 210" fill="url(#brassH)"/>
+    <g class="nl" style="transition-delay:.9s"><circle cx="352" cy="192" r="26" fill="url(#ng)"/>
+      <path class="nl-f" d="${flamePath(352,199,13,5)}" fill="url(#flg)"/></g>
+  </g>
+  <rect class="t f-marble" x="${-E}" y="620" width="${W}" height="9"/>
+  <rect class="t f-marble2" x="${-E}" y="629" width="${W}" height="2"/>
+  <rect x="${-E}" y="631" width="${W}" height="69" fill="#000" opacity=".35"/>
   <rect x="${-E}" width="${W}" height="700" fill="url(#vig)" pointer-events="none"/>
 
   <g class="pre">
@@ -156,29 +164,9 @@ const SCENE=(()=>{const wide=innerWidth>=900;const W=wide?Math.max(400,Math.min(
     <text x="200" y="494" text-anchor="middle" font-family="Cinzel,serif" font-size="8.5" letter-spacing="3" fill="#cfbe94">FEBRUARY ${esc(CONFIG.mainDate.year)}</text>
   </g>
 
-  <!-- after lighting: a bandhanwar of roses with swinging bells, and a welcome -->
-  <g class="wel bandh" style="transition-delay:.5s">${(()=>{
-    let s=`<defs>
-      <radialGradient id="rsA" cx=".38" cy=".32" r=".75"><stop offset="0" stop-color="#e98a93"/><stop offset=".55" stop-color="#8c2a34"/><stop offset="1" stop-color="#3a0b12"/></radialGradient>
-      <radialGradient id="rsB" cx=".38" cy=".32" r=".75"><stop offset="0" stop-color="#fff0ec"/><stop offset=".55" stop-color="#ecbcb4"/><stop offset="1" stop-color="#b9787a"/></radialGradient>
-      <linearGradient id="bell" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#9c8050"/><stop offset=".45" stop-color="#fff6dc"/><stop offset=".7" stop-color="#e6cf98"/><stop offset="1" stop-color="#8a7046"/></linearGradient></defs>`;
-    const rose=(x,y,r,k)=>`<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="${r}" fill="url(#rs${k})"/><path d="M${(x-r*.5).toFixed(1)} ${(y-r*.1).toFixed(1)} q${(r*.5).toFixed(1)} ${(-r*.6).toFixed(1)} ${r.toFixed(1)} 0 M${(x-r*.35).toFixed(1)} ${(y+r*.25).toFixed(1)} q${(r*.35).toFixed(1)} ${(-r*.4).toFixed(1)} ${(r*.7).toFixed(1)} 0" stroke="${k==='A'?'#3a0b12':'#b9787a'}" stroke-opacity=".55" stroke-width=".7" fill="none"/>`;
-    const leaf=(x,y,a)=>`<path transform="translate(${x} ${y}) rotate(${a})" d="M0 0 q5 7 0 16 q-5 -9 0 -16z" fill="#5b6b2c" stroke="#3e4a1c" stroke-width=".5"/>`;
-    const pts=[];for(let x=-Math.ceil(E/100)*100;x<=400+Math.ceil(E/100)*100;x+=100)pts.push(x);
-    // swags of roses between the hanging points
-    for(let i=0;i<pts.length-1;i++){const x0=pts[i],x1=pts[i+1];for(let k=0;k<=13;k++){const t=k/13,x=x0+(x1-x0)*t,y=8+Math.sin(t*Math.PI)*34;s+=rose(x,y,5.4,k%2?'A':'B');}}
-    // leaf clusters and hanging strands with bells
-    pts.forEach((x,i)=>{s+=leaf(x-6,4,-40)+leaf(x+6,4,40)+leaf(x,6,0);
-      const len=x===200?2:(x<=0||x>=400)?5:4,xx=x===-E?x+8:x;
-      s+=`<g class="bell" style="transform-origin:${xx}px 10px;animation-delay:-${(i*.37).toFixed(2)}s">
-        <line x1="${xx}" y1="10" x2="${xx}" y2="${16+len*10}" stroke="#cdb27c" stroke-width=".8"/>`;
-      for(let k=0;k<len;k++)s+=rose(xx,18+k*10,3.8,k%2?'B':'A');
-      const by=18+len*10;
-      s+=`<path d="M${xx-5} ${by+9} Q${xx-5} ${by} ${xx} ${by} Q${xx+5} ${by} ${xx+5} ${by+9} Z" fill="url(#bell)"/><rect x="${xx-6}" y="${by+8.5}" width="12" height="1.6" rx=".8" fill="#cdb27c"/><circle cx="${xx}" cy="${by+11.5}" r="1.5" fill="#e6cf98"/></g>`;});
-    return s;})()}
-    <ellipse cx="200" cy="108" rx="96" ry="26" fill="#24080e" opacity=".55" filter="url(#big)"/>
-    <text x="200" y="106" text-anchor="middle" font-family="Tiro Devanagari Hindi,serif" font-size="22" fill="url(#gtext)">॥ स्वागतम् ॥</text>
-    <text x="200" y="124" text-anchor="middle" font-family="Cormorant Garamond,serif" font-style="italic" font-size="12.5" fill="#f2e6c7">thank you for your blessings</text>
+  <g class="wel" style="transition-delay:.6s">
+    <text x="200" y="66" text-anchor="middle" font-family="Tiro Devanagari Hindi,serif" font-size="21" fill="url(#gtext)">॥ स्वागतम् ॥</text>
+    <text x="200" y="88" text-anchor="middle" font-family="Cormorant Garamond,serif" font-style="italic" font-size="12.5" fill="#efe1be">thank you for your blessings</text>
   </g>
 
   <!-- the scroll: tells guests to light the diya -->
