@@ -185,7 +185,7 @@ const SCENE=(()=>{const wide=innerWidth>=900;const W=wide?Math.max(400,Math.min(
     <text x="200" y="62" text-anchor="middle" font-family="Pinyon Script,cursive" font-size="36" fill="url(#gtext)">You're invited</text>
     <text x="200" y="86" text-anchor="middle" font-family="Cinzel,serif" font-size="8.5" letter-spacing="3" fill="#efe1be">TO A WEDDING IN ${esc(CONFIG.city.toUpperCase())}</text>
   </g>
-  <g transform="translate(200 410) scale(${E>60?Math.min(1.45,1+E/900).toFixed(3):1}) translate(-200 -410)">
+  <g transform="translate(200 410) scale(${E>60?Math.min(1.7,1+E/600).toFixed(3):1}) translate(-200 -410)">
   <g class="wel" style="transition-delay:1.2s">
     <text x="200" y="318" text-anchor="middle" font-family="Cinzel,serif" font-size="8" letter-spacing="2.6" fill="#efe1be">THE FAMILIES</text>
     <text x="200" y="332" text-anchor="middle" font-family="Cinzel,serif" font-size="8" letter-spacing="2.6" fill="#efe1be">INVITE YOU TO</text>
@@ -225,6 +225,7 @@ const SCENE=(()=>{const wide=innerWidth>=900;const W=wide?Math.max(400,Math.min(
 
   </g>
   <!-- the scroll: tells guests to light the diya -->
+  <g transform="translate(200 ${E>60?392:410}) scale(${E>60?Math.min(1.75,1+E/560).toFixed(3):1}) translate(-200 -410)">
   <g class="scrollp" id="scrollp">
     <defs>
       <linearGradient id="parch" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#d9bd85"/><stop offset=".12" stop-color="#f6e3b4"/><stop offset=".5" stop-color="#fbf0d2"/><stop offset=".88" stop-color="#f6e3b4"/><stop offset="1" stop-color="#d2b47a"/></linearGradient>
@@ -246,6 +247,7 @@ const SCENE=(()=>{const wide=innerWidth>=900;const W=wide?Math.max(400,Math.min(
     </g>
     <g class="rod-b"><rect x="128" y="486" width="144" height="11" rx="5.5" fill="url(#rod)"/><circle cx="126" cy="491.5" r="6.5" fill="url(#knob)"/><circle cx="274" cy="491.5" r="6.5" fill="url(#knob)"/></g>
     <rect x="128" y="331" width="144" height="11" rx="5.5" fill="url(#rod)"/><circle cx="126" cy="336.5" r="6.5" fill="url(#knob)"/><circle cx="274" cy="336.5" r="6.5" fill="url(#knob)"/>
+  </g>
   </g>
 
   <!-- the diya -->
