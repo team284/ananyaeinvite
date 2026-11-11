@@ -85,7 +85,8 @@ const SCENE=(()=>{const wide=innerWidth>=900;const W=wide?Math.max(400,Math.min(
     <g class="nl" style="transition-delay:${dl}s"><circle cx="${x}" cy="${y+3}" r="15" fill="url(#ng)"/>
       <ellipse cx="${x}" cy="${y+11}" rx="5" ry="1.8" fill="#a98e4b"/><ellipse cx="${x}" cy="${y+10.4}" rx="3.6" ry="1" fill="#421015"/>
       <path class="nl-f" style="animation-delay:-${fd}s" d="${flamePath(x+2.4,y+9.6,11,4.6)}" fill="url(#flg)"/></g>`;};
-  for(let y=170;y<=570;y+=80){niches+=niche(42,y)+niche(358,y);}
+  for(let y=150;y<=590;y+=40){niches+=niche(42,y)+niche(358,y);}
+  for(let x=40-Math.floor(E/40)*40;x<=360+E;x+=40){niches+=niche(x,674);}
   const bevel=(d,w)=>`<path d="${d}" fill="none" stroke="#000" stroke-opacity=".45" stroke-width="${w+1}" transform="translate(1.6 1.8)"/><path d="${d}" fill="none" stroke="#fff" stroke-opacity=".22" stroke-width="${w}" transform="translate(-1 -1)"/><path class="t s-carve" d="${d}" stroke-width="${w}"/>`;
   const rosette=(x,y)=>`<g>${bevel(`M${x} ${y} m-15 0 a15 15 0 1 0 30 0 a15 15 0 1 0 -30 0`,1.2)}${Array.from({length:8},(_,i)=>`<path class="t s-carve" stroke-width="1" d="M${x} ${y} L${(x+Math.cos(i*Math.PI/4)*12).toFixed(1)} ${(y+Math.sin(i*Math.PI/4)*12).toFixed(1)}"/>`).join('')}<circle class="t s-carve" cx="${x}" cy="${y}" r="4" stroke-width="1"/></g>`;
   let side='';
@@ -94,10 +95,10 @@ const SCENE=(()=>{const wide=innerWidth>=900;const W=wide?Math.max(400,Math.min(
   const petals=Array.from({length:6},(_,i)=>{const x=166+i*12;const y=614+Math.sin((i+.5)/6*Math.PI)*7;return `<path d="M${x} ${y} q3 -4 6 0 q-3 4 -6 0z" fill="#f0e2c0" opacity=".85"/>`;}).join('');
   svg.innerHTML=`<defs>
     <pattern id="jali" width="20" height="20" patternUnits="userSpaceOnUse">
-      <circle class="t s-carve" cx="10" cy="10" r="6.5" stroke-width=".7" opacity=".2"/>
-      <path class="t s-carve" d="M10 3.5 Q13 10 10 16.5 Q7 10 10 3.5Z" stroke-width=".6" opacity=".14"/>
-      <circle class="t s-carve" cx="0" cy="0" r="3" stroke-width=".7" opacity=".16"/><circle class="t s-carve" cx="20" cy="0" r="3" stroke-width=".7" opacity=".16"/>
-      <circle class="t s-carve" cx="0" cy="20" r="3" stroke-width=".7" opacity=".16"/><circle class="t s-carve" cx="20" cy="20" r="3" stroke-width=".7" opacity=".16"/>
+      <circle class="t s-carve" cx="10" cy="10" r="6.5" stroke-width=".8" opacity=".5"/>
+      <path class="t s-carve" d="M10 3.5 Q13 10 10 16.5 Q7 10 10 3.5Z" stroke-width=".6" opacity=".4"/>
+      <circle class="t s-carve" cx="0" cy="0" r="3" stroke-width=".8" opacity=".45"/><circle class="t s-carve" cx="20" cy="0" r="3" stroke-width=".8" opacity=".45"/>
+      <circle class="t s-carve" cx="0" cy="20" r="3" stroke-width=".8" opacity=".45"/><circle class="t s-carve" cx="20" cy="20" r="3" stroke-width=".8" opacity=".45"/>
     </pattern>
     <pattern id="petal" width="12" height="12" patternUnits="userSpaceOnUse"><path class="t s-carve" d="M6 0 Q10 6 6 12 Q2 6 6 0Z" stroke-width=".8" opacity=".85"/></pattern>
     <pattern id="grain" width="160" height="160" patternUnits="userSpaceOnUse"><image href="${getComputedStyle(document.documentElement).getPropertyValue('--stone-tex').slice(4,-1).replace(/"/g,'')}" width="160" height="160"/></pattern>
