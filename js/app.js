@@ -89,7 +89,23 @@ const SCENE=(()=>{const wide=innerWidth>=900;const W=wide?Math.max(400,Math.min(
   for(let x=40-Math.floor(E/40)*40;x<=360+E;x+=40){niches+=niche(x,674);}
   const bevel=(d,w)=>`<path d="${d}" fill="none" stroke="#000" stroke-opacity=".45" stroke-width="${w+1}" transform="translate(1.6 1.8)"/><path d="${d}" fill="none" stroke="#fff" stroke-opacity=".22" stroke-width="${w}" transform="translate(-1 -1)"/><path class="t s-carve" d="${d}" stroke-width="${w}"/>`;
   const rosette=(x,y)=>`<g>${bevel(`M${x} ${y} m-15 0 a15 15 0 1 0 30 0 a15 15 0 1 0 -30 0`,1.2)}${Array.from({length:8},(_,i)=>`<path class="t s-carve" stroke-width="1" d="M${x} ${y} L${(x+Math.cos(i*Math.PI/4)*12).toFixed(1)} ${(y+Math.sin(i*Math.PI/4)*12).toFixed(1)}"/>`).join('')}<circle class="t s-carve" cx="${x}" cy="${y}" r="4" stroke-width="1"/></g>`;
+  // wide screens: a carved jharokha (balcony window) on each side, light glowing through its jaali when lit
   let side='';
+  const jharokha=cx=>`<g>
+    <path class="t f-wall2" d="M${cx-84} 188 L${cx+84} 188 L${cx+74} 178 Q${cx} 128 ${cx-74} 178 Z"/>${bevel(`M${cx-84} 188 L${cx+84} 188 L${cx+74} 178 Q${cx} 128 ${cx-74} 178 Z`,1)}
+    <path class="t f-wall2" d="M${cx-17} 146 a17 17 0 0 1 34 0 Z"/>${bevel(`M${cx-17} 146 a17 17 0 0 1 34 0 Z`,.9)}<path class="t s-carve" d="M${cx} 129 V118 M${cx-3} 122 H${cx+3}" stroke-width="1.2"/>
+    <rect class="t f-wall2" x="${cx-80}" y="188" width="160" height="7"/>${bevel(`M${cx-80} 188 H${cx+80} V195 H${cx-80} Z`,.8)}
+    <path class="t f-wall2" d="${archPath(cx,132,310,486,4)}"/><path d="${archPath(cx,132,310,486,4)}" fill="url(#petal)"/>${bevel(archPath(cx,132,310,486,4),1.4)}
+    <path d="${archPath(cx,108,312,476,4)}" fill="#14040a"/>
+    <path class="lightwash" d="${archPath(cx,108,312,476,4)}" fill="url(#jglow)"/>
+    <path d="${archPath(cx,108,312,476,4)}" fill="url(#jaali)"/>${bevel(archPath(cx,108,312,476,4),1.2)}
+    <rect class="t f-wall2" x="${cx-74}" y="300" width="9" height="186"/><rect class="t f-wall2" x="${cx+65}" y="300" width="9" height="186"/>
+    ${bevel(`M${cx-74} 300 H${cx-65} V486 H${cx-74} Z`,.7)}${bevel(`M${cx+65} 300 H${cx+74} V486 H${cx+65} Z`,.7)}
+    <rect class="t f-wall2" x="${cx-86}" y="486" width="172" height="10"/>${bevel(`M${cx-86} 486 H${cx+86} V496 H${cx-86} Z`,1)}
+    ${[-58,0,58].map(d=>`<path class="t f-wall2" d="M${cx+d-12} 496 H${cx+d+12} Q${cx+d+8} 512 ${cx+d} 524 Q${cx+d-8} 512 ${cx+d-12} 496 Z"/>${bevel(`M${cx+d-12} 496 H${cx+d+12} Q${cx+d+8} 512 ${cx+d} 524 Q${cx+d-8} 512 ${cx+d-12} 496 Z`,.7)}`).join('')}
+  </g>`;
+  if(E>110){const region=E+22-30,n=Math.max(1,Math.floor(region/230));
+    for(let i=0;i<n;i++){const off=region*(i+.5)/n;side+=jharokha(22-15-off)+jharokha(378+15+off);}}
   // diya on the ledge (clay)
   const dots=Array.from({length:13},(_,i)=>{const t=i/12;const x=158+t*76;const y=607+Math.sin(t*Math.PI)*9;return `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="1.5" fill="#d3c49d"/>`;}).join('');
   const petals=Array.from({length:6},(_,i)=>{const x=166+i*12;const y=614+Math.sin((i+.5)/6*Math.PI)*7;return `<path d="M${x} ${y} q3 -4 6 0 q-3 4 -6 0z" fill="#f0e2c0" opacity=".85"/>`;}).join('');
@@ -102,6 +118,11 @@ const SCENE=(()=>{const wide=innerWidth>=900;const W=wide?Math.max(400,Math.min(
     </pattern>
     <pattern id="petal" width="12" height="12" patternUnits="userSpaceOnUse"><path class="t s-carve" d="M6 0 Q10 6 6 12 Q2 6 6 0Z" stroke-width=".8" opacity=".85"/></pattern>
     <pattern id="grain" width="160" height="160" patternUnits="userSpaceOnUse"><image href="${getComputedStyle(document.documentElement).getPropertyValue('--stone-tex').slice(4,-1).replace(/"/g,'')}" width="160" height="160"/></pattern>
+    <pattern id="jaali" width="12" height="12" patternUnits="userSpaceOnUse">
+      <path class="t s-carve" d="M6 0 L12 6 L6 12 L0 6 Z M6 3 L9 6 L6 9 L3 6 Z" stroke-width=".9"/>
+      <circle class="t s-carve" cx="0" cy="0" r="1.6" stroke-width=".7"/><circle class="t s-carve" cx="12" cy="12" r="1.6" stroke-width=".7"/>
+    </pattern>
+    <radialGradient id="jglow" cx=".5" cy=".62" r=".6"><stop offset="0" stop-color="#ffd27a" stop-opacity=".95"/><stop offset=".55" stop-color="#ff9a3a" stop-opacity=".55"/><stop offset="1" stop-color="#8c2a34" stop-opacity=".25"/></radialGradient>
     <linearGradient id="inner" x1="0" y1="0" x2="0" y2="1"><stop class="t st1" offset="0"/><stop class="t st2" offset="1"/></linearGradient>
     <radialGradient id="ng"><stop offset="0" stop-color="#ffd27a" stop-opacity=".85"/><stop offset=".4" stop-color="#ff9a3a" stop-opacity=".3"/><stop offset="1" stop-color="#ff7a1a" stop-opacity="0"/></radialGradient>
     <linearGradient id="flg" x1="0" y1="1" x2="0" y2="0"><stop offset="0" stop-color="#7a8cff" stop-opacity=".7"/><stop offset=".12" stop-color="#ffb347"/><stop offset=".45" stop-color="#ffe08a"/><stop offset=".8" stop-color="#ff9a2a"/><stop offset="1" stop-color="#ff5a0a" stop-opacity="0"/></linearGradient>
