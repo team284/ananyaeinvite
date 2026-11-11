@@ -73,9 +73,12 @@ function waxSeal(svg,initials,id){
 }
 
 /* ================= 1 · SCENE ================= */
+/* On wide screens the scene widens to fill the screen; the 400-unit-wide arch stays in the middle. */
+const SCENE=(()=>{const wide=innerWidth>=900;const W=wide?Math.max(400,Math.min(1400,Math.round(700*innerWidth/innerHeight/20)*20)):400;return {W,E:(W-400)/2};})();
 (function(){
   const svg=$('sceneSvg');let k=0,niches='';
-  const niche=(x,y)=>{const dl=(.5+k*.055).toFixed(2);const fd=(k*.23%1.4).toFixed(2);k++;
+  const W=SCENE.W,E=SCENE.E;svg.setAttribute('viewBox',`${-E} 0 ${W} 700`);$('scene').style.aspectRatio=`${W} / 700`;
+  const niche=(x,y)=>{const dl=(.45+Math.hypot(x-259,(y-600)*.6)/260).toFixed(2);const fd=(k*.23%1.4).toFixed(2);k++;
     return `<path class="t f-niche" d="M${x-8} ${y+13} L${x-8} ${y-1} Q${x-8} ${y-12} ${x} ${y-16} Q${x+8} ${y-12} ${x+8} ${y-1} L${x+8} ${y+13} Z"/>
     <path d="M${x-8} ${y+13} L${x-8} ${y-1} Q${x-8} ${y-12} ${x} ${y-16}" fill="none" stroke="#000" stroke-opacity=".5" stroke-width="1.4"/>
     <path d="M${x} ${y-16} Q${x+8} ${y-12} ${x+8} ${y-1} L${x+8} ${y+13}" fill="none" stroke="#fff" stroke-opacity=".12" stroke-width="1"/>
@@ -83,9 +86,15 @@ function waxSeal(svg,initials,id){
       <ellipse cx="${x}" cy="${y+11}" rx="5" ry="1.8" fill="#a98e4b"/><ellipse cx="${x}" cy="${y+10.4}" rx="3.6" ry="1" fill="#421015"/>
       <path class="nl-f" style="animation-delay:-${fd}s" d="${flamePath(x+2.4,y+9.6,11,4.6)}" fill="url(#flg)"/></g>`;};
   for(let y=150;y<=590;y+=40){niches+=niche(42,y)+niche(358,y);}
-  for(let x=40;x<=360;x+=40){niches+=niche(x,674);}
+  for(let x=40-Math.floor(E/40)*40;x<=360+E;x+=40){niches+=niche(x,674);}
   const bevel=(d,w)=>`<path d="${d}" fill="none" stroke="#000" stroke-opacity=".45" stroke-width="${w+1}" transform="translate(1.6 1.8)"/><path d="${d}" fill="none" stroke="#fff" stroke-opacity=".22" stroke-width="${w}" transform="translate(-1 -1)"/><path class="t s-carve" d="${d}" stroke-width="${w}"/>`;
   const rosette=(x,y)=>`<g>${bevel(`M${x} ${y} m-15 0 a15 15 0 1 0 30 0 a15 15 0 1 0 -30 0`,1.2)}${Array.from({length:8},(_,i)=>`<path class="t s-carve" stroke-width="1" d="M${x} ${y} L${(x+Math.cos(i*Math.PI/4)*12).toFixed(1)} ${(y+Math.sin(i*Math.PI/4)*12).toFixed(1)}"/>`).join('')}<circle class="t s-carve" cx="${x}" cy="${y}" r="4" stroke-width="1"/></g>`;
+  // wider screens: extend the palace wall with more pillars, lamp niches and blind arches
+  let side='';
+  for(let kk=1;E>0;kk++){const L=42-140*kk,R=358+140*kk;if(L<-E+16&&R>400+E-16)break;
+    [L,R].forEach(cx=>{if(cx<-E+16||cx>400+E-16)return;side+=`<rect x="${cx-20}" y="104" width="40" height="516" class="t f-wall2"/>${bevel(`M${cx-20} 104 H${cx+20} V620 H${cx-20} Z`,1.2)}`;for(let y=150;y<=590;y+=40)niches+=niche(cx,y);});
+    [L+70,R-70].forEach(cx=>{if(cx<-E+40||cx>400+E-40)return;const d=archPath(cx,88,430,620,4);
+      side+=`<path class="t f-wall2" d="${d}"/><path d="${archPath(cx,74,432,620,4)}" fill="url(#inner)" opacity=".85"/>${bevel(d,1.2)}${bevel(archPath(cx,74,432,620,4),1)}${rosette(cx,330)}`;niches+=niche(cx,560);});}
   // diya on the ledge (clay)
   const dots=Array.from({length:13},(_,i)=>{const t=i/12;const x=158+t*76;const y=607+Math.sin(t*Math.PI)*9;return `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="1.5" fill="#d3c49d"/>`;}).join('');
   const petals=Array.from({length:6},(_,i)=>{const x=166+i*12;const y=614+Math.sin((i+.5)/6*Math.PI)*7;return `<path d="M${x} ${y} q3 -4 6 0 q-3 4 -6 0z" fill="#f0e2c0" opacity=".85"/>`;}).join('');
@@ -115,9 +124,10 @@ function waxSeal(svg,initials,id){
     <filter id="big" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="8"/></filter>
     <clipPath id="opn"><path d="${archPath(200,196,340,620,6)}"/></clipPath>
   </defs>
-  <rect class="t f-wall" width="400" height="700"/>
-  <rect width="400" height="700" fill="url(#jali)"/>
-  <rect width="400" height="700" fill="url(#grain)" style="mix-blend-mode:overlay"/>
+  <rect class="t f-wall" x="${-E}" width="${W}" height="700"/>
+  <rect x="${-E}" width="${W}" height="700" fill="url(#jali)"/>
+  <rect x="${-E}" width="${W}" height="700" fill="url(#grain)" style="mix-blend-mode:overlay"/>
+  ${side}
   <rect x="22" y="104" width="40" height="516" class="t f-wall2"/><rect x="338" y="104" width="40" height="516" class="t f-wall2"/>
   ${bevel('M22 104 H62 V620 H22 Z',1.2)}${bevel('M338 104 H378 V620 H338 Z',1.2)}
   ${rosette(80,128)}${rosette(320,128)}
@@ -130,11 +140,11 @@ function waxSeal(svg,initials,id){
   ${bevel(archPath(200,196,340,620,6),1.6)}
   <circle id="wash" class="lightwash" cx="259" cy="560" r="230" fill="url(#wash)"/>
   ${niches}
-  <rect class="t f-marble" x="0" y="620" width="400" height="16"/>
+  <rect class="t f-marble" x="${-E}" y="620" width="${W}" height="16"/>
   <path d="M0 626 C60 622 90 632 150 627 S300 622 400 628" stroke="#a88e4b" stroke-opacity=".25" fill="none"/>
-  <rect class="t f-marble2" x="0" y="636" width="400" height="5"/>
-  <rect x="0" y="641" width="400" height="59" fill="#000" opacity=".25"/>
-  <rect width="400" height="700" fill="url(#vig)" pointer-events="none"/>
+  <rect class="t f-marble2" x="${-E}" y="636" width="${W}" height="5"/>
+  <rect x="${-E}" y="641" width="${W}" height="59" fill="#000" opacity=".25"/>
+  <rect x="${-E}" width="${W}" height="700" fill="url(#vig)" pointer-events="none"/>
 
   <g class="pre">
     <text x="200" y="62" text-anchor="middle" font-family="Pinyon Script,cursive" font-size="36" fill="url(#gtext)">You're invited</text>
@@ -160,12 +170,12 @@ function waxSeal(svg,initials,id){
       <linearGradient id="bell" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#9c8050"/><stop offset=".45" stop-color="#fff6dc"/><stop offset=".7" stop-color="#e6cf98"/><stop offset="1" stop-color="#8a7046"/></linearGradient></defs>`;
     const rose=(x,y,r,k)=>`<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="${r}" fill="url(#rs${k})"/><path d="M${(x-r*.5).toFixed(1)} ${(y-r*.1).toFixed(1)} q${(r*.5).toFixed(1)} ${(-r*.6).toFixed(1)} ${r.toFixed(1)} 0 M${(x-r*.35).toFixed(1)} ${(y+r*.25).toFixed(1)} q${(r*.35).toFixed(1)} ${(-r*.4).toFixed(1)} ${(r*.7).toFixed(1)} 0" stroke="${k==='A'?'#3a0b12':'#b9787a'}" stroke-opacity=".55" stroke-width=".7" fill="none"/>`;
     const leaf=(x,y,a)=>`<path transform="translate(${x} ${y}) rotate(${a})" d="M0 0 q5 7 0 16 q-5 -9 0 -16z" fill="#5b6b2c" stroke="#3e4a1c" stroke-width=".5"/>`;
-    const pts=[0,100,200,300,400];
+    const pts=[];for(let x=-Math.ceil(E/100)*100;x<=400+Math.ceil(E/100)*100;x+=100)pts.push(x);
     // swags of roses between the hanging points
-    for(let i=0;i<4;i++){const x0=pts[i],x1=pts[i+1];for(let k=0;k<=13;k++){const t=k/13,x=x0+(x1-x0)*t,y=8+Math.sin(t*Math.PI)*34;s+=rose(x,y,5.4,k%2?'A':'B');}}
+    for(let i=0;i<pts.length-1;i++){const x0=pts[i],x1=pts[i+1];for(let k=0;k<=13;k++){const t=k/13,x=x0+(x1-x0)*t,y=8+Math.sin(t*Math.PI)*34;s+=rose(x,y,5.4,k%2?'A':'B');}}
     // leaf clusters and hanging strands with bells
     pts.forEach((x,i)=>{s+=leaf(x-6,4,-40)+leaf(x+6,4,40)+leaf(x,6,0);
-      const len=(i===2)?2:(i===0||i===4)?5:4,xx=i===0?8:i===4?392:x;
+      const len=x===200?2:(x<=0||x>=400)?5:4,xx=x===-E?x+8:x;
       s+=`<g class="bell" style="transform-origin:${xx}px 10px;animation-delay:-${(i*.37).toFixed(2)}s">
         <line x1="${xx}" y1="10" x2="${xx}" y2="${16+len*10}" stroke="#cdb27c" stroke-width=".8"/>`;
       for(let k=0;k<len;k++)s+=rose(xx,18+k*10,3.8,k%2?'B':'A');
@@ -253,7 +263,7 @@ function waxSeal(svg,initials,id){
   let mx=380,my=720,rot=-48;
   const place=()=>match.setAttribute('transform',`translate(${mx.toFixed(1)} ${my.toFixed(1)}) rotate(${rot.toFixed(1)})`);
   const moveTo=(x,y,ms,r)=>{const x0=mx,y0=my,r0=rot,r1=r==null?rot:r;return tween(ms,k=>{const e=ease(k);mx=x0+(x-x0)*e;my=y0+(y-y0)*e;rot=r0+(r1-r0)*e;place();});};
-  const toScreen=(x,y)=>{const r=sc.getBoundingClientRect();return[r.left+x/400*r.width,r.top+y/700*r.height];};
+  const toScreen=(x,y)=>{const r=sc.getBoundingClientRect();return[r.left+(x+SCENE.E)/SCENE.W*r.width,r.top+y/700*r.height];};
   function lightDiya(){
     sc.classList.add('lit');lit=true;$('pill').innerHTML='Blessings received · Scroll <span>⌄</span>';
     const[x,y]=toScreen(259,580);burst(x,y,26,'spark');unlock();
@@ -463,13 +473,13 @@ $('wins').innerHTML=CONFIG.photos.map((p,i)=>`<div class="win" id="w${i}">
 document.querySelectorAll('.win').forEach(w=>w.querySelector('.win-btn').addEventListener('click',()=>{const o=!w.classList.contains('open');w.classList.toggle('open',o);if(o){const[x,y]=centerOf(w);burst(x,y-40,14,'petal');}}));
 
 /* ================= 6 · ACTS ================= */
-let toranN=0;function toran(colA,colB){let s='';const W=400;const u=++toranN;
-  s+=`<path d="M0 8 Q100 18 200 8 T400 8" stroke="#5a692b" stroke-width="2" fill="none"/>`;
+let toranN=0;function toran(colA,colB){let s='';const W=1600;const u=++toranN;
+  s+=`<path d="M0 8 Q100 18 200 8 ${Array.from({length:7},(_,i)=>`T${400+i*200} 8`).join(' ')}" stroke="#5a692b" stroke-width="2" fill="none"/>`;
   for(let x=8;x<W;x+=20){const len=3+((x/20)%3===0?3:(x/20)%2?1:2);const yb=8+Math.sin(x/400*Math.PI*2)*5+5;
     s+=`<line x1="${x}" y1="${yb}" x2="${x}" y2="${yb+len*9}" stroke="#6f1b24" stroke-width=".6"/>`;
     for(let j=0;j<len;j++){const c=j%2?colB:colA;s+=`<circle cx="${x}" cy="${yb+5+j*9}" r="5" fill="url(#mg${c===colA?'a':'b'}${u})"/>`;}
     s+=`<path d="M${x+10} ${yb-2} q6 10 0 22 q-6 -12 0 -22z" fill="#657730" stroke="#485522" stroke-width=".5"/>`;}
-  return `<svg class="toran" viewBox="0 0 400 70" preserveAspectRatio="none" aria-hidden="true"><defs>
+  return `<svg class="toran" viewBox="0 0 1600 70" preserveAspectRatio="xMidYMin slice" aria-hidden="true"><defs>
     <radialGradient id="mga${u}" cx=".4" cy=".35" r=".7"><stop offset="0" stop-color="#ffd36a"/><stop offset=".6" stop-color="${colA}"/><stop offset="1" stop-color="#61181f"/></radialGradient>
     <radialGradient id="mgb${u}" cx=".4" cy=".35" r=".7"><stop offset="0" stop-color="#fff0a0"/><stop offset=".6" stop-color="${colB}"/><stop offset="1" stop-color="#6c1b23"/></radialGradient></defs>${s}</svg>`;}
 /* ---------- Event scenes: illustrated images with interactive layers on top ---------- */
@@ -510,16 +520,22 @@ $('acts').innerHTML=CONFIG.events.map((e,i)=>{
   if(e.key==='vivah'){art=sceneFrame('vivah',vivahLayers())+`<div class="diyas" id="diyas" aria-hidden="true"></div><p class="phera-count" id="pc">PHERA 0 OF 7</p>`;note='Tap the sacred fire to walk the seven pheras with them.';}
   return `<section class="act act-${e.key}" aria-label="${esc(e.en)}">${toran(e.key==='vivah'?'#8c2a34':'#b8404c',e.key==='vivah'?'#ecbcb4':'#f4cfc7')}
    <div class="inner">
+    <div class="act-head">
     <p class="act-no">${esc(e.act)} · ${esc(day.toUpperCase())}</p>
     <p class="act-hi foil">${esc(e.hi)}</p>
     <p class="act-en">${esc(e.en.toUpperCase())}</p>
     <p class="act-tag">${esc(e.tag)}</p>
     <div class="act-when"><b>${esc(tm)} ONWARDS</b><span>${esc(e.place)}, ${esc(CONFIG.venue.split(',')[0])}</span></div>
     <p class="act-copy">${esc(e.copy)}</p>
+    </div>
+    <div class="act-visual">
     ${art}
     <p class="play-note" id="note-${e.key}" aria-live="polite">${note}</p>
+    </div>
+    <div class="act-meta">
     <div class="dress"><div><small>DRESS CODE</small><p>${esc(e.dress)}</p></div><span class="dots">${e.sw.map(c=>`<i style="background:${c}"></i>`).join('')}</span></div>
     <a class="btn" href="${cal}" target="_blank" rel="noopener">Add to calendar</a>
+    </div>
    </div></section>`;
 }).join('');
 
