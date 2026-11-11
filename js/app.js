@@ -91,21 +91,32 @@ const SCENE=(()=>{const wide=innerWidth>=900;const W=wide?Math.max(400,Math.min(
   const rosette=(x,y)=>`<g>${bevel(`M${x} ${y} m-15 0 a15 15 0 1 0 30 0 a15 15 0 1 0 -30 0`,1.2)}${Array.from({length:8},(_,i)=>`<path class="t s-carve" stroke-width="1" d="M${x} ${y} L${(x+Math.cos(i*Math.PI/4)*12).toFixed(1)} ${(y+Math.sin(i*Math.PI/4)*12).toFixed(1)}"/>`).join('')}<circle class="t s-carve" cx="${x}" cy="${y}" r="4" stroke-width="1"/></g>`;
   // wide screens: a carved jharokha (balcony window) on each side, light glowing through its jaali when lit
   let side='';
-  const jharokha=cx=>`<g>
-    <path class="t f-wall2" d="M${cx-84} 188 L${cx+84} 188 L${cx+74} 178 Q${cx} 128 ${cx-74} 178 Z"/>${bevel(`M${cx-84} 188 L${cx+84} 188 L${cx+74} 178 Q${cx} 128 ${cx-74} 178 Z`,1)}
-    <path class="t f-wall2" d="M${cx-17} 146 a17 17 0 0 1 34 0 Z"/>${bevel(`M${cx-17} 146 a17 17 0 0 1 34 0 Z`,.9)}<path class="t s-carve" d="M${cx} 129 V118 M${cx-3} 122 H${cx+3}" stroke-width="1.2"/>
-    <rect class="t f-wall2" x="${cx-80}" y="188" width="160" height="7"/>${bevel(`M${cx-80} 188 H${cx+80} V195 H${cx-80} Z`,.8)}
-    <path class="t f-wall2" d="${archPath(cx,132,310,486,4)}"/><path d="${archPath(cx,132,310,486,4)}" fill="url(#petal)"/>${bevel(archPath(cx,132,310,486,4),1.4)}
-    <path d="${archPath(cx,108,312,476,4)}" fill="#14040a"/>
-    <path class="lightwash" d="${archPath(cx,108,312,476,4)}" fill="url(#jglow)"/>
-    <path d="${archPath(cx,108,312,476,4)}" fill="url(#jaali)"/>${bevel(archPath(cx,108,312,476,4),1.2)}
-    <rect class="t f-wall2" x="${cx-74}" y="300" width="9" height="186"/><rect class="t f-wall2" x="${cx+65}" y="300" width="9" height="186"/>
-    ${bevel(`M${cx-74} 300 H${cx-65} V486 H${cx-74} Z`,.7)}${bevel(`M${cx+65} 300 H${cx+74} V486 H${cx+65} Z`,.7)}
-    <rect class="t f-wall2" x="${cx-86}" y="486" width="172" height="10"/>${bevel(`M${cx-86} 486 H${cx+86} V496 H${cx-86} Z`,1)}
-    ${[-58,0,58].map(d=>`<path class="t f-wall2" d="M${cx+d-12} 496 H${cx+d+12} Q${cx+d+8} 512 ${cx+d} 524 Q${cx+d-8} 512 ${cx+d-12} 496 Z"/>${bevel(`M${cx+d-12} 496 H${cx+d+12} Q${cx+d+8} 512 ${cx+d} 524 Q${cx+d-8} 512 ${cx+d-12} 496 Z`,.7)}`).join('')}
-  </g>`;
-  if(E>110){const region=E+22-30,n=Math.max(1,Math.floor(region/230));
-    for(let i=0;i<n;i++){const off=region*(i+.5)/n;side+=jharokha(22-15-off)+jharokha(378+15+off);}}
+  // wide screens: palace wings (mahal) stretching out from the main arch, windows glow when lit
+  const win=(cx,w,spring,bottom,jaali)=>{const d=archPath(cx,w,spring,bottom,3);return `<path d="${d}" fill="#14040a"/><path class="lightwash" d="${d}" fill="url(#jglow)"/>${jaali?`<path d="${d}" fill="url(#jaali)"/>`:''}${bevel(d,.9)}`;};
+  const chhatri=cx=>`<rect class="t f-wall2" x="${cx-22}" y="196" width="44" height="6"/>${bevel(`M${cx-22} 196 H${cx+22} V202 H${cx-22} Z`,.7)}
+    ${[-16,16].map(d=>`<rect class="t f-wall2" x="${cx+d-2}" y="176" width="4" height="20"/>`).join('')}<path d="${archPath(cx,22,190,196,2)}" fill="#14040a"/><path class="lightwash" d="${archPath(cx,22,190,196,2)}" fill="url(#jglow)"/>
+    <rect class="t f-wall2" x="${cx-25}" y="170" width="50" height="6"/>${bevel(`M${cx-25} 170 H${cx+25} V176 H${cx-25} Z`,.7)}
+    <path class="t f-wall2" d="M${cx-17} 170 Q${cx-17} 150 ${cx} 146 Q${cx+17} 150 ${cx+17} 170 Z"/>${bevel(`M${cx-17} 170 Q${cx-17} 150 ${cx} 146 Q${cx+17} 150 ${cx+17} 170 Z`,.8)}
+    <path class="t s-carve" d="M${cx} 146 V136 M${cx-3} 140 H${cx+3}" stroke-width="1.1"/>`;
+  const wing=(xa,xb)=>{const w=xb-xa;if(w<90)return '';let s='';
+    s+=`<rect class="t f-wall2" x="${xa}" y="208" width="${w}" height="412"/><rect x="${xa}" y="208" width="${w}" height="412" fill="url(#petal)" opacity=".35"/>${bevel(`M${xa} 208 H${xb} V620 H${xa} Z`,1)}`;
+    // parapet with merlons
+    s+=`<rect class="t f-wall2" x="${xa}" y="202" width="${w}" height="8"/>${bevel(`M${xa} 202 H${xb} V210 H${xa} Z`,.8)}`;
+    for(let x=xa+4;x<xb-6;x+=14)s+=`<path class="t f-wall2" d="M${x} 202 V197 Q${x+4} 193 ${x+8} 197 V202 Z"/>`;
+    const nc=Math.max(1,Math.round(w/170));for(let i=0;i<nc;i++)s+=chhatri(xa+w*(i+.5)/nc);
+    // upper floor: small jaali windows
+    const nu=Math.max(2,Math.floor(w/52));for(let i=0;i<nu;i++){const cx=xa+w*(i+.5)/nu;s+=win(cx,30,282,334,true)+`<rect class="t f-wall2" x="${cx-20}" y="334" width="40" height="5"/>`;}
+    // cornice with dentils
+    s+=`<rect class="t f-wall2" x="${xa}" y="352" width="${w}" height="9"/>${bevel(`M${xa} 352 H${xb} V361 H${xa} Z`,.9)}`;
+    for(let x=xa+3;x<xb-4;x+=9)s+=`<rect class="t f-wall2" x="${x}" y="361" width="5" height="5"/>`;
+    // lower floor: larger arched openings with a balustrade
+    const nl=Math.max(2,Math.floor(w/74));for(let i=0;i<nl;i++){const cx=xa+w*(i+.5)/nl;s+=win(cx,46,448,546,false);
+      s+=`<rect class="t f-wall2" x="${cx-28}" y="546" width="56" height="7"/>${bevel(`M${cx-28} 546 H${cx+28} V553 H${cx-28} Z`,.7)}`;
+      for(let k=-2;k<=2;k++)s+=`<rect class="t f-wall2" x="${cx+k*10-1.5}" y="530" width="3" height="16"/>`;}
+    // plinth
+    s+=`<path class="t s-carve" d="M${xa} 578 H${xb} M${xa} 584 H${xb}" stroke-width=".8"/>`;
+    return s;};
+  if(E>60){side+=wing(-E+18,8)+wing(392,400+E-18);}
   // diya on the ledge (clay)
   const dots=Array.from({length:13},(_,i)=>{const t=i/12;const x=158+t*76;const y=607+Math.sin(t*Math.PI)*9;return `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="1.5" fill="#d3c49d"/>`;}).join('');
   const petals=Array.from({length:6},(_,i)=>{const x=166+i*12;const y=614+Math.sin((i+.5)/6*Math.PI)*7;return `<path d="M${x} ${y} q3 -4 6 0 q-3 4 -6 0z" fill="#f0e2c0" opacity=".85"/>`;}).join('');
