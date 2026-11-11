@@ -77,7 +77,15 @@ function waxSeal(svg,initials,id){
 const SCENE=(()=>{const wide=innerWidth>=900;const W=wide?Math.max(400,Math.min(1400,Math.round(700*innerWidth/innerHeight/20)*20)):400;return {W,E:(W-400)/2};})();
 (function(){
   const svg=$('sceneSvg');let k=0,niches='';
-  const W=SCENE.W,E=SCENE.E;svg.setAttribute('viewBox',`${-E} 0 ${W} 700`);$('scene').style.aspectRatio=`${W} / 700`;
+  const W=SCENE.W,E=SCENE.E;
+  const CW=E>60?Math.round(Math.min(196+E*.95,620)):196,HC=CW/2,PX=HC+60;
+  const archWide=(w)=>{const a=w/2,top=170-(w-CW)*.866,b=340-top,pts=[],n=9;
+    for(let i=0;i<=n;i++){const t=i/n*Math.PI/2;pts.push([200-a*Math.cos(t),340-b*Math.sin(t)-(i===n?6:0)]);}
+    for(let i=n-1;i>=0;i--){const t=i/n*Math.PI/2;pts.push([200+a*Math.cos(t),340-b*Math.sin(t)]);}
+    let d=`M${200-a} 620 L${200-a} 340`;
+    for(let i=1;i<pts.length;i++){const[x0,y0]=pts[i-1],[x1,y1]=pts[i];const cr=Math.hypot(x1-x0,y1-y0)*.62;d+=` A${cr.toFixed(2)} ${cr.toFixed(2)} 0 0 1 ${x1.toFixed(2)} ${y1.toFixed(2)}`;}
+    return d+` L${200+a} 620 Z`;};
+  const A=w=>E>60?archWide(CW+(w-196)):archPath(200,w,340,620,6);svg.setAttribute('viewBox',`${-E} 0 ${W} 700`);$('scene').style.aspectRatio=`${W} / 700`;
   const niche=(x,y)=>{const dl=(.45+Math.hypot(x-259,(y-600)*.6)/260).toFixed(2);const fd=(k*.23%1.4).toFixed(2);k++;
     return `<path class="t f-niche" d="M${x-8} ${y+13} L${x-8} ${y-1} Q${x-8} ${y-12} ${x} ${y-16} Q${x+8} ${y-12} ${x+8} ${y-1} L${x+8} ${y+13} Z"/>
     <path d="M${x-8} ${y+13} L${x-8} ${y-1} Q${x-8} ${y-12} ${x} ${y-16}" fill="none" stroke="#000" stroke-opacity=".5" stroke-width="1.4"/>
@@ -85,7 +93,7 @@ const SCENE=(()=>{const wide=innerWidth>=900;const W=wide?Math.max(400,Math.min(
     <g class="nl" style="transition-delay:${dl}s"><circle cx="${x}" cy="${y+3}" r="15" fill="url(#ng)"/>
       <ellipse cx="${x}" cy="${y+11}" rx="5" ry="1.8" fill="#a98e4b"/><ellipse cx="${x}" cy="${y+10.4}" rx="3.6" ry="1" fill="#421015"/>
       <path class="nl-f" style="animation-delay:-${fd}s" d="${flamePath(x+2.4,y+9.6,11,4.6)}" fill="url(#flg)"/></g>`;};
-  for(let y=150;y<=590;y+=40){niches+=niche(42,y)+niche(358,y);}
+  for(let y=150;y<=590;y+=40){niches+=niche(200-PX,y)+niche(200+PX,y);}
   for(let x=40-Math.floor(E/40)*40;x<=360+E;x+=40){niches+=niche(x,674);}
   const bevel=(d,w)=>`<path d="${d}" fill="none" stroke="#000" stroke-opacity=".45" stroke-width="${w+1}" transform="translate(1.6 1.8)"/><path d="${d}" fill="none" stroke="#fff" stroke-opacity=".22" stroke-width="${w}" transform="translate(-1 -1)"/><path class="t s-carve" d="${d}" stroke-width="${w}"/>`;
   const rosette=(x,y)=>`<g>${bevel(`M${x} ${y} m-15 0 a15 15 0 1 0 30 0 a15 15 0 1 0 -30 0`,1.2)}${Array.from({length:8},(_,i)=>`<path class="t s-carve" stroke-width="1" d="M${x} ${y} L${(x+Math.cos(i*Math.PI/4)*12).toFixed(1)} ${(y+Math.sin(i*Math.PI/4)*12).toFixed(1)}"/>`).join('')}<circle class="t s-carve" cx="${x}" cy="${y}" r="4" stroke-width="1"/></g>`;
@@ -116,7 +124,7 @@ const SCENE=(()=>{const wide=innerWidth>=900;const W=wide?Math.max(400,Math.min(
     // plinth
     s+=`<path class="t s-carve" d="M${xa} 578 H${xb} M${xa} 584 H${xb}" stroke-width=".8"/>`;
     return s;};
-  if(E>60){side+=wing(-E+18,8)+wing(392,400+E-18);}
+  if(E>60){side+=wing(-E+18,200-PX-34)+wing(200+PX+34,400+E-18);}
   // diya on the ledge (clay)
   const dots=Array.from({length:13},(_,i)=>{const t=i/12;const x=158+t*76;const y=607+Math.sin(t*Math.PI)*9;return `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="1.5" fill="#d3c49d"/>`;}).join('');
   const petals=Array.from({length:6},(_,i)=>{const x=166+i*12;const y=614+Math.sin((i+.5)/6*Math.PI)*7;return `<path d="M${x} ${y} q3 -4 6 0 q-3 4 -6 0z" fill="#f0e2c0" opacity=".85"/>`;}).join('');
@@ -149,22 +157,22 @@ const SCENE=(()=>{const wide=innerWidth>=900;const W=wide?Math.max(400,Math.min(
     <linearGradient id="gtext" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fff6dc"/><stop offset=".35" stop-color="#e6cf98"/><stop offset=".6" stop-color="#fff2d0"/><stop offset="1" stop-color="#b8996a"/></linearGradient>
     <filter id="soft" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation=".7"/></filter>
     <filter id="big" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="8"/></filter>
-    <clipPath id="opn"><path d="${archPath(200,196,340,620,6)}"/></clipPath>
+    <clipPath id="opn"><path d="${A(196)}"/></clipPath>
   </defs>
   <rect class="t f-wall" x="${-E}" width="${W}" height="700"/>
   <rect x="${-E}" width="${W}" height="700" fill="url(#jali)"/>
   <rect x="${-E}" width="${W}" height="700" fill="url(#grain)" style="mix-blend-mode:overlay"/>
   ${side}
-  <rect x="22" y="104" width="40" height="516" class="t f-wall2"/><rect x="338" y="104" width="40" height="516" class="t f-wall2"/>
-  ${bevel('M22 104 H62 V620 H22 Z',1.2)}${bevel('M338 104 H378 V620 H338 Z',1.2)}
-  ${rosette(80,128)}${rosette(320,128)}
-  <path class="t f-wall2" d="${archPath(200,236,340,620,6)}"/>
-  <path d="${archPath(200,236,340,620,6)}" fill="url(#petal)"/>
-  ${bevel(archPath(200,236,340,620,6),1.8)}
-  ${bevel(archPath(200,218,340,620,6),1)}
-  <path d="${archPath(200,196,340,620,6)}" fill="url(#inner)"/>
-  <g clip-path="url(#opn)"><path d="${archPath(200,196,340,620,6)}" fill="none" stroke="#000" stroke-opacity=".75" stroke-width="26" filter="url(#big)"/></g>
-  ${bevel(archPath(200,196,340,620,6),1.6)}
+  <rect x="${200-PX-20}" y="104" width="40" height="516" class="t f-wall2"/><rect x="${200+PX-20}" y="104" width="40" height="516" class="t f-wall2"/>
+  ${bevel(`M${200-PX-20} 104 H${200-PX+20} V620 H${200-PX-20} Z`,1.2)}${bevel(`M${200+PX-20} 104 H${200+PX+20} V620 H${200+PX-20} Z`,1.2)}
+  ${rosette(200-HC-22,128)}${rosette(200+HC+22,128)}
+  <path class="t f-wall2" d="${A(236)}"/>
+  <path d="${A(236)}" fill="url(#petal)"/>
+  ${bevel(A(236),1.8)}
+  ${bevel(A(218),1)}
+  <path d="${A(196)}" fill="url(#inner)"/>
+  <g clip-path="url(#opn)"><path d="${A(196)}" fill="none" stroke="#000" stroke-opacity=".75" stroke-width="26" filter="url(#big)"/></g>
+  ${bevel(A(196),1.6)}
   <circle id="wash" class="lightwash" cx="259" cy="560" r="230" fill="url(#wash)"/>
   ${niches}
   <rect class="t f-marble" x="${-E}" y="620" width="${W}" height="16"/>
@@ -177,6 +185,7 @@ const SCENE=(()=>{const wide=innerWidth>=900;const W=wide?Math.max(400,Math.min(
     <text x="200" y="62" text-anchor="middle" font-family="Pinyon Script,cursive" font-size="36" fill="url(#gtext)">You're invited</text>
     <text x="200" y="86" text-anchor="middle" font-family="Cinzel,serif" font-size="8.5" letter-spacing="3" fill="#efe1be">TO A WEDDING IN ${esc(CONFIG.city.toUpperCase())}</text>
   </g>
+  <g transform="translate(200 410) scale(${E>60?Math.min(1.45,1+E/900).toFixed(3):1}) translate(-200 -410)">
   <g class="wel" style="transition-delay:1.2s">
     <text x="200" y="318" text-anchor="middle" font-family="Cinzel,serif" font-size="8" letter-spacing="2.6" fill="#efe1be">THE FAMILIES</text>
     <text x="200" y="332" text-anchor="middle" font-family="Cinzel,serif" font-size="8" letter-spacing="2.6" fill="#efe1be">INVITE YOU TO</text>
@@ -214,6 +223,7 @@ const SCENE=(()=>{const wide=innerWidth>=900;const W=wide?Math.max(400,Math.min(
     <text x="200" y="124" text-anchor="middle" font-family="Cormorant Garamond,serif" font-style="italic" font-size="12.5" fill="#f2e6c7">thank you for your blessings</text>
   </g>
 
+  </g>
   <!-- the scroll: tells guests to light the diya -->
   <g class="scrollp" id="scrollp">
     <defs>
