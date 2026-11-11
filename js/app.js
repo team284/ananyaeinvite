@@ -115,13 +115,21 @@ const SCENE=(()=>{const wide=innerWidth>=900;const W=wide?Math.max(400,Math.min(
     <linearGradient id="lit" x1="1" y1="0" x2="0" y2="0"><stop offset="0" stop-color="#ffb35a" stop-opacity=".55"/><stop offset=".6" stop-color="#ff8a2a" stop-opacity="0"/></linearGradient>
     <linearGradient id="gtext" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fff6dc"/><stop offset=".35" stop-color="#e6cf98"/><stop offset=".6" stop-color="#fff2d0"/><stop offset="1" stop-color="#b8996a"/></linearGradient>
     <radialGradient id="roseglow" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#8c2a34" stop-opacity=".55"/><stop offset=".55" stop-color="#5c1520" stop-opacity=".25"/><stop offset="1" stop-color="#3a0b12" stop-opacity="0"/></radialGradient>
+    <radialGradient id="gJas" cx=".35" cy=".3" r=".7"><stop offset="0" stop-color="#ffffff"/><stop offset=".6" stop-color="#f6e3b4"/><stop offset="1" stop-color="#b8996a"/></radialGradient>
+    <radialGradient id="gRose" cx=".35" cy=".3" r=".75"><stop offset="0" stop-color="#e98a93"/><stop offset=".55" stop-color="#8c2a34"/><stop offset="1" stop-color="#3a0b12"/></radialGradient>
     <linearGradient id="brassH" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#8a7046"/><stop offset=".5" stop-color="#f6e3b4"/><stop offset="1" stop-color="#8a7046"/></linearGradient>
     <filter id="soft" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation=".7"/></filter>
     <filter id="big" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="8"/></filter>
     <clipPath id="opn"><path d="${archPath(200,196,340,620,6)}"/></clipPath>
   </defs>
   <rect class="t f-wall" x="${-E}" width="${W}" height="700"/>
+  <rect x="${-E}" width="${W}" height="700" fill="url(#jali)" opacity=".55"/>
   <rect x="${-E}" width="${W}" height="700" fill="url(#grain)" style="mix-blend-mode:overlay" opacity=".35"/>
+  ${[22,378].map(x=>`<g>
+    <path class="t s-line" d="M${x-9} 620 V176 M${x+9} 620 V176" stroke-width=".9"/>
+    <path class="t s-line" d="M${x-14} 176 H${x+14} M${x-12} 170 H${x+12} M${x-10} 164 Q${x} 150 ${x+10} 164 M${x-14} 620 H${x+14} M${x-12} 612 H${x+12}" stroke-width=".9"/>
+    ${[260,390,520].map(y=>`<path class="t s-line" d="M${x} ${y-12} L${x+6} ${y} L${x} ${y+12} L${x-6} ${y} Z" stroke-width=".7"/>`).join('')}
+  </g>`).join('')}
   <circle class="lightwash" cx="200" cy="560" r="470" fill="url(#roseglow)"/>
   <path class="t s-line" d="${archPath(200,236,340,620,6)}" stroke-width="1"/>
   <path class="t s-line" d="${archPath(200,222,340,620,6)}" stroke-width=".5" opacity=".55"/>
@@ -143,6 +151,20 @@ const SCENE=(()=>{const wide=innerWidth>=900;const W=wide?Math.max(400,Math.min(
     <g class="nl" style="transition-delay:.9s"><circle cx="352" cy="192" r="26" fill="url(#ng)"/>
       <path class="nl-f" d="${flamePath(352,199,13,5)}" fill="url(#flg)"/></g>
   </g>
+  ${[[-150,150],[550,150],[-330,236],[730,236],[-500,110],[900,110]].filter(([x])=>x>-E+24&&x<400+E-24).map(([x,cl],i)=>`<g class="hang" style="transform-origin:${x}px -10px;animation-delay:-${(i*1.3).toFixed(1)}s">
+    <line x1="${x}" y1="-10" x2="${x}" y2="${cl}" stroke="#a88a58" stroke-width=".8" opacity=".55"/>
+    <path d="M${x-11} ${cl+4} Q${x} ${cl} ${x+11} ${cl+4} L${x+8} ${cl+14} Q${x} ${cl+20} ${x-8} ${cl+14} Z" fill="url(#brassH)"/>
+    <path d="M${x-6} ${cl+14} Q${x} ${cl+26} ${x+6} ${cl+14}" fill="url(#brassH)"/>
+    <g class="nl" style="transition-delay:${(1.1+Math.abs(x-200)/900).toFixed(2)}s"><circle cx="${x}" cy="${cl-4}" r="26" fill="url(#ng)"/><path class="nl-f" d="${flamePath(x,cl+3,13,5)}" fill="url(#flg)"/></g>
+  </g>`).join('')}
+  <g class="wel arch-garland" style="transition-delay:.9s">${(()=>{let s='';const R=246,pts=[];
+    for(let d=180;d>=120;d-=3.2){const t=d*Math.PI/180;pts.push([318+R*Math.cos(t),340-R*Math.sin(t)]);}
+    for(let d=60;d>=0;d-=3.2){const t=d*Math.PI/180;pts.push([82+R*Math.cos(t),340-R*Math.sin(t)]);}
+    pts.forEach(([x,y],i)=>{const rose=i%5===2;s+=rose?`<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="4.6" fill="url(#gRose)"/><path d="M${(x-2.4).toFixed(1)} ${(y-.4).toFixed(1)} q2.4 -2.6 4.8 0" stroke="#3a0b12" stroke-opacity=".5" stroke-width=".6" fill="none"/>`
+      :`<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="3" fill="url(#gJas)"/>`;});
+    [[82,340],[318,340]].forEach(([x,y])=>{s+=`<g class="tassel" style="transform-origin:${x}px ${y}px"><line x1="${x}" y1="${y}" x2="${x}" y2="${y+46}" stroke="#e6cf98" stroke-width=".7"/>${[0,1,2,3].map(k=>`<circle cx="${x}" cy="${y+8+k*9}" r="${k%2?2.6:3.4}" fill="url(#${k%2?'gJas':'gRose'})"/>`).join('')}<path d="M${x-4} ${y+46} L${x} ${y+58} L${x+4} ${y+46} Z" fill="url(#brassH)"/></g>`;});
+    return s;})()}</g>
+  ${[[150,619,-20,'#8c2a34'],[171,623,25,'#ecbcb4'],[228,621,60,'#8c2a34'],[278,622,-35,'#ecbcb4'],[296,619,15,'#8c2a34'],[132,622,40,'#ecbcb4']].map(([x,y,r,c])=>`<path transform="translate(${x} ${y}) rotate(${r})" d="M0 0 q3.2 -3.6 6.4 0 q-3.2 2.6 -6.4 0z" fill="${c}" opacity=".85"/>`).join('')}
   <rect class="t f-marble" x="${-E}" y="620" width="${W}" height="9"/>
   <rect class="t f-marble2" x="${-E}" y="629" width="${W}" height="2"/>
   <rect x="${-E}" y="631" width="${W}" height="69" fill="#000" opacity=".35"/>
