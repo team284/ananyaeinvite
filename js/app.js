@@ -127,29 +127,33 @@ const SCENE=(()=>{const wide=innerWidth>=900;const W=wide?Math.max(400,Math.min(
   <rect class="t f-wall" x="${-E}" width="${W}" height="700"/>
   <rect x="${-E}" width="${W}" height="700" fill="url(#jali)" opacity=".55"/>
   <rect x="${-E}" width="${W}" height="700" fill="url(#grain)" style="mix-blend-mode:overlay" opacity=".35"/>
-  ${[22,378].map(x=>`<g>
-    <path class="t s-line" d="M${x-9} 620 V176 M${x+9} 620 V176" stroke-width=".9"/>
-    <path class="t s-line" d="M${x-14} 176 H${x+14} M${x-12} 170 H${x+12} M${x-10} 164 Q${x} 150 ${x+10} 164 M${x-14} 620 H${x+14} M${x-12} 612 H${x+12}" stroke-width=".9"/>
-    ${[260,390,520].map(y=>`<path class="t s-line" d="M${x} ${y-12} L${x+6} ${y} L${x} ${y+12} L${x-6} ${y} Z" stroke-width=".7"/>`).join('')}
-  </g>`).join('')}
   <circle class="lightwash" cx="200" cy="560" r="470" fill="url(#roseglow)"/>
-  ${E>60?(()=>{let s='';let sd=5;const rr=()=>(sd=(sd*16807)%2147483647)/2147483647;
-    const Dw=Math.min(E*.5,250),x0=-E,x1=-E+Dw,tx=x0+Dw*.3,ty=430;
-    const drape=`<path d="M${x0} -6 L${x1} -6 C${x1-6} 140 ${x1-Dw*.35} 330 ${tx} ${ty} C${x0+Dw*.5} ${ty+60} ${x1-8} 560 ${x1+14} 700 L${x0} 700 Z" fill="url(#velvet)"/>
-      ${[.2,.42,.64,.84].map(f=>`<path d="M${x0+Dw*f} -6 C${x0+Dw*f-4} 160 ${x0+Dw*f*.55} 330 ${tx+(f-.5)*12} ${ty}" stroke="#ecbcb4" stroke-opacity=".07" stroke-width="6" fill="none"/><path d="M${tx+(f-.5)*14} ${ty+8} C${x0+Dw*f*.8} 520 ${x0+Dw*f} 600 ${x0+Dw*f*1.1} 700" stroke="#000" stroke-opacity=".18" stroke-width="5" fill="none"/>`).join('')}
-      <path d="M${x1} -6 C${x1-6} 140 ${x1-Dw*.35} 330 ${tx} ${ty} C${x0+Dw*.5} ${ty+60} ${x1-8} 560 ${x1+14} 700" stroke="url(#trim)" stroke-width="3" fill="none"/>
-      <path d="M${x1-5} -6 C${x1-11} 140 ${x1-Dw*.38} 330 ${tx-3} ${ty-2}" stroke="#cdb27c" stroke-opacity=".5" stroke-width=".8" stroke-dasharray="2 3" fill="none"/>
-      <g class="tassel" style="transform-origin:${tx}px ${ty}px">
-        <path d="M${tx-12} ${ty-4} Q${tx} ${ty+6} ${tx+12} ${ty-4}" stroke="url(#trim)" stroke-width="4" fill="none"/>
-        ${[[-6,-2,5,'gRose'],[5,-3,4.4,'gRose'],[0,4,3.4,'gJas'],[-11,3,2.8,'gJas'],[10,3,2.8,'gJas']].map(([dx,dy,r,g])=>`<circle cx="${tx+dx}" cy="${ty+dy}" r="${r}" fill="url(#${g})"/>`).join('')}
-        <line x1="${tx}" y1="${ty+6}" x2="${tx}" y2="${ty+40}" stroke="#cdb27c" stroke-width=".8"/>
-        <path d="M${tx-5} ${ty+38} L${tx} ${ty+58} L${tx+5} ${ty+38} Z" fill="url(#brassH)"/></g>`;
-    // phoolon ki ladi: jasmine strings with roses, between the drape and the arch
-    let ladi='';for(let x=x1+18;x<=-34;x+=24){const len=150+rr()*270;ladi+=`<g class="tassel" style="transform-origin:${x.toFixed(1)}px 0px;animation-delay:-${(rr()*4).toFixed(2)}s"><line x1="${x.toFixed(1)}" y1="-4" x2="${x.toFixed(1)}" y2="${len.toFixed(0)}" stroke="#cdb27c" stroke-opacity=".45" stroke-width=".5"/>`;
-      for(let y=6,k=0;y<len;y+=9,k++){const rose=k%7===5;ladi+=`<circle cx="${x.toFixed(1)}" cy="${y}" r="${rose?3.4:2.3}" fill="url(#${rose?'gRose':'gJas'})"/>`;}
-      ladi+=`<circle cx="${x.toFixed(1)}" cy="${(len+3).toFixed(0)}" r="4" fill="url(#gRose)"/></g>`;}
-    const side=drape+ladi;
-    return `<g class="decor">${side}</g><g class="decor" transform="translate(400 0) scale(-1 1)">${side}</g>`;})():''}
+  <g class="t gold-art">${(()=>{let s='';
+    const ln=(d,w=.8,o=1)=>`<path class="t s-line" d="${d}" stroke-width="${w}"${o<1?` opacity="${o}"`:''}/>`;
+    const lotus=(cx,cy,r)=>ln(`M${cx} ${cy} C${cx-r*.5} ${cy-r*.4} ${cx-r*.35} ${cy-r} ${cx} ${cy-r*1.25} C${cx+r*.35} ${cy-r} ${cx+r*.5} ${cy-r*.4} ${cx} ${cy} M${cx} ${cy} C${cx-r*.9} ${cy-r*.2} ${cx-r*1.1} ${cy-r*.75} ${cx-r*.95} ${cy-r*.95} C${cx-r*.55} ${cy-r*.7} ${cx-r*.25} ${cy-r*.35} ${cx} ${cy} M${cx} ${cy} C${cx+r*.9} ${cy-r*.2} ${cx+r*1.1} ${cy-r*.75} ${cx+r*.95} ${cy-r*.95} C${cx+r*.55} ${cy-r*.7} ${cx+r*.25} ${cy-r*.35} ${cx} ${cy} M${cx-r*1.2} ${cy} H${cx+r*1.2}`,.8);
+    const mandala=(cx,cy,r)=>{let m=ln(`M${cx-r} ${cy} a${r} ${r} 0 1 0 ${2*r} 0 a${r} ${r} 0 1 0 ${-2*r} 0`,.7)+ln(`M${cx-r*.42} ${cy} a${r*.42} ${r*.42} 0 1 0 ${r*.84} 0 a${r*.42} ${r*.42} 0 1 0 ${-r*.84} 0`,.6);
+      for(let i=0;i<12;i++){const t=i/12*Math.PI*2,c=Math.cos(t),sn=Math.sin(t);const x0=cx+c*r*.45,y0=cy+sn*r*.45,x1=cx+c*r*.92,y1=cy+sn*r*.92,px=-sn*r*.16,py=c*r*.16;
+        m+=ln(`M${x0.toFixed(1)} ${y0.toFixed(1)} Q${((x0+x1)/2+px).toFixed(1)} ${((y0+y1)/2+py).toFixed(1)} ${x1.toFixed(1)} ${y1.toFixed(1)} Q${((x0+x1)/2-px).toFixed(1)} ${((y0+y1)/2-py).toFixed(1)} ${x0.toFixed(1)} ${y0.toFixed(1)}`,.55);}
+      return m+`<circle class="t f-dot" cx="${cx}" cy="${cy}" r="${(r*.1).toFixed(1)}"/>`;};
+    const vine=(x,y0,y1)=>{let d=`M${x} ${y1}`,lv='';for(let y=y1;y>=y0;y-=6){d+=` L${(x+Math.sin(y/34)*7).toFixed(1)} ${y}`;}
+      for(let y=y1-26,k=0;y>y0+10;y-=30,k++){const vx=x+Math.sin(y/34)*7,sd=k%2?1:-1;lv+=ln(`M${vx.toFixed(1)} ${y} q${sd*8} -4 ${sd*12} -12 q${-sd*9} 1 ${-sd*12} 12`,.6);if(k%3===1)lv+=`<circle class="t f-dot" cx="${(vx+sd*14).toFixed(1)}" cy="${y-14}" r="1.6"/>`;}
+      return ln(d,.8)+lv+lotus(x,y0,9);};
+    // card border
+    s+=ln(`M${-E+10} 10 H${400+E-10} V690 H${-E+10} Z`,1)+ln(`M${-E+16} 16 H${400+E-16} V684 H${-E+16} Z`,.5,.7);
+    [[-E+10,10],[400+E-10,10],[-E+10,690],[400+E-10,690]].forEach(([x,y])=>{s+=`<circle class="t f-dot" cx="${x}" cy="${y}" r="2.4"/>`;});
+    // frieze across the top
+    s+=ln(`M${-E+40} 106 H160 M240 106 H${400+E-40}`,.6,.8)+`<use href="#ornament" x="160" y="99" width="80" height="14" class="t orn-c"/>`;
+    // lotus finial on the arch
+    s+=lotus(200,133,10);
+    // vines beside the arch
+    s+=vine(46,190,600)+vine(354,190,600);
+    // wide screens: mirrored carved panels with a mandala and a lotus
+    for(let k=0;;k++){const off=300+k*200,cl=200-off,cr=200+off;if(cl<-E+70&&cr>400+E-70)break;
+      [cl,cr].forEach(cx=>{if(cx<-E+70||cx>400+E-70)return;
+        s+=ln(archPath(cx,128,380,600,4),.9)+ln(archPath(cx,114,380,600,4),.5,.6)+mandala(cx,420,40)+lotus(cx,560,16)+lotus(cx,228,8)+
+          ln(`M${cx-50} 600 H${cx+50}`,.6);});
+      }
+    return s;})()}</g>
 
   <path class="t s-line" d="${archPath(200,236,340,620,6)}" stroke-width="1"/>
   <path class="t s-line" d="${archPath(200,222,340,620,6)}" stroke-width=".5" opacity=".55"/>
@@ -157,27 +161,6 @@ const SCENE=(()=>{const wide=innerWidth>=900;const W=wide?Math.max(400,Math.min(
   <g clip-path="url(#opn)"><path d="${archPath(200,196,340,620,6)}" fill="none" stroke="#000" stroke-opacity=".7" stroke-width="26" filter="url(#big)"/></g>
   <path class="t s-line" d="${archPath(200,196,340,620,6)}" stroke-width="1.3"/>
   <circle id="wash" class="lightwash" cx="259" cy="560" r="230" fill="url(#wash)"/>
-  <g class="hang" style="transform-origin:48px -10px">
-    <line x1="48" y1="-10" x2="48" y2="196" stroke="#a88a58" stroke-width=".8" opacity=".6"/>
-    <path d="M37 200 Q48 196 59 200 L56 210 Q48 216 40 210 Z" fill="url(#brassH)"/>
-    <path d="M42 210 Q48 222 54 210" fill="url(#brassH)"/>
-    <g class="nl" style="transition-delay:.9s"><circle cx="48" cy="192" r="26" fill="url(#ng)"/>
-      <path class="nl-f" d="${flamePath(48,199,13,5)}" fill="url(#flg)"/></g>
-  </g>
-  <g class="hang" style="transform-origin:352px -10px;animation-delay:-2.5s">
-    <line x1="352" y1="-10" x2="352" y2="196" stroke="#a88a58" stroke-width=".8" opacity=".6"/>
-    <path d="M341 200 Q352 196 363 200 L360 210 Q352 216 344 210 Z" fill="url(#brassH)"/>
-    <path d="M346 210 Q352 222 358 210" fill="url(#brassH)"/>
-    <g class="nl" style="transition-delay:.9s"><circle cx="352" cy="192" r="26" fill="url(#ng)"/>
-      <path class="nl-f" d="${flamePath(352,199,13,5)}" fill="url(#flg)"/></g>
-  </g>
-  <g class="wel arch-garland" style="transition-delay:.9s">${(()=>{let s='';const R=246,pts=[];
-    for(let d=180;d>=120;d-=3.2){const t=d*Math.PI/180;pts.push([318+R*Math.cos(t),340-R*Math.sin(t)]);}
-    for(let d=60;d>=0;d-=3.2){const t=d*Math.PI/180;pts.push([82+R*Math.cos(t),340-R*Math.sin(t)]);}
-    pts.forEach(([x,y],i)=>{const rose=i%5===2;s+=rose?`<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="4.6" fill="url(#gRose)"/><path d="M${(x-2.4).toFixed(1)} ${(y-.4).toFixed(1)} q2.4 -2.6 4.8 0" stroke="#3a0b12" stroke-opacity=".5" stroke-width=".6" fill="none"/>`
-      :`<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="3" fill="url(#gJas)"/>`;});
-    [[82,340],[318,340]].forEach(([x,y])=>{s+=`<g class="tassel" style="transform-origin:${x}px ${y}px"><line x1="${x}" y1="${y}" x2="${x}" y2="${y+46}" stroke="#e6cf98" stroke-width=".7"/>${[0,1,2,3].map(k=>`<circle cx="${x}" cy="${y+8+k*9}" r="${k%2?2.6:3.4}" fill="url(#${k%2?'gJas':'gRose'})"/>`).join('')}<path d="M${x-4} ${y+46} L${x} ${y+58} L${x+4} ${y+46} Z" fill="url(#brassH)"/></g>`;});
-    return s;})()}</g>
   ${[[150,619,-20,'#8c2a34'],[171,623,25,'#ecbcb4'],[228,621,60,'#8c2a34'],[278,622,-35,'#ecbcb4'],[296,619,15,'#8c2a34'],[132,622,40,'#ecbcb4']].map(([x,y,r,c])=>`<path transform="translate(${x} ${y}) rotate(${r})" d="M0 0 q3.2 -3.6 6.4 0 q-3.2 2.6 -6.4 0z" fill="${c}" opacity=".85"/>`).join('')}
   <rect class="t f-marble" x="${-E}" y="620" width="${W}" height="9"/>
   <rect class="t f-marble2" x="${-E}" y="629" width="${W}" height="2"/>

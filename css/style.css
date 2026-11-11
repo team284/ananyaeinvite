@@ -59,11 +59,11 @@ h2.title{font-family:var(--f-script);font-weight:400;font-size:3rem;line-height:
 
 /* ================= SCENE ================= */
 .scene{position:relative;width:100%;aspect-ratio:400/700;overflow:hidden;background:#300c0f;
-  --wall:#140407;--line:#5e3a36;--carve:#6a2630;--marble:#4a3a2e;--marble2:#2a1e18;--in1:#0b0204;--in2:#030001;}
+  --wall:#1a0509;--line:#6b4a3c;--carve:#4a1a20;--marble:#4a3a2e;--marble2:#2a1e18;--in1:#0b0204;--in2:#030001;}
 .scene.lit{--wall:#22070c;--line:#e6cf98;--carve:#a8404c;--marble:#ead8b2;--marble2:#a88a58;--in1:#1e070b;--in2:#070203;}
 .scene svg{position:absolute;inset:0;width:100%;height:100%;display:block}
 .t{transition:fill 2.4s ease .2s,stroke 2.4s ease .2s,stop-color 2.4s ease .2s}
-.f-wall{fill:var(--wall)}.s-line{stroke:var(--line);fill:none}.f-wall2{fill:var(--wall2)}.f-niche{fill:var(--niche)}.f-marble{fill:var(--marble)}.f-marble2{fill:var(--marble2)}
+.f-wall{fill:var(--wall)}.f-dot{fill:var(--line)}.orn-c{color:var(--line);transition:color 2.4s ease .2s}.s-line{stroke:var(--line);fill:none}.f-wall2{fill:var(--wall2)}.f-niche{fill:var(--niche)}.f-marble{fill:var(--marble)}.f-marble2{fill:var(--marble2)}
 .s-carve{stroke:var(--carve);fill:none}
 .st1{stop-color:var(--in1)}.st2{stop-color:var(--in2)}
 .nl{opacity:0;transition:opacity .8s ease}
@@ -428,3 +428,6 @@ body{min-height:100vh;min-height:100dvh}
 .scene-fig .kspot{z-index:2}
 #sc-mehendi{cursor:zoom-in;touch-action:pan-y}
 @media (min-width:900px){.game-card{max-width:460px}}
+
+.gold-art{transition:filter 2.4s ease}
+.lit .gold-art{filter:drop-shadow(0 0 2px rgba(246,227,180,.35))}
