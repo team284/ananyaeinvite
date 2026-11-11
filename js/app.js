@@ -85,25 +85,19 @@ const SCENE=(()=>{const wide=innerWidth>=900;const W=wide?Math.max(400,Math.min(
     <g class="nl" style="transition-delay:${dl}s"><circle cx="${x}" cy="${y+3}" r="15" fill="url(#ng)"/>
       <ellipse cx="${x}" cy="${y+11}" rx="5" ry="1.8" fill="#a98e4b"/><ellipse cx="${x}" cy="${y+10.4}" rx="3.6" ry="1" fill="#421015"/>
       <path class="nl-f" style="animation-delay:-${fd}s" d="${flamePath(x+2.4,y+9.6,11,4.6)}" fill="url(#flg)"/></g>`;};
-  for(let y=150;y<=590;y+=40){niches+=niche(42,y)+niche(358,y);}
-  for(let x=40-Math.floor(E/40)*40;x<=360+E;x+=40){niches+=niche(x,674);}
+  for(let y=170;y<=570;y+=80){niches+=niche(42,y)+niche(358,y);}
   const bevel=(d,w)=>`<path d="${d}" fill="none" stroke="#000" stroke-opacity=".45" stroke-width="${w+1}" transform="translate(1.6 1.8)"/><path d="${d}" fill="none" stroke="#fff" stroke-opacity=".22" stroke-width="${w}" transform="translate(-1 -1)"/><path class="t s-carve" d="${d}" stroke-width="${w}"/>`;
   const rosette=(x,y)=>`<g>${bevel(`M${x} ${y} m-15 0 a15 15 0 1 0 30 0 a15 15 0 1 0 -30 0`,1.2)}${Array.from({length:8},(_,i)=>`<path class="t s-carve" stroke-width="1" d="M${x} ${y} L${(x+Math.cos(i*Math.PI/4)*12).toFixed(1)} ${(y+Math.sin(i*Math.PI/4)*12).toFixed(1)}"/>`).join('')}<circle class="t s-carve" cx="${x}" cy="${y}" r="4" stroke-width="1"/></g>`;
-  // wider screens: extend the palace wall with more pillars, lamp niches and blind arches
   let side='';
-  for(let kk=1;E>0;kk++){const L=42-140*kk,R=358+140*kk;if(L<-E+16&&R>400+E-16)break;
-    [L,R].forEach(cx=>{if(cx<-E+16||cx>400+E-16)return;side+=`<rect x="${cx-20}" y="104" width="40" height="516" class="t f-wall2"/>${bevel(`M${cx-20} 104 H${cx+20} V620 H${cx-20} Z`,1.2)}`;for(let y=150;y<=590;y+=40)niches+=niche(cx,y);});
-    [L+70,R-70].forEach(cx=>{if(cx<-E+40||cx>400+E-40)return;const d=archPath(cx,88,430,620,4);
-      side+=`<path class="t f-wall2" d="${d}"/><path d="${archPath(cx,74,432,620,4)}" fill="url(#inner)" opacity=".85"/>${bevel(d,1.2)}${bevel(archPath(cx,74,432,620,4),1)}${rosette(cx,330)}`;niches+=niche(cx,560);});}
   // diya on the ledge (clay)
   const dots=Array.from({length:13},(_,i)=>{const t=i/12;const x=158+t*76;const y=607+Math.sin(t*Math.PI)*9;return `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="1.5" fill="#d3c49d"/>`;}).join('');
   const petals=Array.from({length:6},(_,i)=>{const x=166+i*12;const y=614+Math.sin((i+.5)/6*Math.PI)*7;return `<path d="M${x} ${y} q3 -4 6 0 q-3 4 -6 0z" fill="#f0e2c0" opacity=".85"/>`;}).join('');
   svg.innerHTML=`<defs>
     <pattern id="jali" width="20" height="20" patternUnits="userSpaceOnUse">
-      <circle class="t s-carve" cx="10" cy="10" r="6.5" stroke-width=".8" opacity=".5"/>
-      <path class="t s-carve" d="M10 3.5 Q13 10 10 16.5 Q7 10 10 3.5Z" stroke-width=".6" opacity=".4"/>
-      <circle class="t s-carve" cx="0" cy="0" r="3" stroke-width=".8" opacity=".45"/><circle class="t s-carve" cx="20" cy="0" r="3" stroke-width=".8" opacity=".45"/>
-      <circle class="t s-carve" cx="0" cy="20" r="3" stroke-width=".8" opacity=".45"/><circle class="t s-carve" cx="20" cy="20" r="3" stroke-width=".8" opacity=".45"/>
+      <circle class="t s-carve" cx="10" cy="10" r="6.5" stroke-width=".7" opacity=".2"/>
+      <path class="t s-carve" d="M10 3.5 Q13 10 10 16.5 Q7 10 10 3.5Z" stroke-width=".6" opacity=".14"/>
+      <circle class="t s-carve" cx="0" cy="0" r="3" stroke-width=".7" opacity=".16"/><circle class="t s-carve" cx="20" cy="0" r="3" stroke-width=".7" opacity=".16"/>
+      <circle class="t s-carve" cx="0" cy="20" r="3" stroke-width=".7" opacity=".16"/><circle class="t s-carve" cx="20" cy="20" r="3" stroke-width=".7" opacity=".16"/>
     </pattern>
     <pattern id="petal" width="12" height="12" patternUnits="userSpaceOnUse"><path class="t s-carve" d="M6 0 Q10 6 6 12 Q2 6 6 0Z" stroke-width=".8" opacity=".85"/></pattern>
     <pattern id="grain" width="160" height="160" patternUnits="userSpaceOnUse"><image href="${getComputedStyle(document.documentElement).getPropertyValue('--stone-tex').slice(4,-1).replace(/"/g,'')}" width="160" height="160"/></pattern>
@@ -497,6 +491,8 @@ function mehendiLayers(){
       <path class="fresh" pathLength="1" d="M628 566 C640 552 652 556 650 566 C648 576 636 574 640 562 C646 548 662 544 671 537"/>
     </svg>
     <span class="glint" style="left:61%;top:50.5%"></span>
+    <span class="game-badge" aria-hidden="true">Find the ${esc(k)}</span>
+    <span class="lens" id="lens" aria-hidden="true"></span>
     <button class="kspot" id="kSpot" type="button" style="left:48%;top:62%" aria-label="The hidden initial"><span>${esc(k)}</span></button>`;
 }
 function sangeetLayers(){
@@ -515,7 +511,12 @@ $('acts').innerHTML=CONFIG.events.map((e,i)=>{
   const tm=fmt(e.start,{hour:'numeric',minute:'2-digit',hour12:true}).toUpperCase();
   const cal=gcal(`${CONFIG.bride} & ${CONFIG.groom}: ${e.en}`,e.start,e.hours,`${e.place}, ${CONFIG.venue}`);
   let art='',note='';
-  if(e.key==='mehendi'){art=sceneFrame('mehendi',mehendiLayers());note=`Legend says the groom's initial hides in the bride's mehendi. Can you find ${esc(CONFIG.groom)}'s "${esc(CONFIG.groom[0])}" in her palm?`;}
+  if(e.key==='mehendi'){art=`<div class="game-card" id="gameCard">
+      <p class="gc-eyebrow"><svg viewBox="0 0 24 24" width="15" height="15" aria-hidden="true"><circle cx="10" cy="10" r="6.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M15 15l5.5 5.5" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg>The Mehendi Game</p>
+      <p class="gc-title">Find the hidden <b>${esc(CONFIG.groom[0])}</b></p>
+      <p class="gc-rule">By tradition, the groom's initial is hidden in the bride's mehendi. Can you spot <b>${esc(CONFIG.groom)}'s "${esc(CONFIG.groom[0])}"</b> in ${esc(CONFIG.bride)}'s palm? Tap or hover to look closer, then tap the letter.</p>
+      <div class="gc-row"><span id="gcTries">Tries: 0</span><button type="button" class="gc-hint" id="gcHint">Need a hint?</button></div>
+    </div>`+sceneFrame('mehendi',mehendiLayers());note=`Legend says the groom's initial hides in the bride's mehendi. Can you find ${esc(CONFIG.groom)}'s "${esc(CONFIG.groom[0])}" in her palm?`;}
   if(e.key==='sangeet'){art=sceneFrame('sangeet',sangeetLayers());note='Tap the dhol to start the night. Turn your sound on.';}
   if(e.key==='vivah'){art=sceneFrame('vivah',vivahLayers())+`<div class="diyas" id="diyas" aria-hidden="true"></div><p class="phera-count" id="pc">PHERA 0 OF 7</p>`;note='Tap the sacred fire to walk the seven pheras with them.';}
   return `<section class="act act-${e.key}" aria-label="${esc(e.en)}">${toran(e.key==='vivah'?'#8c2a34':'#b8404c',e.key==='vivah'?'#ecbcb4':'#f4cfc7')}
@@ -539,17 +540,32 @@ $('acts').innerHTML=CONFIG.events.map((e,i)=>{
    </div></section>`;
 }).join('');
 
-/* mehendi: find the groom's initial hidden in the bride's mehendi */
+/* mehendi game: find the groom's initial hidden in the bride's mehendi */
 (function(){
   const fig=$('sc-mehendi');if(!fig)return;
-  const spot=$('kSpot'),note=$('note-mehendi');let found=false,misses=0;
+  const spot=$('kSpot'),note=$('note-mehendi'),lens=$('lens'),img=fig.querySelector('img'),card=$('gameCard');
+  let found=false,tries=0,hints=0;
+  const setTries=()=>{$('gcTries').textContent=`Tries: ${tries}`;};
   if('IntersectionObserver' in window&&!RM){const io=new IntersectionObserver(es=>{es.forEach(en=>{fig.classList.toggle('live',en.isIntersecting);});},{threshold:.3});io.observe(fig);}else fig.classList.add('live');
-  spot.addEventListener('click',ev=>{ev.stopPropagation();if(found)return;found=true;fig.classList.add('found');
-    note.textContent=`Found it. ${CONFIG.bride}'s mehendi hides ${CONFIG.groom}'s initial, just like the old tradition.`;
-    const[x,y]=centerOf(spot);burst(x,y,46,'spark');});
-  fig.addEventListener('click',()=>{if(found)return;misses++;fig.classList.remove('nope');void fig.offsetWidth;fig.classList.add('nope');
-    note.textContent=misses<2?'Not there. Look closely at the mehendi on her palm.':misses<4?'Warmer. Try below the big flowers on her palm.':'Hint: near the centre of her palm, just above her fingers.';
-    if(misses>=4)spot.classList.add('hint');});
+  // magnifying glass: follows the finger or mouse over the picture
+  const ZOOM=2.6;
+  function moveLens(cx,cy){const r=fig.getBoundingClientRect(),x=cx-r.left,y=cy-r.top;if(x<0||y<0||x>r.width||y>r.height){lens.classList.remove('on');return;}
+    const L=lens.offsetWidth/2;lens.style.left=x+'px';lens.style.top=y+'px';lens.style.backgroundImage=`url(${img.currentSrc||img.src})`;
+    lens.style.backgroundSize=`${r.width*ZOOM}px ${r.height*ZOOM}px`;lens.style.backgroundPosition=`${-(x*ZOOM-L)}px ${-(y*ZOOM-L)}px`;lens.classList.add('on');}
+  fig.addEventListener('pointermove',e=>{if(!found)moveLens(e.clientX,e.clientY);});
+  fig.addEventListener('pointerdown',e=>{if(!found)moveLens(e.clientX,e.clientY);});
+  fig.addEventListener('pointerleave',e=>{if(e.pointerType==='mouse')lens.classList.remove('on');});
+  let hideT=0;fig.addEventListener('pointerup',e=>{if(e.pointerType!=='mouse'){clearTimeout(hideT);hideT=setTimeout(()=>lens.classList.remove('on'),1400);}});
+  function win(){found=true;fig.classList.add('found');lens.classList.remove('on');card.classList.add('won');
+    $('gcTries').textContent=tries<=1?'Found on the first try!':`Found in ${tries} tries`;$('gcHint').hidden=true;
+    note.textContent=`You found it. ${CONFIG.bride}'s mehendi hides ${CONFIG.groom}'s initial, just like the old tradition.`;
+    const[x,y]=centerOf(spot);burst(x,y,50,'spark');burst(0,0,60,'rain');}
+  spot.addEventListener('click',ev=>{ev.stopPropagation();if(found)return;tries++;win();});
+  fig.addEventListener('click',()=>{if(found)return;tries++;setTries();fig.classList.remove('nope');void fig.offsetWidth;fig.classList.add('nope');
+    note.textContent=tries<3?'Not there. Keep looking in the mehendi on her palm.':'Still hiding! Tap "Need a hint?" if you are stuck.';});
+  $('gcHint').addEventListener('click',()=>{if(found)return;hints++;
+    if(hints===1)note.textContent='Hint: it is in the middle of her palm, below the two big flowers.';
+    else{note.textContent='Here it is, glowing. Tap it!';spot.classList.add('hint');}});
 })();
 
 /* sangeet: tap the dhol */
