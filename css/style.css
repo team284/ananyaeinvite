@@ -81,6 +81,8 @@ html.locked,html.locked body{overflow:hidden;height:100%;overscroll-behavior:non
 .rod-b{animation:rodb 1.5s cubic-bezier(.3,.7,.3,1) .4s both}
 @keyframes unfurl{from{transform:scaleY(.02)}to{transform:none}}
 @keyframes rodb{from{transform:translateY(-148px)}to{transform:none}}
+.decor{transition:filter 2s ease;filter:brightness(.6)}
+.lit .decor{filter:none}
 .tassel{animation:hangsway 4s ease-in-out infinite alternate;transform-box:view-box}
 .hang{animation:hangsway 5s ease-in-out infinite alternate;transform-box:view-box}
 .hang:nth-of-type(2n){animation-delay:-2.5s}

@@ -115,6 +115,8 @@ const SCENE=(()=>{const wide=innerWidth>=900;const W=wide?Math.max(400,Math.min(
     <linearGradient id="lit" x1="1" y1="0" x2="0" y2="0"><stop offset="0" stop-color="#ffb35a" stop-opacity=".55"/><stop offset=".6" stop-color="#ff8a2a" stop-opacity="0"/></linearGradient>
     <linearGradient id="gtext" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fff6dc"/><stop offset=".35" stop-color="#e6cf98"/><stop offset=".6" stop-color="#fff2d0"/><stop offset="1" stop-color="#b8996a"/></linearGradient>
     <radialGradient id="roseglow" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#8c2a34" stop-opacity=".55"/><stop offset=".55" stop-color="#5c1520" stop-opacity=".25"/><stop offset="1" stop-color="#3a0b12" stop-opacity="0"/></radialGradient>
+    <linearGradient id="velvet" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#2a070d"/><stop offset=".35" stop-color="#5c1520"/><stop offset=".55" stop-color="#7a1e2a"/><stop offset=".8" stop-color="#4a1018"/><stop offset="1" stop-color="#2a070d"/></linearGradient>
+    <linearGradient id="trim" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff6dc"/><stop offset=".5" stop-color="#cdb27c"/><stop offset="1" stop-color="#8a7046"/></linearGradient>
     <radialGradient id="gJas" cx=".35" cy=".3" r=".7"><stop offset="0" stop-color="#ffffff"/><stop offset=".6" stop-color="#f6e3b4"/><stop offset="1" stop-color="#b8996a"/></radialGradient>
     <radialGradient id="gRose" cx=".35" cy=".3" r=".75"><stop offset="0" stop-color="#e98a93"/><stop offset=".55" stop-color="#8c2a34"/><stop offset="1" stop-color="#3a0b12"/></radialGradient>
     <linearGradient id="brassH" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#8a7046"/><stop offset=".5" stop-color="#f6e3b4"/><stop offset="1" stop-color="#8a7046"/></linearGradient>
@@ -131,6 +133,24 @@ const SCENE=(()=>{const wide=innerWidth>=900;const W=wide?Math.max(400,Math.min(
     ${[260,390,520].map(y=>`<path class="t s-line" d="M${x} ${y-12} L${x+6} ${y} L${x} ${y+12} L${x-6} ${y} Z" stroke-width=".7"/>`).join('')}
   </g>`).join('')}
   <circle class="lightwash" cx="200" cy="560" r="470" fill="url(#roseglow)"/>
+  ${E>60?(()=>{let s='';let sd=5;const rr=()=>(sd=(sd*16807)%2147483647)/2147483647;
+    const Dw=Math.min(E*.5,250),x0=-E,x1=-E+Dw,tx=x0+Dw*.3,ty=430;
+    const drape=`<path d="M${x0} -6 L${x1} -6 C${x1-6} 140 ${x1-Dw*.35} 330 ${tx} ${ty} C${x0+Dw*.5} ${ty+60} ${x1-8} 560 ${x1+14} 700 L${x0} 700 Z" fill="url(#velvet)"/>
+      ${[.2,.42,.64,.84].map(f=>`<path d="M${x0+Dw*f} -6 C${x0+Dw*f-4} 160 ${x0+Dw*f*.55} 330 ${tx+(f-.5)*12} ${ty}" stroke="#ecbcb4" stroke-opacity=".07" stroke-width="6" fill="none"/><path d="M${tx+(f-.5)*14} ${ty+8} C${x0+Dw*f*.8} 520 ${x0+Dw*f} 600 ${x0+Dw*f*1.1} 700" stroke="#000" stroke-opacity=".18" stroke-width="5" fill="none"/>`).join('')}
+      <path d="M${x1} -6 C${x1-6} 140 ${x1-Dw*.35} 330 ${tx} ${ty} C${x0+Dw*.5} ${ty+60} ${x1-8} 560 ${x1+14} 700" stroke="url(#trim)" stroke-width="3" fill="none"/>
+      <path d="M${x1-5} -6 C${x1-11} 140 ${x1-Dw*.38} 330 ${tx-3} ${ty-2}" stroke="#cdb27c" stroke-opacity=".5" stroke-width=".8" stroke-dasharray="2 3" fill="none"/>
+      <g class="tassel" style="transform-origin:${tx}px ${ty}px">
+        <path d="M${tx-12} ${ty-4} Q${tx} ${ty+6} ${tx+12} ${ty-4}" stroke="url(#trim)" stroke-width="4" fill="none"/>
+        ${[[-6,-2,5,'gRose'],[5,-3,4.4,'gRose'],[0,4,3.4,'gJas'],[-11,3,2.8,'gJas'],[10,3,2.8,'gJas']].map(([dx,dy,r,g])=>`<circle cx="${tx+dx}" cy="${ty+dy}" r="${r}" fill="url(#${g})"/>`).join('')}
+        <line x1="${tx}" y1="${ty+6}" x2="${tx}" y2="${ty+40}" stroke="#cdb27c" stroke-width=".8"/>
+        <path d="M${tx-5} ${ty+38} L${tx} ${ty+58} L${tx+5} ${ty+38} Z" fill="url(#brassH)"/></g>`;
+    // phoolon ki ladi: jasmine strings with roses, between the drape and the arch
+    let ladi='';for(let x=x1+18;x<=-34;x+=24){const len=150+rr()*270;ladi+=`<g class="tassel" style="transform-origin:${x.toFixed(1)}px 0px;animation-delay:-${(rr()*4).toFixed(2)}s"><line x1="${x.toFixed(1)}" y1="-4" x2="${x.toFixed(1)}" y2="${len.toFixed(0)}" stroke="#cdb27c" stroke-opacity=".45" stroke-width=".5"/>`;
+      for(let y=6,k=0;y<len;y+=9,k++){const rose=k%7===5;ladi+=`<circle cx="${x.toFixed(1)}" cy="${y}" r="${rose?3.4:2.3}" fill="url(#${rose?'gRose':'gJas'})"/>`;}
+      ladi+=`<circle cx="${x.toFixed(1)}" cy="${(len+3).toFixed(0)}" r="4" fill="url(#gRose)"/></g>`;}
+    const side=drape+ladi;
+    return `<g class="decor">${side}</g><g class="decor" transform="translate(400 0) scale(-1 1)">${side}</g>`;})():''}
+
   <path class="t s-line" d="${archPath(200,236,340,620,6)}" stroke-width="1"/>
   <path class="t s-line" d="${archPath(200,222,340,620,6)}" stroke-width=".5" opacity=".55"/>
   <path d="${archPath(200,196,340,620,6)}" fill="url(#inner)"/>
@@ -151,12 +171,6 @@ const SCENE=(()=>{const wide=innerWidth>=900;const W=wide?Math.max(400,Math.min(
     <g class="nl" style="transition-delay:.9s"><circle cx="352" cy="192" r="26" fill="url(#ng)"/>
       <path class="nl-f" d="${flamePath(352,199,13,5)}" fill="url(#flg)"/></g>
   </g>
-  ${[[-150,150],[550,150],[-330,236],[730,236],[-500,110],[900,110]].filter(([x])=>x>-E+24&&x<400+E-24).map(([x,cl],i)=>`<g class="hang" style="transform-origin:${x}px -10px;animation-delay:-${(i*1.3).toFixed(1)}s">
-    <line x1="${x}" y1="-10" x2="${x}" y2="${cl}" stroke="#a88a58" stroke-width=".8" opacity=".55"/>
-    <path d="M${x-11} ${cl+4} Q${x} ${cl} ${x+11} ${cl+4} L${x+8} ${cl+14} Q${x} ${cl+20} ${x-8} ${cl+14} Z" fill="url(#brassH)"/>
-    <path d="M${x-6} ${cl+14} Q${x} ${cl+26} ${x+6} ${cl+14}" fill="url(#brassH)"/>
-    <g class="nl" style="transition-delay:${(1.1+Math.abs(x-200)/900).toFixed(2)}s"><circle cx="${x}" cy="${cl-4}" r="26" fill="url(#ng)"/><path class="nl-f" d="${flamePath(x,cl+3,13,5)}" fill="url(#flg)"/></g>
-  </g>`).join('')}
   <g class="wel arch-garland" style="transition-delay:.9s">${(()=>{let s='';const R=246,pts=[];
     for(let d=180;d>=120;d-=3.2){const t=d*Math.PI/180;pts.push([318+R*Math.cos(t),340-R*Math.sin(t)]);}
     for(let d=60;d>=0;d-=3.2){const t=d*Math.PI/180;pts.push([82+R*Math.cos(t),340-R*Math.sin(t)]);}
