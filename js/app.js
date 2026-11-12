@@ -872,3 +872,15 @@ if('serviceWorker' in navigator&&(location.protocol==='https:'||location.hostnam
   $('tap').addEventListener('click',()=>{if(!off)setTimeout(play,900);},{once:true});
   document.addEventListener('visibilitychange',()=>{if(document.hidden&&!au.paused){au.pause();btn.dataset.resume='1';}else if(!document.hidden&&btn.dataset.resume){delete btn.dataset.resume;if(btn.classList.contains('on'))au.play().catch(()=>{});}});
 })();
+
+/* ================= DIYAS: small flickering diyas in the corners of every slide ================= */
+(function(){
+  const diya=(sz)=>{const d=(1.1+Math.random()*.7).toFixed(2),dl=(-Math.random()*2).toFixed(2),g=(1.8+Math.random()*1.2).toFixed(2);
+    return `<svg class="dy ${sz}" viewBox="0 0 40 44" style="--d:${d}s;--dl:${dl}s;--g:${g}s"><circle class="dy-glow" cx="20" cy="17" r="17" fill="url(#dyGlow)"/><path class="dy-fl" d="M20 3C15.6 10.5 15.2 15.2 20 20.5C24.8 15.2 24.4 10.5 20 3Z" fill="url(#dyFlame)"/><path d="M19.2 20.5h1.6v3h-1.6z" fill="#3a0b12"/><path d="M4 24Q20 21 36 24Q33 36.5 20 37.5Q7 36.5 4 24Z" fill="url(#dyClay)"/><path d="M4 24Q20 27.2 36 24" fill="none" stroke="#e6cf98" stroke-width="1"/><g fill="#e6cf98"><circle cx="12.5" cy="30" r="1"/><circle cx="20" cy="32.2" r="1"/><circle cx="27.5" cy="30" r="1"/></g></svg>`;};
+  const groups=[['sm','md'],['md','sm','lg']];
+  document.querySelectorAll('#page > section.sec:not(#scene), #page footer.sec, #acts .act').forEach((sec,i)=>{
+    if(sec.offsetHeight<220)return;   // skip short title-only bands
+    const g=groups[i%2];
+    sec.insertAdjacentHTML('beforeend',`<div class="diyas l" aria-hidden="true">${g.map(diya).join('')}</div><div class="diyas r" aria-hidden="true">${[...g].reverse().map(diya).join('')}</div>`);
+  });
+})();
