@@ -45,6 +45,7 @@
 
 <!-- ======================= 2 · THE NAMES ======================= -->
 <section class="sec" id="names">
+  <i class="str" style="left:4%;height:70px"></i><i class="str" style="left:8%"></i><i class="str" style="right:4%;height:70px"></i><i class="str" style="right:8%"></i>
   <p class="eyebrow">A letter for you</p>
   <h2 class="title foil">From Two Families</h2>
   <svg class="orn" viewBox="0 0 170 24" aria-hidden="true"><use href="#ornament"/></svg>
@@ -69,19 +70,37 @@
 </section>
 
 <!-- ======================= 3 · THE DATE ======================= -->
-<section class="sec" id="date" style="padding-top:20px">
-  <div class="frame">
-    <p class="eyebrow">Save the date</p>
-    <h2 class="title foil">The Date</h2>
-    <svg class="orn" viewBox="0 0 170 24" aria-hidden="true"><use href="#ornament"/></svg>
-    <div class="tiles" id="tiles"></div>
-    <p class="hint" id="dateHint">Scratch the gold to reveal</p>
-    <div class="when" id="when" hidden>
-      <p class="big" id="whenLine"></p>
-      <p class="lede" id="whenSub" style="margin-top:0"></p>
-      <a class="btn line" id="whenCal" target="_blank" rel="noopener" style="margin-top:10px">Add to calendar</a>
+<section class="sec std" id="date">
+  <div class="std-toran" aria-hidden="true"></div>
+  <div class="std-grid">
+    <aside class="cal" aria-label="Calendar for the wedding month">
+      <div class="cal-h" id="calH"></div>
+      <div class="cal-dow" aria-hidden="true"><span>S</span><span>M</span><span>T</span><span>W</span><span>T</span><span>F</span><span>S</span></div>
+      <div class="cal-gr" id="calGr"></div>
+      <div class="cal-n">Save the date</div>
+    </aside>
+    <div class="std-mid">
+      <p class="std-cap">Save the date</p>
+      <div class="std-box">
+        <svg class="co c1" viewBox="0 0 46 46" fill="none" aria-hidden="true"><path d="M2 44V10Q2 2 10 2H44M10 44V16Q10 10 16 10H44"/><circle cx="17" cy="17" r="2.5"/></svg><svg class="co c2" viewBox="0 0 46 46" fill="none" aria-hidden="true"><path d="M2 44V10Q2 2 10 2H44M10 44V16Q10 10 16 10H44"/><circle cx="17" cy="17" r="2.5"/></svg><svg class="co c3" viewBox="0 0 46 46" fill="none" aria-hidden="true"><path d="M2 44V10Q2 2 10 2H44M10 44V16Q10 10 16 10H44"/><circle cx="17" cy="17" r="2.5"/></svg><svg class="co c4" viewBox="0 0 46 46" fill="none" aria-hidden="true"><path d="M2 44V10Q2 2 10 2H44M10 44V16Q10 10 16 10H44"/><circle cx="17" cy="17" r="2.5"/></svg>
+        <svg class="std-mand" id="stdMand" viewBox="-100 -100 200 200" fill="none" aria-hidden="true"><circle r="20"/><circle r="45"/><circle r="70"/><circle r="95"/></svg>
+        <h2 class="title foil">The Date</h2>
+        <svg class="orn" viewBox="0 0 170 24" aria-hidden="true"><use href="#ornament"/></svg>
+        <p class="std-note">Mark your calendars, we can&rsquo;t wait to celebrate with you.</p>
+        <div class="tiles" id="tiles"></div>
+        <p class="hint" id="dateHint">Scratch the gold to reveal</p>
+        <div class="when" id="when" hidden>
+          <p class="std-day" id="whenDay"></p>
+          <p class="std-venue" id="whenLine"></p>
+          <p class="lede" id="whenSub" style="margin-top:0"></p>
+          <div class="std-cd" role="timer"><div><b id="sdD">0</b><small>Days</small></div><div><b id="sdH">00</b><small>Hrs</small></div><div><b id="sdM">00</b><small>Min</small></div><div><b id="sdS">00</b><small>Sec</small></div></div>
+          <div class="std-btns"><a class="btn" id="whenCal" target="_blank" rel="noopener">Add to calendar</a><a class="btn line" id="whenMap" target="_blank" rel="noopener">View location</a></div>
+        </div>
+      </div>
     </div>
+    <aside class="std-diya" aria-hidden="true"><svg viewBox="0 0 200 220"><defs><radialGradient id="sdg"><stop offset="0" stop-color="#ffd27a" stop-opacity=".75"/><stop offset="1" stop-color="#ffd27a" stop-opacity="0"/></radialGradient><linearGradient id="sfg" x1="0" y1="1" x2="0" y2="0"><stop offset="0" stop-color="#ff8a2a"/><stop offset="1" stop-color="#fff2c4"/></linearGradient></defs><circle class="sd-glow" cx="100" cy="70" r="70" fill="url(#sdg)"/><g fill="rgba(246,227,180,.14)" stroke="#e6cf98" stroke-width="1.2"><ellipse cx="100" cy="166" rx="15" ry="38" transform="rotate(-62 100 202)"/><ellipse cx="100" cy="166" rx="15" ry="38" transform="rotate(62 100 202)"/><ellipse cx="100" cy="166" rx="15" ry="38" transform="rotate(-32 100 202)"/><ellipse cx="100" cy="166" rx="15" ry="38" transform="rotate(32 100 202)"/><ellipse cx="100" cy="166" rx="15" ry="38"/></g><path d="M38 86Q100 74 162 86Q154 128 100 134Q46 128 38 86Z" fill="#5c1520" stroke="#e6cf98" stroke-width="1.6"/><path d="M38 86Q100 98 162 86" fill="none" stroke="#e6cf98"/><g fill="#e6cf98"><circle cx="68" cy="108" r="2.4"/><circle cx="100" cy="117" r="2.4"/><circle cx="132" cy="108" r="2.4"/></g><path d="M100 76v10" stroke="#e6cf98" stroke-width="1.5"/><path class="sd-flame" d="M100 20C86 44 84 60 100 76C116 60 114 44 100 20Z" fill="url(#sfg)"/></svg><p>शुभ विवाह</p></aside>
   </div>
+  <svg class="std-vine" viewBox="0 0 100 320" aria-hidden="true"><path d="M50 0C15 60 85 100 50 160C15 220 85 260 50 320"/><ellipse cx="72" cy="48" rx="15" ry="6" transform="rotate(-30 72 48)"/><ellipse cx="28" cy="104" rx="15" ry="6" transform="rotate(30 28 104)"/><ellipse cx="74" cy="150" rx="15" ry="6" transform="rotate(-30 74 150)"/><ellipse cx="26" cy="208" rx="15" ry="6" transform="rotate(30 26 208)"/><ellipse cx="72" cy="252" rx="15" ry="6" transform="rotate(-30 72 252)"/><ellipse cx="30" cy="300" rx="15" ry="6" transform="rotate(30 30 300)"/></svg>
 </section>
 
 <!-- ======================= 4 · OUR STORY ======================= -->

@@ -20,11 +20,12 @@ window.CONFIG = {
   ],
   /* Solo portraits beside the envelope (3:4 portrait works best). Leave src empty to hide them. */
   couple:{groom:"photos/couple/groom.jpg", bride:"photos/couple/bride.jpg"},
+  /* capOnPhoto: the caption is already written on the picture, so none is added on top */
   photos:[
-    {cap:"The first trip", src:"", hue:[352,8]},
-    {cap:"Sunday mornings", src:"", hue:[8,352]},
-    {cap:"The day he asked", src:"", hue:[354,75]},
-    {cap:"Home", src:"", hue:[10,354]}
+    {cap:"First trip, Delhi market", src:"photos/moments/first-trip.jpg", capOnPhoto:true},
+    {cap:"Lake boating, Udaipur", src:"photos/moments/lake-boating.jpg", capOnPhoto:true},
+    {cap:"The day he asked", src:"photos/moments/the-day-he-asked.jpg", capOnPhoto:true},
+    {cap:"Roka", src:"photos/moments/roka.jpg", capOnPhoto:true}
   ],
   /* Illustrations for the three functions; w and h are the image size in pixels. */
   scenes:{

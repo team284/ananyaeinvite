@@ -20,6 +20,7 @@ function tex(w,h,draw){const c=document.createElement('canvas');c.width=w;c.heig
   r.setProperty('--stone-tex',`url(${tex(160,160,(x,w,h)=>{const d=x.createImageData(w,h);for(let i=0;i<d.data.length;i+=4){const v=Math.random()>.5?255:60;d.data[i]=v;d.data[i+1]=v*.8;d.data[i+2]=v*.6;d.data[i+3]=Math.random()*26;}x.putImageData(d,0,0);})})`);
   r.setProperty('--marble-tex',`url(${tex(200,220,(x,w,h)=>{x.strokeStyle='rgba(177,150,82,.18)';for(let i=0;i<7;i++){x.lineWidth=.5+Math.random()*1.2;x.beginPath();let X=Math.random()*w,Y=0;x.moveTo(X,Y);while(Y<h){X+=(Math.random()-.5)*26;Y+=12+Math.random()*16;x.lineTo(X,Y);}x.stroke();}})})`);
   const dm=`<svg xmlns='http://www.w3.org/2000/svg' width='84' height='84' viewBox='0 0 84 84'><g fill='none' stroke='%23d9a845' stroke-opacity='.10' stroke-width='1'><path d='M42 14c8 6 8 18 0 24c-8-6-8-18 0-24z'/><path d='M42 38c-6 4-14 4-18-2M42 38c6 4 14 4 18-2'/><circle cx='42' cy='44' r='2'/><path d='M0 0c6 4 6 10 0 14M84 0c-6 4-6 10 0 14M0 70c6 4 6 10 0 14M84 70c-6 4-6 10 0 14'/></g><g fill='%23d9a845' fill-opacity='.10'><circle cx='0' cy='42' r='1.6'/><circle cx='84' cy='42' r='1.6'/><circle cx='42' cy='0' r='1.6'/><circle cx='42' cy='84' r='1.6'/></g></svg>`;
+  r.setProperty('--jaali-tex',`url("data:image/svg+xml,${encodeURIComponent("<svg xmlns='http://www.w3.org/2000/svg' width='18' height='18'><path d='M9 0L18 9L9 18L0 9Z' fill='none' stroke='#e6cf98' stroke-opacity='.45' stroke-width='1'/><circle cx='9' cy='9' r='1.6' fill='#e6cf98' fill-opacity='.5'/></svg>")}")`);
   r.setProperty('--damask',`url("data:image/svg+xml,${dm.replace(/#/g,'%23').replace(/</g,'%3C').replace(/>/g,'%3E').replace(/"/g,"'")}")`);
 })();
 
@@ -469,7 +470,26 @@ $('seal').addEventListener('click',openEnvelope);
 const dparts=[["Day",CONFIG.mainDate.day],["Month",CONFIG.mainDate.month],["Year",CONFIG.mainDate.year]];
 $('tiles').innerHTML=dparts.map(([l,v])=>`<div class="tile"><div class="tile-in"><span class="v${v.length>4?' sm':''}">${esc(v)}</span><canvas tabindex="0" aria-label="Scratch to reveal the ${l.toLowerCase()}, or press Enter"></canvas></div><span class="tile-cap">${l.toUpperCase()}</span></div>`).join('');
 const mainEv=CONFIG.events[CONFIG.events.length-1];
-$('whenLine').textContent=CONFIG.mainDate.line;$('whenSub').textContent=CONFIG.mainDate.sub;
+{const wd=new Date(mainEv.start),tm=(CONFIG.mainDate.line.split('·')[1]||'').trim();
+  $('whenDay').textContent=fmt(mainEv.start,{weekday:'long'});
+  $('whenLine').textContent=[tm,CONFIG.venue].filter(Boolean).join(' · ');
+  $('whenSub').textContent=CONFIG.mainDate.sub;$('whenMap').href=maps;
+  // the calendar card for the wedding month, with a heart around the day
+  const y=+fmt(mainEv.start,{year:'numeric'}),mo=+fmt(mainEv.start,{month:'numeric'})-1,dd=+fmt(mainEv.start,{day:'numeric'});
+  $('calH').textContent=`${CONFIG.mainDate.month} ${CONFIG.mainDate.year}`;
+  const first=new Date(y,mo,1).getDay(),days=new Date(y,mo+1,0).getDate();let h='';
+  for(let i=0;i<first;i++)h+='<span></span>';
+  for(let d=1;d<=days;d++)h+=d===dd?`<span class="hit"><svg class="cal-heart" viewBox="0 0 32 32" aria-hidden="true"><path pathLength="100" d="M16 27C6 19.5 3 14 3 9.8C3 6 6 3.5 9.5 3.5C12.3 3.5 14.8 5 16 7.5C17.2 5 19.7 3.5 22.5 3.5C26 3.5 29 6 29 9.8C29 14 26 19.5 16 27Z"/></svg>${d}</span>`:`<span>${d}</span>`;
+  $('calGr').innerHTML=h;
+  $('stdMand').insertAdjacentHTML('beforeend',Array.from({length:12},(_,k)=>`<path transform="rotate(${k*30})" d="M0 0C14 -30 14 -60 0 -92C-14 -60 -14 -30 0 0Z"/>`).join(''));
+  const T2=new Date(mainEv.start).getTime();
+  const tick2=()=>{const s=Math.max(0,Math.floor((T2-Date.now())/1000));$('sdD').textContent=Math.floor(s/86400);$('sdH').textContent=String(Math.floor(s%86400/3600)).padStart(2,'0');$('sdM').textContent=String(Math.floor(s%3600/60)).padStart(2,'0');$('sdS').textContent=String(s%60).padStart(2,'0');};
+  tick2();setInterval(tick2,1000);}
+function hearts(){if(RM)return;const w=document.createElement('div');w.className='hearts';document.body.appendChild(w);
+  const cols=['#8c2a34','#e6cf98','#ecbcb4','#f6e3b4'];
+  for(let i=0;i<34;i++){const s=document.createElement('span');s.textContent='♥';s.style.left=Math.random()*100+'vw';s.style.fontSize=(14+Math.random()*20)+'px';s.style.color=cols[i%4];
+    s.style.animationDuration=(4+Math.random()*3.5)+'s';s.style.animationDelay=(Math.random()*1.6)+'s';s.style.setProperty('--dx',(Math.random()*120-60)+'px');w.appendChild(s);}
+  setTimeout(()=>w.remove(),9500);}
 $('whenCal').href=gcal(`${CONFIG.bride} & ${CONFIG.groom}: ${mainEv.en}`,mainEv.start,mainEv.hours,CONFIG.venue);
 let revealed=0;
 function foil(cv){
@@ -485,7 +505,7 @@ function foil(cv){
 }
 function scratched(cv){const d=cv.getContext('2d').getImageData(0,0,cv.width,cv.height).data;let c=0,t=0;for(let i=3;i<d.length;i+=80){t++;if(d[i]<20)c++;}return c/t;}
 function tileDone(cv){if(cv.classList.contains('done'))return;cv.classList.add('done');revealed++;const[x,y]=centerOf(cv);burst(x,y,16,'spark');
-  if(revealed===3){$('when').hidden=false;$('dateHint').hidden=true;}}
+  if(revealed===3){$('when').hidden=false;$('dateHint').hidden=true;$('date').classList.add('shown');hearts();}}
 document.querySelectorAll('.tile canvas').forEach(cv=>{
   foil(cv);let down=false,last=null,m=0;
   const pt=e=>{const r=cv.getBoundingClientRect();return[e.clientX-r.left,e.clientY-r.top];};
@@ -602,9 +622,10 @@ function bokeh(h1,h2){return tex(300,430,(x,w,h)=>{const g=x.createLinearGradien
   x.beginPath();x.ellipse(w*.6,h*.8,w*.14,h*.26,0,0,7);x.fill();x.beginPath();x.arc(w*.6,h*.5,w*.078,0,7);x.fill();});}
 $('wins').innerHTML=CONFIG.photos.map((p,i)=>`<div class="win" id="w${i}">
   <button class="win-btn" type="button" aria-label="Open the window: ${esc(p.cap)}">
+    <span class="crown" aria-hidden="true"></span>
     <div class="opening">
       <div class="ph" style="background-image:url(${p.src?esc(p.src):bokeh(p.hue[0],p.hue[1])})">${p.src?'':`<span class="ph-tag">YOUR PHOTO HERE</span>`}</div>
-      <p class="ph-cap">${esc(p.cap)}</p>
+      ${p.capOnPhoto?'':`<p class="ph-cap">${esc(p.cap)}</p>`}
       <div class="shut l"><i></i><i></i></div><div class="shut r"><i></i><i></i></div>
     </div>
   </button><div class="sill" aria-hidden="true"></div></div>`).join('');

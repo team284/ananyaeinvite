@@ -120,9 +120,21 @@ html.locked,html.locked body{overflow:hidden;height:100%;overscroll-behavior:non
 .seal svg{width:100%;height:100%;display:block}
 .env.open .seal{opacity:0;transform:translate(-50%,-50%) scale(1.35) rotate(-12deg)}
 .env-stage.done .env{opacity:0;transform:scale(.92) translateY(20px)}
-/* the couple's portraits: laptops only, either side of the envelope (bride left, groom right); hidden on phones */
-.couple{display:block}
-.cp{display:none;margin:0}
+/* the couple's portraits as pinned cards: under the letter on phones (bride left, groom right), beside it on laptops */
+.couple{display:grid;grid-template-columns:1fr 1fr;grid-template-areas:"mid mid" "b g";column-gap:18px;row-gap:40px;align-items:start}
+.cp-mid{grid-area:mid;min-width:0}
+.cp-b{grid-area:b;--r:-4deg}.cp-g{grid-area:g;--r:4deg}
+.cp{display:block;position:relative;margin:0;justify-self:center;width:min(200px,100%);padding:10px 10px 6px;border-radius:4px;background:var(--paper-tex,none) 0 0/240px 240px,linear-gradient(160deg,#fbf0d2,#e9d7a4);box-shadow:0 20px 40px rgba(0,0,0,.5);transform:rotate(var(--r));animation:cpSway 6s ease-in-out infinite alternate}
+.cp-g{animation-delay:-3s}
+@keyframes cpSway{to{transform:rotate(calc(var(--r) * -.4))}}
+.cp::before{content:"";position:absolute;top:-9px;left:50%;width:18px;height:18px;margin-left:-9px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#fff6dc,#b8996a);box-shadow:0 3px 6px rgba(0,0,0,.5);z-index:2}
+.cp-frame{padding:5px;border:1px solid #b8996a}
+.cp-frame img{display:block;width:100%;aspect-ratio:3/4;object-fit:cover;object-position:50% 20%;filter:sepia(.18) saturate(.92);background:#2a070d}
+.cp figcaption{font-family:var(--f-script);font-size:1.9rem;line-height:1.3;color:#8c2a34;margin-top:2px}
+.str{position:absolute;top:0;width:1px;height:90px;background:linear-gradient(#b8996a,transparent);pointer-events:none}
+.str::after{content:"";position:absolute;bottom:-4px;left:-5px;width:11px;height:11px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#fff6dc,#b8996a);box-shadow:0 0 14px rgba(246,227,180,.7)}
+#names .str{display:none}
+@media (prefers-reduced-motion:reduce){.cp{animation:none}}
 .names{display:grid;gap:4px;justify-items:center}
 .names .ga{font-family:var(--f-hi);color:var(--gold);font-size:1.05rem}
 .names .nm{font-family:var(--f-script);font-size:clamp(3.2rem,15vw,4.4rem);line-height:1.08;margin-top:6px;white-space:nowrap}
@@ -137,13 +149,65 @@ html.locked,html.locked body{overflow:hidden;height:100%;overscroll-behavior:non
 @keyframes fade{to{opacity:1}}
 
 /* ================= DATE ================= */
-.tiles{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:30px}
+.tiles{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:26px}
+/* ---- save the date: calendar card, bordered box with scratch cards, diya ---- */
+.std{padding-top:96px}
+.std-toran{position:absolute;left:50%;top:0;width:100vw;transform:translateX(-50%);height:46px;border-top:2px solid #b8996a;pointer-events:none;
+  background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='64' height='48'%3E%3Cpath d='M0 1Q32 44 64 1' fill='rgba(230,207,152,.14)' stroke='%23e6cf98'/%3E%3Cpath d='M32 22v10' stroke='%23e6cf98'/%3E%3Ccircle cx='32' cy='37' r='4' fill='%23e6cf98'/%3E%3Ccircle cx='32' cy='37' r='1.6' fill='%233a0b12'/%3E%3C/svg%3E") repeat-x center top}
+.std-grid{display:grid;grid-template-columns:1fr;gap:38px;justify-items:center}
+.std-mid{width:100%}
+.std-cap{display:flex;align-items:center;justify-content:center;gap:14px;font-family:var(--f-caps);font-weight:600;font-size:.95rem;letter-spacing:.3em;text-transform:uppercase;color:var(--gold-hi);margin-bottom:22px}
+.std-cap::before,.std-cap::after{content:"";width:clamp(30px,8vw,90px);height:1px;background:linear-gradient(90deg,transparent,#b8996a)}
+.std-cap::after{transform:scaleX(-1)}
+.std-box{position:relative;padding:44px 16px 36px;border:3px double rgba(230,207,152,.55)}
+.std-box::before{content:"";position:absolute;inset:9px;border:1px solid rgba(230,207,152,.22);pointer-events:none}
+.std-box>*:not(.co):not(.std-mand){position:relative}
+.std-box .co{position:absolute;width:40px;height:40px;stroke:#e6cf98}.std-box .co circle{fill:#e6cf98;stroke:none}
+.co.c1{left:-3px;top:-3px}.co.c2{right:-3px;top:-3px;transform:scaleX(-1)}.co.c3{left:-3px;bottom:-3px;transform:scaleY(-1)}.co.c4{right:-3px;bottom:-3px;transform:scale(-1,-1)}
+.std-mand{position:absolute;left:50%;top:50%;width:84%;transform:translate(-50%,-50%);opacity:.08;stroke:#e6cf98;pointer-events:none}
+.std-note{margin:12px auto 0;max-width:30ch;font-style:italic;font-size:1.08rem;color:var(--muted)}
+.std-day{font-family:var(--f-script);font-size:3rem;line-height:1;color:var(--gold-hi)}
+.std-venue{font-family:var(--f-caps);font-size:.72rem;letter-spacing:.18em;text-transform:uppercase;color:var(--ivory)}
+.std-cd{display:flex;justify-content:center;gap:10px;margin-top:10px}
+.std-cd div{min-width:58px;padding:8px 6px;border:1px solid rgba(230,207,152,.5);background:rgba(0,0,0,.18);display:grid;gap:2px}
+.std-cd b{font-family:var(--f-caps);font-size:1.4rem;font-weight:600;color:var(--ivory)}
+.std-cd small{font-family:var(--f-caps);font-size:.5rem;letter-spacing:.25em;text-transform:uppercase;color:var(--gold)}
+.std-btns{display:flex;justify-content:center;flex-wrap:wrap;gap:12px;margin-top:16px}
+.std.shown .when{animation:stdIn .9s ease both}
+@keyframes stdIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+.cal{position:relative;width:min(240px,78%);padding:22px 14px 14px;border-radius:4px;background:var(--paper-tex,none) 0 0/240px 240px,linear-gradient(160deg,#fbf0d2,#e9d7a4);box-shadow:0 20px 44px rgba(0,0,0,.5);color:#5c1520;text-align:center;transform:rotate(-3deg);animation:calSway 6s ease-in-out infinite alternate}
+@keyframes calSway{to{transform:rotate(1deg)}}
+.cal::before{content:"";position:absolute;top:-9px;left:50%;width:18px;height:18px;margin-left:-9px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#fff6dc,#b8996a);box-shadow:0 3px 6px rgba(0,0,0,.5)}
+.cal-h{font-family:var(--f-caps);font-size:.8rem;letter-spacing:.2em;text-transform:uppercase;border-bottom:1px solid rgba(184,153,106,.7);padding-bottom:8px;min-height:1.6em;color:transparent;transition:color .9s}
+.std.shown .cal-h{color:#5c1520}
+.cal-dow,.cal-gr{display:grid;grid-template-columns:repeat(7,1fr);text-align:center}
+.cal-dow{font-family:var(--f-caps);font-size:.55rem;margin:8px 0 2px;color:#9c8050}
+.cal-gr span{position:relative;aspect-ratio:1;display:grid;place-items:center;font-size:.95rem}
+.cal-gr .hit{z-index:1;transition:color .6s}
+.std.shown .cal-gr .hit{font-weight:600;color:#8c2a34}
+.cal-heart{position:absolute;width:210%;height:210%;left:-55%;top:-55%;fill:rgba(140,42,52,.14);stroke:#8c2a34;stroke-width:1.6;stroke-dasharray:100;stroke-dashoffset:100;opacity:0;pointer-events:none}
+.std.shown .cal-heart{opacity:1;animation:calDraw 1.6s .5s forwards,calBeat 2s 2.3s infinite}
+@keyframes calDraw{to{stroke-dashoffset:0}}
+@keyframes calBeat{50%{transform:scale(1.1)}}
+.cal-n{margin-top:8px;font-family:var(--f-script);font-size:1.6rem}
+.std-diya{width:min(170px,50%);text-align:center}
+.std-diya svg{width:100%;height:auto;overflow:visible}
+.std-diya p{font-family:var(--f-hi);font-size:1.3rem;color:var(--gold-hi);margin-top:4px}
+.sd-flame{transform-box:fill-box;transform-origin:50% 100%;animation:sdFlick 1.6s ease-in-out infinite alternate}
+@keyframes sdFlick{0%{transform:scale(1,1) rotate(-2deg)}50%{transform:scale(.93,1.09) rotate(2deg)}100%{transform:scale(1.03,.96) rotate(-1deg)}}
+.sd-glow{animation:sdGlow 2.4s ease-in-out infinite alternate}
+@keyframes sdGlow{from{opacity:.5}to{opacity:1}}
+.std-vine{display:none}
+.hearts{position:fixed;inset:0;overflow:hidden;pointer-events:none;z-index:50}
+.hearts span{position:absolute;top:-40px;opacity:0;animation:heartFall linear forwards;text-shadow:0 0 8px rgba(0,0,0,.25)}
+@keyframes heartFall{0%{transform:translate(0,0) rotate(-15deg);opacity:0}10%{opacity:1}50%{transform:translate(var(--dx),55vh) rotate(15deg)}100%{transform:translate(calc(var(--dx) * -1),112vh) rotate(-20deg);opacity:.9}}
+@media (prefers-reduced-motion:reduce){.cal,.sd-flame,.sd-glow{animation:none}.hearts{display:none}}
 .tile{display:grid;gap:10px;justify-items:center}
 .tile-in{position:relative;width:100%;aspect-ratio:1/1.12;overflow:hidden;border-radius:3px;display:grid;place-content:center;
   background:var(--marble-tex,none) center/cover,linear-gradient(150deg,#fbf6ec,#efe1bd);
   box-shadow:inset 0 0 0 3px #f7efdc,inset 0 0 0 4px #b39958,inset 0 0 0 7px #f7efdc,inset 0 0 0 8px rgba(179,153,88,.6),0 14px 28px rgba(0,0,0,.45)}
 .tile-in .v{font-family:var(--f-caps);font-weight:600;font-size:2rem;color:#59161d;line-height:1}
-.tile-in .v.sm{font-size:1.1rem;letter-spacing:.06em}
+.tile-in .v.sm{font-size:clamp(.78rem,3.4vw,1.05rem);letter-spacing:.02em}
 .tile-in canvas{position:absolute;inset:0;width:100%;height:100%;touch-action:none;cursor:grab;transition:opacity .7s ease}
 .tile-in canvas.done{opacity:0;pointer-events:none}
 .tile-cap{font-family:var(--f-caps);font-size:.6rem;letter-spacing:.3em;color:var(--gold)}
@@ -182,7 +246,8 @@ html.locked,html.locked body{overflow:hidden;height:100%;overscroll-behavior:non
 .win-btn{position:relative;width:100%;border:0;padding:12px 12px 0;cursor:pointer;background:var(--stone-tex,none) 0 0/160px 160px,linear-gradient(180deg,#c5b17f,#af944f);border-radius:999px 999px 6px 6px;
   box-shadow:inset 0 2px 0 rgba(255,240,210,.5),inset 0 -3px 6px rgba(60,14,19,.45),0 20px 34px rgba(0,0,0,.5)}
 .win-btn::before{content:"";position:absolute;left:50%;top:-16px;width:22px;height:22px;transform:translateX(-50%);border-radius:50% 50% 4px 4px;background:linear-gradient(180deg,#d7c9a5,#af944f);box-shadow:inset 0 -2px 3px rgba(60,14,19,.4)}
-.opening{position:relative;aspect-ratio:3/4.3;border-radius:999px 999px 2px 2px;overflow:hidden;perspective:900px;background:#190608;box-shadow:inset 0 0 0 2px rgba(60,14,19,.6)}
+.crown{display:block;aspect-ratio:2/1;margin-bottom:8px;border-radius:999px 999px 0 0;background:var(--jaali-tex,none) center bottom/18px 18px,linear-gradient(180deg,#2a070d,#4a1218);box-shadow:inset 0 0 0 2px rgba(60,14,19,.6),inset 0 6px 14px rgba(0,0,0,.5)}
+.opening{position:relative;aspect-ratio:1/1;border-radius:2px;overflow:hidden;perspective:900px;background:#190608;box-shadow:inset 0 0 0 2px rgba(60,14,19,.6)}
 .opening .ph{position:absolute;inset:0;background-size:cover;background-position:center}
 .opening .ph img{width:100%;height:100%;object-fit:cover;display:block}
 .opening .ph::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,transparent 55%,rgba(17,4,5,.7))}
@@ -365,24 +430,32 @@ body{min-height:100vh;min-height:100dvh}
   .names .nm{font-size:6.4rem}
   .names .par{font-size:.95rem}
   .names .lede{max-width:40ch}
-  /* portraits either side of the envelope: bride left, groom right; same height as the envelope */
-  .couple{display:grid;grid-template-columns:1fr 480px 1fr;grid-template-areas:"b mid g";column-gap:56px;align-items:start}
-  .cp-mid{grid-area:mid;min-width:0}
-  .cp-b{grid-area:b;justify-self:end}.cp-g{grid-area:g;justify-self:start}
-  .cp:not([hidden]){display:block;position:relative;height:320px;aspect-ratio:3/4;margin-top:54px;transition:margin-top .8s ease}
-  .couple.opened{align-items:center}
-  .couple.opened .cp:not([hidden]){margin-top:0}
-  .cp-frame{position:absolute;inset:0;border-radius:999px 999px 0 0;border:1.5px solid #e6cf98;box-shadow:0 18px 34px rgba(0,0,0,.42);transition:box-shadow 1.4s ease}
-  .cp-frame::before{content:"";position:absolute;inset:-8px;border-radius:999px 999px 0 0;border:1px solid rgba(246,227,180,.32);pointer-events:none}
-  .cp-frame img{display:block;width:100%;height:100%;object-fit:cover;border-radius:999px 999px 0 0;background:#2a070d;filter:saturate(.92) sepia(.12)}
-  .cp-frame::after{content:"";position:absolute;inset:0;border-radius:999px 999px 0 0;pointer-events:none;background:linear-gradient(180deg,rgba(140,42,52,.16) 0%,rgba(92,21,32,.2) 55%,rgba(58,11,18,.55) 100%);mix-blend-mode:multiply}
-  .cp figcaption{position:absolute;left:0;right:0;top:calc(100% + 16px);text-align:center;font-family:var(--f-script);font-size:2rem;line-height:1;color:var(--gold-hi)}
-  .couple.opened .cp-frame{box-shadow:0 18px 34px rgba(0,0,0,.42),0 0 40px rgba(246,227,180,.28)}
+  /* portraits either side of the envelope: bride left, groom right */
+  .couple{grid-template-columns:1fr 480px 1fr;grid-template-areas:"b mid g";column-gap:clamp(24px,4vw,64px);align-items:center}
+  .cp{width:clamp(190px,17vw,260px);padding:12px 12px 8px}
+  .cp figcaption{font-size:2.3rem}
+  .couple.opened .cp{box-shadow:0 20px 40px rgba(0,0,0,.5),0 0 44px rgba(246,227,180,.25)}
+  #names .str{display:block}
   /* date */
   .frame{max-width:780px;margin-inline:auto;padding:64px 56px}
+  .std{padding-top:130px}
+  .std-grid{grid-template-columns:minmax(200px,1fr) minmax(0,620px) minmax(150px,1fr);align-items:center;gap:2.5vw}
+  .std-mid{justify-self:stretch}
+  .std .tiles{max-width:540px}
+  .std-box{padding:52px 48px 44px}
+  .std-box .co{width:46px;height:46px}
+  .std-cap{font-size:1.3rem}
+  .std-note{font-size:1.2rem}
+  .std-day{font-size:3.6rem}
+  .std-venue{font-size:.8rem}
+  .std-cd div{min-width:70px}.std-cd b{font-size:1.7rem}.std-cd small{font-size:.55rem}
+  .cal{width:min(240px,100%)}
+  .std-diya{width:min(200px,90%)}
+  .std-vine{display:block;position:absolute;right:-2%;top:22%;width:clamp(50px,5vw,80px);height:62%;fill:none;stroke:#e6cf98;stroke-width:1.2;opacity:.28;pointer-events:none}
+  .std-vine ellipse{fill:rgba(230,207,152,.18)}
   .tiles{max-width:560px;margin-inline:auto;gap:22px}
   .tile-in .v{font-size:2.8rem}
-  .tile-in .v.sm{font-size:1.5rem}
+  .tile-in .v.sm{font-size:1.3rem}
   .when .big{font-size:1.35rem}
   /* story */
   .stack{max-width:460px}
