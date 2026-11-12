@@ -1,9 +1,10 @@
 /* Offline cache for the invite: network first, cache only when offline. Bump VERSION when files change. */
-const VERSION = 'invite-v20';
+const VERSION = 'invite-v21';
 const SHELL = [
   './', 'index.html', 'css/style.css', 'js/config.js', 'js/app.js', 'manifest.webmanifest',
   'photos/events/mehendi.jpg', 'photos/events/sangeet.jpg', 'photos/events/vivah.jpg',
   'photos/couple/groom.jpg', 'photos/couple/bride.jpg',
+  'photos/story/delhi.jpg', 'photos/story/mumbai.jpg', 'photos/story/udaipur.jpg', 'photos/venue/palace.jpg',
   'photos/moments/first-trip.jpg', 'photos/moments/lake-boating.jpg', 'photos/moments/the-day-he-asked.jpg', 'photos/moments/roka.jpg',
   'icons/favicon.svg', 'icons/icon-192.png', 'icons/icon-512.png', 'icons/apple-touch-icon.png',
   'fonts/pinyon-script-latin-400-normal.woff2',
@@ -27,7 +28,8 @@ self.addEventListener('fetch', e => {
   e.respondWith(
     fetch(req, { cache: 'no-cache' })
       .then(r => {
-        if (r.ok) { const copy = r.clone(); caches.open(VERSION).then(c => c.put(req.mode === 'navigate' ? 'index.html' : req, copy)); }
+        // 206 = part of a file (the music streams in pieces); those can't be cached
+        if (r.status === 200) { const copy = r.clone(); caches.open(VERSION).then(c => c.put(req.mode === 'navigate' ? 'index.html' : req, copy)); }
         return r;
       })
       .catch(() => caches.match(req.mode === 'navigate' ? 'index.html' : req).then(hit => hit || caches.match(req)))

@@ -8,14 +8,16 @@ window.CONFIG = {
   bride:"Ananya", groom:"Kabir",
   brideFull:"Ananya Kapoor", groomFull:"Kabir Malhotra",
   brideParents:"Smt. Ritu & Shri Rajiv Kapoor", groomParents:"Smt. Meera & Shri Sanjay Malhotra",
+  /* Venue picture (leave empty to use the drawn palace) and the background music (leave empty to hide the music button) */
+  venueImg:"photos/venue/palace.jpg", music:"assets/wedding-tune.mp3",
   city:"Udaipur", venue:"Jharokha Mahal, Lake Pichola", address:"Gangaur Ghat Road, Udaipur, Rajasthan", mapsQuery:"Lake Pichola Udaipur",
   mainDate:{day:"14", month:"February", year:"2027", line:"Sunday · 7:00 PM", sub:"By Lake Pichola, with dinner after the pheras"},
   story:[
-    {city:"Delhi", when:"Lohri 2020", art:"delhi", stamp:"#8c2a34",
+    {city:"Delhi", when:"Lohri 2020", art:"delhi", img:"photos/story/delhi.jpg", stamp:"#8c2a34",
      text:"Two strangers at a college friend's Lohri, a short walk from India Gate. One bonfire, one long argument about the best gajak, and a number saved as 'Gajak Girl'."},
-    {city:"Mumbai", when:"Monsoon 2022", art:"mumbai", stamp:"#5b6b2c",
+    {city:"Mumbai", when:"Monsoon 2022", art:"mumbai", img:"photos/story/mumbai.jpg", stamp:"#5b6b2c",
      text:"Kabir moved to Mumbai. Midnight walks on Marine Drive with Ananya on video call, the Gateway lit behind him, and a drawer full of Rajdhani tickets."},
-    {city:"Udaipur", when:"Diwali 2025", art:"udaipur", stamp:"#3a0b12",
+    {city:"Udaipur", when:"Diwali 2025", art:"udaipur", img:"photos/story/udaipur.jpg", stamp:"#3a0b12",
      text:"A boat on Lake Pichola at sunset. He asked, and she said yes before he finished. So we're bringing everyone back to the same lake."}
   ],
   /* Solo portraits beside the envelope (3:4 portrait works best). Leave src empty to hide them. */

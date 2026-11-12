@@ -591,7 +591,7 @@ function postmark(city,yr){return `<svg class="pmark" viewBox="0 0 80 80" aria-h
   ${[0,1,2,3].map(i=>`<path d="M74 ${30+i*6} q8 -3 16 0 t16 0" stroke="#59161d" fill="none" stroke-width="1"/>`).join('')}</svg>`;}
 const stack=$('stack');let order=CONFIG.story.map((_,i)=>i);
 stack.innerHTML=CONFIG.story.map((s,i)=>`<article class="pc" data-i="${i}" tabindex="0" aria-label="${esc(s.city)}, ${esc(s.when)}.${i<CONFIG.story.length-1?' Tap for the next postcard.':''}">
-  <div class="pc-art">${ART[s.art]()}</div>
+  <div class="pc-art">${s.img?`<img src="${esc(s.img)}" alt="${esc(s.city)}" decoding="async">`:ART[s.art]()}</div>
   <div class="stamp"><div style="background:${s.stamp}"><b>${esc(s.city[0])}</b>${esc(s.city.toUpperCase())}<br>${esc(s.when.match(/\d{4}/)[0])}</div></div>
   ${postmark(s.city,s.when.match(/\d{4}/)[0])}
   <div class="pc-body"><p class="pc-yr">${esc(s.when)}</p><p class="pc-city">${esc(s.city)}</p><p class="txt">${esc(s.text)}</p></div>
@@ -814,6 +814,7 @@ tick();setInterval(tick,1000);
     <g transform="translate(0 ${wl*2}) scale(1 -1)" opacity=".45" filter="url(#vb)">${b}</g>
     ${Array.from({length:16},(_,i)=>`<rect class="shimmer" style="animation-delay:-${(rnd()*3).toFixed(2)}s" x="${30+rnd()*340}" y="${wl+6+rnd()*80}" width="${8+rnd()*22}" height="1.2" fill="#ffd98a"/>`).join('')}
     <g transform="translate(90 262)"><path d="M-26 0 Q0 8 26 0 L20 6 Q0 11 -20 6Z" fill="#0d0814"/><line x1="0" y1="0" x2="0" y2="-14" stroke="#0d0814" stroke-width="1.2"/><circle cx="0" cy="-15" r="2.4" fill="#ffd27a"/><circle cx="0" cy="-15" r="8" fill="#ffd27a" opacity=".2"/></g>`;
+  if(CONFIG.venueImg){const im=new Image();im.src=CONFIG.venueImg;im.alt=`${CONFIG.venue}, lit up for the wedding by the lake`;im.decoding='async';im.className='venue-photo';$('palace').replaceWith(im);}
 })();
 $('city').textContent=CONFIG.city;$('vname').textContent=CONFIG.venue;$('vaddr').textContent=CONFIG.address;$('mapBtn').href=maps;
 const ICON={plane:'<svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.3"><path d="M4 18l24-8-3 4-9 3-3 8-2 1 1-7-6 1z"/><path d="M4 18l3 3"/></svg>',
@@ -855,3 +856,19 @@ if('serviceWorker' in navigator&&(location.protocol==='https:'||location.hostnam
   let reloaded=false;const hadController=!!navigator.serviceWorker.controller;
   navigator.serviceWorker.addEventListener('controllerchange',()=>{if(!hadController||reloaded)return;reloaded=true;location.reload();});
 }
+
+/* ================= MUSIC: a small on/off button; starts softly when the diya is lit, unless the guest turned it off before ================= */
+(function(){
+  const btn=$('music');if(!CONFIG.music||!btn)return;
+  const au=new Audio(CONFIG.music);au.loop=true;au.preload='none';au.volume=0;
+  let off=false;try{off=localStorage.getItem('invite-music')==='off';}catch(e){}
+  let fadeT=null;
+  const fade=(to,ms,done)=>{clearInterval(fadeT);const from=au.volume,t0=performance.now();fadeT=setInterval(()=>{const k=Math.min(1,(performance.now()-t0)/ms);au.volume=from+(to-from)*k;if(k>=1){clearInterval(fadeT);done&&done();}},40);};
+  const set=on=>{btn.classList.toggle('on',on);btn.setAttribute('aria-pressed',on);btn.setAttribute('aria-label',on?'Pause the music':'Play the music');};
+  const play=()=>{au.play().then(()=>{set(true);fade(.55,1600);}).catch(()=>set(false));};
+  const stop=()=>{set(false);fade(0,500,()=>au.pause());};
+  btn.hidden=false;set(false);
+  btn.addEventListener('click',()=>{if(au.paused||!btn.classList.contains('on')){off=false;play();}else{off=true;stop();}try{localStorage.setItem('invite-music',off?'off':'on');}catch(e){}});
+  $('tap').addEventListener('click',()=>{if(!off)setTimeout(play,900);},{once:true});
+  document.addEventListener('visibilitychange',()=>{if(document.hidden&&!au.paused){au.pause();btn.dataset.resume='1';}else if(!document.hidden&&btn.dataset.resume){delete btn.dataset.resume;if(btn.classList.contains('on'))au.play().catch(()=>{});}});
+})();
