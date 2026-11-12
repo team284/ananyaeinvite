@@ -72,11 +72,112 @@ function waxSeal(svg,initials,id){
   <ellipse cx="36" cy="30" rx="13" ry="7" fill="#fff" opacity=".18" transform="rotate(-30 36 30)"/>`;
 }
 
+/* Ganpati ji artwork */
+const BG='velvet';
+// Ganpati ji in gold outline. Drawn in a 100×118 box, centred on x=50. Trunk turns to his left (viewer's right).
+// The glow behind him (class "lightwash") only appears once the diya is lit.
+function ganesh(id){
+  const dk=`url(#${id}F)`;
+  return `<defs>
+   <linearGradient id="${id}G" gradientUnits="userSpaceOnUse" x1="10" y1="0" x2="90" y2="118"><stop offset="0" stop-color="#fff6dc"/><stop offset=".35" stop-color="#e6cf98"/><stop offset=".65" stop-color="#f6e3b4"/><stop offset="1" stop-color="#b8996a"/></linearGradient>
+   <radialGradient id="${id}F" gradientUnits="userSpaceOnUse" cx="50" cy="50" r="48"><stop offset="0" stop-color="#7c2230"/><stop offset=".6" stop-color="#5e1520"/><stop offset="1" stop-color="#3a0b12"/></radialGradient>
+   <radialGradient id="${id}H" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#ffd27a" stop-opacity=".9"/><stop offset=".35" stop-color="#ffb347" stop-opacity=".62"/><stop offset=".7" stop-color="#ff8a2a" stop-opacity=".22"/><stop offset="1" stop-color="#ff7a1a" stop-opacity="0"/></radialGradient>
+  </defs>
+  <g class="lightwash"><circle class="gglow" cx="50" cy="55" r="68" fill="url(#${id}H)"/></g>
+  <circle cx="50" cy="56" r="44" fill="none" stroke="url(#${id}G)" stroke-width=".7" opacity=".75"/>
+  <circle cx="50" cy="56" r="41" fill="none" stroke="url(#${id}G)" stroke-width=".4" stroke-dasharray="1.2 2.4" opacity=".75"/>
+  <g stroke="url(#${id}G)" stroke-width="1.25" stroke-linejoin="round" stroke-linecap="round" fill="${dk}">
+    <g transform="translate(0 -12)">
+      <path d="M50 128 C38 128 28 122 24 114 C32 114 42 120 50 128 Z M50 128 C62 128 72 122 76 114 C68 114 58 120 50 128 Z"/>
+      <path d="M50 128 C40 124 36 114 38 106 C44 110 48 118 50 128 Z M50 128 C60 124 64 114 62 106 C56 110 52 118 50 128 Z"/>
+      <path d="M50 128 C44 120 44 110 50 102 C56 110 56 120 50 128 Z"/>
+    </g>
+    <path d="M37 38 C25 29 7 34 8 54 C9 72 23 80 36 69 C40 63 40 50 37 38 Z"/>
+    <path d="M63 38 C75 29 93 34 92 54 C91 72 77 80 64 69 C60 63 60 50 63 38 Z"/>
+    <path d="M33 44 C22 40 14 46 15 56 C16 66 24 70 32 64 M67 44 C78 40 86 46 85 56 C84 66 76 70 68 64" fill="none" stroke-width=".7" opacity=".7"/>
+    <path d="M30 49 C24 47 20 51 20.5 56 C21 61 25 63 29 60 M70 49 C76 47 80 51 79.5 56 C79 61 75 63 71 60" fill="none" stroke-width=".55" stroke-dasharray=".1 2.2" opacity=".9"/>
+    <path d="M35 36 Q50 31 65 36 Q69 52 61 63 Q50 69 39 63 Q31 52 35 36 Z"/>
+    <path d="M36 32 C36 23 41 17 45 15 L50 3 L55 15 C59 17 64 23 64 32 Z"/>
+    <path d="M34 31 H66 L64.5 37 H35.5 Z"/>
+    <path d="M41 25 Q50 19 59 25 M43 18.5 Q50 15 57 18.5" fill="none" stroke-width=".7" opacity=".8"/>
+    <circle cx="50" cy="26" r="2.4" fill="#c1303e" stroke-width=".7"/>
+    <circle cx="50" cy="2.5" r="1.3" fill="url(#${id}G)" stroke="none"/>
+    <g fill="url(#${id}G)" stroke="none"><circle cx="39" cy="34" r=".8"/><circle cx="44.5" cy="34" r=".8"/><circle cx="50" cy="34" r=".8"/><circle cx="55.5" cy="34" r=".8"/><circle cx="61" cy="34" r=".8"/></g>
+    <path d="M47 39.5 Q50 46 53 39.5" fill="none" stroke="#e0505c" stroke-width="1.1"/>
+    <circle cx="50" cy="44.2" r="1.1" fill="#e0505c" stroke="none"/>
+    <path d="M39.5 49 Q43.5 45.6 47 48.6 Q43.5 50.8 39.5 49 Z" fill="url(#${id}G)" stroke-width=".6"/>
+    <path d="M60.5 49 Q56.5 45.6 53 48.6 Q56.5 50.8 60.5 49 Z" fill="url(#${id}G)" stroke-width=".6"/>
+    <path d="M42.5 60 Q37 67 40.5 73 Q42 67 45.5 62.5 Z" stroke-width=".9"/>
+    <path d="M57.5 60 Q60.5 62.5 60 65.5 L56 63 Z" stroke-width=".9"/>
+    <path d="M44 53 C42.5 66 42 82 47 93 C51 102 63 104 68 96 C71 90 68 84 63 84.5 C59.5 85 59 89 61.5 90.5 C59.5 93.5 55 93 53 88 C50.5 81 51 68 56 53 Z"/>
+    <path d="M44.2 60 Q50 62 55.4 60 M44 66 Q49.5 68 54 66 M44.2 72 Q49 74 52.8 72 M44.8 78 Q49 80 52.4 78" fill="none" stroke-width=".6" opacity=".7"/>
+  </g>`;
+}
+
+
+/* Wall pattern: Mughal jaali (ogee curves with small flowers). Other options kept: buti | paisley | lotus | mandala */
+const PAT='ogee';
+function bgPattern(){
+  const g=(w,h,body,op=.42)=>`<pattern id="buti" width="${w}" height="${h}" patternUnits="userSpaceOnUse"><g class="t s-carve" stroke-width=".8" opacity="${op}">${body}</g></pattern>`;
+  const flower=(x,y,r=6)=>`<path d="M${x} ${y-r} Q${x+r/2} ${y-r/3} ${x} ${y} Q${x-r/2} ${y-r/3} ${x} ${y-r}Z M${x} ${y+r} Q${x+r/2} ${y+r/3} ${x} ${y} Q${x-r/2} ${y+r/3} ${x} ${y+r}Z M${x-r} ${y} Q${x-r/3} ${y-r/2} ${x} ${y} Q${x-r/3} ${y+r/2} ${x-r} ${y}Z M${x+r} ${y} Q${x+r/3} ${y-r/2} ${x} ${y} Q${x+r/3} ${y+r/2} ${x+r} ${y}Z"/><circle cx="${x}" cy="${y}" r="1"/>`;
+  const paisley=(x,y,rot)=>`<g transform="translate(${x} ${y}) rotate(${rot})"><path d="M-3 9 C-11 3 -9 -9 0 -10 C8 -11 11 -3 7 4 C4 9 -1 10 -1 15 C-4 14 -5 12 -3 9Z"/><path d="M-2 4 C-6 0 -4 -6 1 -6 C5 -6 6 -1 3 2 C1 4 -1 5 -2 4Z" opacity=".7"/><circle cx="0" cy="-2" r="1"/></g>`;
+  const lotus=(x,y)=>`<path d="M${x} ${y+5} C${x-3} ${y+1} ${x-2} ${y-4} ${x} ${y-7} C${x+2} ${y-4} ${x+3} ${y+1} ${x} ${y+5}Z M${x} ${y+5} C${x-5} ${y+4} ${x-8} ${y} ${x-8} ${y-3} C${x-4} ${y-2} ${x-1} ${y+1} ${x} ${y+5}Z M${x} ${y+5} C${x+5} ${y+4} ${x+8} ${y} ${x+8} ${y-3} C${x+4} ${y-2} ${x+1} ${y+1} ${x} ${y+5}Z"/>`;
+  if(PAT==='paisley')return g(52,60,paisley(13,15,-20)+paisley(39,45,160)+`<circle cx="39" cy="15" r="1.2"/><circle cx="13" cy="45" r="1.2"/>`);
+  if(PAT==='lotus')return g(44,44,`<path d="M0 22 L22 0 L44 22 L22 44Z" stroke-dasharray="2 2.5" opacity=".7"/>${lotus(22,23)}<circle cx="0" cy="0" r="1.6"/><circle cx="44" cy="0" r="1.6"/><circle cx="0" cy="44" r="1.6"/><circle cx="44" cy="44" r="1.6"/>`,.45);
+  if(PAT==='ogee')return g(44,64,`<path d="M0 0 C0 16 22 16 22 32 C22 48 0 48 0 64 M44 0 C44 16 22 16 22 32 C22 48 44 48 44 64"/>${flower(0,32,5)}${flower(44,32,5)}${flower(22,0,5)}${flower(22,64,5)}<circle cx="22" cy="32" r="1.6"/>`,.34);
+  if(PAT==='mandala')return g(60,60,`<circle cx="30" cy="30" r="1"/>`,.25);
+  return g(46,54,flower(11.5,13.5)+flower(34.5,40.5));
+}
+function bigMandala(cx,cy){
+  if(PAT!=='mandala')return '';let s='';
+  for(const [r,n,len] of [[110,24,16],[160,36,20],[215,48,24],[275,60,28]]){
+    s+=`<circle cx="${cx}" cy="${cy}" r="${r}" stroke-width=".8"/>`;
+    for(let i=0;i<n;i++){const a=i/n*Math.PI*2,x=cx+Math.cos(a)*r,y=cy+Math.sin(a)*r,x2=cx+Math.cos(a)*(r+len),y2=cy+Math.sin(a)*(r+len),da=Math.PI/n*.8,
+      xl=cx+Math.cos(a-da)*(r+len*.5),yl=cy+Math.sin(a-da)*(r+len*.5),xr=cx+Math.cos(a+da)*(r+len*.5),yr=cy+Math.sin(a+da)*(r+len*.5);
+      s+=`<path d="M${x.toFixed(1)} ${y.toFixed(1)} Q${xl.toFixed(1)} ${yl.toFixed(1)} ${x2.toFixed(1)} ${y2.toFixed(1)} Q${xr.toFixed(1)} ${yr.toFixed(1)} ${x.toFixed(1)} ${y.toFixed(1)}Z"/>`;}
+  }
+  return `<g class="t s-carve" opacity=".4" fill="none">${s}</g>`;
+}
+
+/* A gold toran across the top: an embroidered velvet band, gold scallops,
+   mango leaves and gold drops, and pearl strands with bells that swing. */
+function torana(){
+  const E=SCENE.E,x0=-E,x1=400+E;let s=`<defs>
+    <linearGradient id="tGold" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff6dc"/><stop offset=".45" stop-color="#e6cf98"/><stop offset="1" stop-color="#9c8050"/></linearGradient>
+    <linearGradient id="tGoldH" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#9c8050"/><stop offset=".45" stop-color="#fff6dc"/><stop offset=".7" stop-color="#e6cf98"/><stop offset="1" stop-color="#8a7046"/></linearGradient>
+    <linearGradient id="tLeaf" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#8a9a4a"/><stop offset=".5" stop-color="#5b6b2c"/><stop offset="1" stop-color="#3a4519"/></linearGradient>
+    <radialGradient id="tPearl" cx=".35" cy=".3" r=".8"><stop offset="0" stop-color="#fffaf0"/><stop offset=".6" stop-color="#f6e3b4"/><stop offset="1" stop-color="#b8996a"/></radialGradient>
+    <radialGradient id="tPink" cx=".35" cy=".3" r=".8"><stop offset="0" stop-color="#fff0ec"/><stop offset=".6" stop-color="#ecbcb4"/><stop offset="1" stop-color="#b9787a"/></radialGradient>
+  </defs>`;
+  // band: velvet with gold borders and a stitched motif
+  s+=`<rect x="${x0}" y="0" width="${x1-x0}" height="15" fill="#3a0b12"/>
+    <rect x="${x0}" y="1.5" width="${x1-x0}" height="1.6" fill="url(#tGold)"/><rect x="${x0}" y="13" width="${x1-x0}" height="1.6" fill="url(#tGold)"/>`;
+  for(let x=x0+5;x<x1;x+=10)s+=`<path d="M${x} 5 L${x+2.6} 8.2 L${x} 11.4 L${x-2.6} 8.2Z" fill="url(#tGold)" opacity=".9"/><circle cx="${x+5}" cy="8.2" r=".8" fill="#e6cf98"/>`;
+  // scallops under the band
+  let d=`M${x0} 14.6`;for(let x=x0;x<x1;x+=20)d+=` Q${x+10} 30 ${x+20} 14.6`;
+  s+=`<path d="${d} V14.6 H${x0}Z" fill="#3a0b12"/><path d="${d}" fill="none" stroke="url(#tGold)" stroke-width="1.3"/>`;
+  for(let x=x0;x<x1;x+=20)s+=`<path d="M${x+10} 19 l2 2.4 l-2 2.4 l-2 -2.4Z" fill="url(#tGold)"/>`;
+  // hangings
+  const leaf=(x)=>`<path d="M${x} 16 C${x+6.5} 23 ${x+5.5} 36 ${x} 45 C${x-5.5} 36 ${x-6.5} 23 ${x} 16Z" fill="url(#tLeaf)" stroke="#cdb27c" stroke-width=".6"/><path d="M${x} 18 V42" stroke="#e6cf98" stroke-width=".5" opacity=".8"/>`;
+  const drop=(x)=>`<line x1="${x}" y1="16" x2="${x}" y2="27" stroke="#cdb27c" stroke-width=".6"/><circle cx="${x}" cy="22" r="1.6" fill="url(#tPearl)"/>
+    <path d="M${x} 27 C${x+3.6} 30 ${x+3.6} 35 ${x} 37.5 C${x-3.6} 35 ${x-3.6} 30 ${x} 27Z" fill="url(#tGold)"/><circle cx="${x}" cy="32.4" r="1.1" fill="#8c2a34"/>`;
+  const strand=(x,n,i)=>{let g=`<g class="bell" style="transform-origin:${x}px 15px;animation-delay:-${(i*.41).toFixed(2)}s"><line x1="${x}" y1="15" x2="${x}" y2="${22+n*6.4}" stroke="#cdb27c" stroke-width=".7"/>`;
+    for(let k=0;k<n;k++)g+=`<circle cx="${x}" cy="${21+k*6.4}" r="2.3" fill="url(#t${k%2?'Pink':'Pearl'})"/>`;
+    const by=22+n*6.4;g+=`<path d="M${x-4.5} ${by+8} Q${x-4.5} ${by} ${x} ${by} Q${x+4.5} ${by} ${x+4.5} ${by+8} Z" fill="url(#tGoldH)"/><rect x="${x-5.5}" y="${by+7.6}" width="11" height="1.5" rx=".75" fill="#cdb27c"/><circle cx="${x}" cy="${by+10.4}" r="1.3" fill="#e6cf98"/></g>`;return g;};
+  let i=0;
+  for(let x=x0+10;x<x1;x+=20,i++){
+    const rel=((x-200)%100+100)%100;
+    if(rel===0)continue;
+    s+=(i%2?drop(x):leaf(x));
+  }
+  for(let x=200-Math.ceil((E+200)/100)*100;x<=x1;x+=100){if(x<x0+5)continue;s+=strand(x,x===200?3:5,(x+1000)/100|0);}
+  return s;
+}
 /* ================= 1 · SCENE ================= */
 /* On wide screens the scene widens to fill the screen; the 400-unit-wide arch stays in the middle. */
 const SCENE=(()=>{const wide=innerWidth>=900;const W=wide?Math.max(400,Math.min(1400,Math.round(700*innerWidth/innerHeight/20)*20)):400;return {W,E:(W-400)/2};})();
 (function(){
-  const svg=$('sceneSvg');let k=0,niches='';
+  const svg=$('sceneSvg');let k=0,niches='';$('scene').classList.add('bg-'+BG);
   const W=SCENE.W,E=SCENE.E;
   const CW=E>60?Math.round(Math.min(196+E*.95,620)):196,HC=CW/2,PX=HC+60;
   const archWide=(w)=>{const a=w/2,top=170-(w-CW)*.866,b=340-top,pts=[],n=9;
@@ -124,7 +225,13 @@ const SCENE=(()=>{const wide=innerWidth>=900;const W=wide?Math.max(400,Math.min(
     // plinth
     s+=`<path class="t s-carve" d="M${xa} 578 H${xb} M${xa} 584 H${xb}" stroke-width=".8"/>`;
     return s;};
-  if(E>60){side+=wing(-E+18,200-PX-34)+wing(200+PX+34,400+E-18);}
+  // Ganpati ji in a carved niche on each side, in place of the palace wings (same artwork both sides, never mirrored)
+  const ganNiche=(xa,xb,n)=>{const w=xb-xa;if(w<90)return '';const cx=(xa+xb)/2,aw=Math.min(150,w*.8),d=archPath(cx,aw,300,600,4),sc=Math.min(1.5,aw*1.02/100);
+    return `<path class="t f-wall2" d="${archPath(cx,aw+22,300,606,4)}"/>${bevel(archPath(cx,aw+22,300,606,4),1)}
+      <path d="${d}" fill="#14040a"/>${bevel(d,1.2)}
+      <g class="gan" transform="translate(${(cx-50*sc).toFixed(1)} ${(450-60*sc).toFixed(1)}) scale(${sc.toFixed(3)})">${ganesh('gs'+n)}</g>
+      <rect class="t f-wall2" x="${cx-aw/2-16}" y="600" width="${aw+32}" height="8"/>${bevel(`M${cx-aw/2-16} 600 H${cx+aw/2+16} V608 H${cx-aw/2-16} Z`,.8)}`;};
+  if(E>60){side+=ganNiche(-E+18,200-PX-34,1)+ganNiche(200+PX+34,400+E-18,2);}
   // diya on the ledge (clay)
   const dots=Array.from({length:13},(_,i)=>{const t=i/12;const x=158+t*76;const y=607+Math.sin(t*Math.PI)*9;return `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="1.5" fill="#d3c49d"/>`;}).join('');
   const petals=Array.from({length:6},(_,i)=>{const x=166+i*12;const y=614+Math.sin((i+.5)/6*Math.PI)*7;return `<path d="M${x} ${y} q3 -4 6 0 q-3 4 -6 0z" fill="#f0e2c0" opacity=".85"/>`;}).join('');
@@ -135,6 +242,8 @@ const SCENE=(()=>{const wide=innerWidth>=900;const W=wide?Math.max(400,Math.min(
       <circle class="t s-carve" cx="0" cy="0" r="3" stroke-width=".8" opacity=".45"/><circle class="t s-carve" cx="20" cy="0" r="3" stroke-width=".8" opacity=".45"/>
       <circle class="t s-carve" cx="0" cy="20" r="3" stroke-width=".8" opacity=".45"/><circle class="t s-carve" cx="20" cy="20" r="3" stroke-width=".8" opacity=".45"/>
     </pattern>
+    ${bgPattern()}
+    <radialGradient id="velv" cx=".5" cy=".4" r=".75"><stop offset="0" stop-color="#fff" stop-opacity="${BG==='ivory'?0:.07}"/><stop offset=".55" stop-color="#fff" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity="${BG==='ivory'?.12:.38}"/></radialGradient>
     <pattern id="petal" width="12" height="12" patternUnits="userSpaceOnUse"><path class="t s-carve" d="M6 0 Q10 6 6 12 Q2 6 6 0Z" stroke-width=".8" opacity=".85"/></pattern>
     <pattern id="grain" width="160" height="160" patternUnits="userSpaceOnUse"><image href="${getComputedStyle(document.documentElement).getPropertyValue('--stone-tex').slice(4,-1).replace(/"/g,'')}" width="160" height="160"/></pattern>
     <pattern id="jaali" width="12" height="12" patternUnits="userSpaceOnUse">
@@ -160,7 +269,9 @@ const SCENE=(()=>{const wide=innerWidth>=900;const W=wide?Math.max(400,Math.min(
     <clipPath id="opn"><path d="${A(196)}"/></clipPath>
   </defs>
   <rect class="t f-wall" x="${-E}" width="${W}" height="700"/>
-  <rect x="${-E}" width="${W}" height="700" fill="url(#jali)"/>
+  <rect x="${-E}" width="${W}" height="700" fill="url(#buti)"/>
+  ${bigMandala(200,330)}
+  <rect x="${-E}" width="${W}" height="700" fill="url(#velv)"/>
   <rect x="${-E}" width="${W}" height="700" fill="url(#grain)" style="mix-blend-mode:overlay"/>
   ${side}
   <rect x="${200-PX-20}" y="104" width="40" height="516" class="t f-wall2"/><rect x="${200+PX-20}" y="104" width="40" height="516" class="t f-wall2"/>
@@ -172,6 +283,7 @@ const SCENE=(()=>{const wide=innerWidth>=900;const W=wide?Math.max(400,Math.min(
   ${bevel(A(218),1)}
   <path d="${A(196)}" fill="url(#inner)"/>
   <g clip-path="url(#opn)"><path d="${A(196)}" fill="none" stroke="#000" stroke-opacity=".75" stroke-width="26" filter="url(#big)"/></g>
+  ${E>60?'':`<g clip-path="url(#opn)"><g class="gan" transform="translate(155 188) scale(.9)">${ganesh('gc')}</g></g>`}
   ${bevel(A(196),1.6)}
   <circle id="wash" class="lightwash" cx="259" cy="560" r="230" fill="url(#wash)"/>
   ${niches}
@@ -185,6 +297,7 @@ const SCENE=(()=>{const wide=innerWidth>=900;const W=wide?Math.max(400,Math.min(
     <text x="200" y="62" text-anchor="middle" font-family="Pinyon Script,cursive" font-size="36" fill="url(#gtext)">You're invited</text>
     <text x="200" y="86" text-anchor="middle" font-family="Cinzel,serif" font-size="8.5" letter-spacing="3" fill="#efe1be">TO A WEDDING IN ${esc(CONFIG.city.toUpperCase())}</text>
   </g>
+  <g class="wel" style="transition-delay:.5s"><g transform="translate(200 0) scale(${E>60?1.45:1}) translate(-200 0)">${torana()}</g></g>
   <g transform="translate(200 410) scale(${E>60?Math.min(1.7,1+E/600).toFixed(3):1}) translate(-200 -410)">
   <g class="wel" style="transition-delay:1.2s">
     <text x="200" y="318" text-anchor="middle" font-family="Cinzel,serif" font-size="8" letter-spacing="2.6" fill="#efe1be">THE FAMILIES</text>
@@ -199,28 +312,10 @@ const SCENE=(()=>{const wide=innerWidth>=900;const W=wide?Math.max(400,Math.min(
   </g>
 
   <!-- after lighting: a bandhanwar of roses with swinging bells, and a welcome -->
-  <g class="wel bandh" style="transition-delay:.5s">${(()=>{
-    let s=`<defs>
-      <radialGradient id="rsA" cx=".38" cy=".32" r=".75"><stop offset="0" stop-color="#e98a93"/><stop offset=".55" stop-color="#8c2a34"/><stop offset="1" stop-color="#3a0b12"/></radialGradient>
-      <radialGradient id="rsB" cx=".38" cy=".32" r=".75"><stop offset="0" stop-color="#fff0ec"/><stop offset=".55" stop-color="#ecbcb4"/><stop offset="1" stop-color="#b9787a"/></radialGradient>
-      <linearGradient id="bell" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#9c8050"/><stop offset=".45" stop-color="#fff6dc"/><stop offset=".7" stop-color="#e6cf98"/><stop offset="1" stop-color="#8a7046"/></linearGradient></defs>`;
-    const rose=(x,y,r,k)=>`<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="${r}" fill="url(#rs${k})"/><path d="M${(x-r*.5).toFixed(1)} ${(y-r*.1).toFixed(1)} q${(r*.5).toFixed(1)} ${(-r*.6).toFixed(1)} ${r.toFixed(1)} 0 M${(x-r*.35).toFixed(1)} ${(y+r*.25).toFixed(1)} q${(r*.35).toFixed(1)} ${(-r*.4).toFixed(1)} ${(r*.7).toFixed(1)} 0" stroke="${k==='A'?'#3a0b12':'#b9787a'}" stroke-opacity=".55" stroke-width=".7" fill="none"/>`;
-    const leaf=(x,y,a)=>`<path transform="translate(${x} ${y}) rotate(${a})" d="M0 0 q5 7 0 16 q-5 -9 0 -16z" fill="#5b6b2c" stroke="#3e4a1c" stroke-width=".5"/>`;
-    const pts=[];for(let x=-Math.ceil(E/100)*100;x<=400+Math.ceil(E/100)*100;x+=100)pts.push(x);
-    // swags of roses between the hanging points
-    for(let i=0;i<pts.length-1;i++){const x0=pts[i],x1=pts[i+1];for(let k=0;k<=13;k++){const t=k/13,x=x0+(x1-x0)*t,y=8+Math.sin(t*Math.PI)*34;s+=rose(x,y,5.4,k%2?'A':'B');}}
-    // leaf clusters and hanging strands with bells
-    pts.forEach((x,i)=>{s+=leaf(x-6,4,-40)+leaf(x+6,4,40)+leaf(x,6,0);
-      const len=x===200?2:(x<=0||x>=400)?5:4,xx=x===-E?x+8:x;
-      s+=`<g class="bell" style="transform-origin:${xx}px 10px;animation-delay:-${(i*.37).toFixed(2)}s">
-        <line x1="${xx}" y1="10" x2="${xx}" y2="${16+len*10}" stroke="#cdb27c" stroke-width=".8"/>`;
-      for(let k=0;k<len;k++)s+=rose(xx,18+k*10,3.8,k%2?'B':'A');
-      const by=18+len*10;
-      s+=`<path d="M${xx-5} ${by+9} Q${xx-5} ${by} ${xx} ${by} Q${xx+5} ${by} ${xx+5} ${by+9} Z" fill="url(#bell)"/><rect x="${xx-6}" y="${by+8.5}" width="12" height="1.6" rx=".8" fill="#cdb27c"/><circle cx="${xx}" cy="${by+11.5}" r="1.5" fill="#e6cf98"/></g>`;});
-    return s;})()}
-    <ellipse cx="200" cy="108" rx="96" ry="26" fill="#24080e" opacity=".55" filter="url(#big)"/>
-    <text x="200" y="106" text-anchor="middle" font-family="Tiro Devanagari Hindi,serif" font-size="22" fill="url(#gtext)">॥ स्वागतम् ॥</text>
-    <text x="200" y="124" text-anchor="middle" font-family="Cormorant Garamond,serif" font-style="italic" font-size="12.5" fill="#f2e6c7">thank you for your blessings</text>
+  <g class="wel bandh" style="transition-delay:.5s">
+    <ellipse class="wl-bg" cx="200" cy="108" rx="96" ry="26" fill="#24080e" opacity=".55" filter="url(#big)"/>
+    <text x="200" y="106" text-anchor="middle" font-family="Tiro Devanagari Hindi,serif" font-size="22" class="wl-t" fill="url(#gtext)">॥ स्वागतम् ॥</text>
+    <text x="200" y="124" text-anchor="middle" font-family="Cormorant Garamond,serif" font-style="italic" font-size="12.5" class="wl-t2" fill="#f2e6c7">thank you for your blessings</text>
   </g>
 
   </g>

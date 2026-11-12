@@ -61,6 +61,11 @@ h2.title{font-family:var(--f-script);font-weight:400;font-size:3rem;line-height:
 .scene{position:relative;width:100%;aspect-ratio:400/700;overflow:hidden;background:#300c0f;
   --wall:#24080e;--wall2:#2e0b13;--carve:#6e2c36;--niche:#12040a;--marble:#8f7f66;--marble2:#5e4e3e;--in1:#140508;--in2:#050102;}
 .scene.lit{--wall:#8c2a34;--wall2:#9a3440;--carve:#f6e3b4;--niche:#2a0a10;--marble:#f6e3b4;--marble2:#cdb27c;--in1:#24080e;--in2:#0a0204;}
+.gan{opacity:.85;transition:opacity 2s ease}.lit .gan{opacity:1}
+.gglow{transform-box:fill-box;transform-origin:50% 50%;animation:gglow 3.2s ease-in-out infinite alternate}
+@keyframes gglow{from{transform:scale(.92);opacity:.8}to{transform:scale(1.04);opacity:1}}
+@media (prefers-reduced-motion:reduce){.gglow{animation:none}}
+.scene.bg-velvet.lit{--wall:#5e1520;--wall2:#6b1b26}
 .scene svg{position:absolute;inset:0;width:100%;height:100%;display:block}
 .t{transition:fill 2.2s ease .2s,stroke 2.2s ease .2s,stop-color 2.2s ease .2s}
 .f-wall{fill:var(--wall)}.f-wall2{fill:var(--wall2)}.f-niche{fill:var(--niche)}.f-marble{fill:var(--marble)}.f-marble2{fill:var(--marble2)}
