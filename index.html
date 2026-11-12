@@ -48,18 +48,24 @@
   <p class="eyebrow">A letter for you</p>
   <h2 class="title foil">From Two Families</h2>
   <svg class="orn" viewBox="0 0 170 24" aria-hidden="true"><use href="#ornament"/></svg>
-  <div class="env-stage" id="envStage">
-    <div class="env" id="env">
-      <div class="env-back"></div>
-      <div class="env-letter"><span class="ga">॥ शुभ विवाह ॥</span><span class="sc">You are invited</span></div>
-      <div class="env-front"></div>
-      <div class="env-addr"><small>Addressed to</small><b id="addr">You &amp; your family</b></div>
-      <div class="env-flap"></div>
-      <button class="seal" id="seal" aria-label="Break the seal to reveal the names"><svg id="sealSvg" viewBox="0 0 100 100" aria-hidden="true"></svg></button>
+  <div class="couple" id="couple">
+    <figure class="cp cp-g" id="cpG" hidden><div class="cp-frame"><img alt="The groom" decoding="async"></div><figcaption><small>The Groom</small><b></b></figcaption></figure>
+    <div class="cp-mid">
+    <div class="env-stage" id="envStage">
+      <div class="env" id="env">
+        <div class="env-back"></div>
+        <div class="env-letter"><span class="ga">॥ शुभ विवाह ॥</span><span class="sc">You are invited</span></div>
+        <div class="env-front"></div>
+        <div class="env-addr"><small>Addressed to</small><b id="addr">You &amp; your family</b></div>
+        <div class="env-flap"></div>
+        <button class="seal" id="seal" aria-label="Break the seal to reveal the names"><svg id="sealSvg" viewBox="0 0 100 100" aria-hidden="true"></svg></button>
+      </div>
     </div>
+    <p class="hint" id="envHint">Tap the seal to reveal the names</p>
+    <div class="names" id="namesCard" hidden></div>
+    </div>
+    <figure class="cp cp-b" id="cpB" hidden><div class="cp-frame"><img alt="The bride" decoding="async"></div><figcaption><small>The Bride</small><b></b></figcaption></figure>
   </div>
-  <p class="hint" id="envHint">Tap the seal to reveal the names</p>
-  <div class="names" id="namesCard" hidden></div>
 </section>
 
 <!-- ======================= 3 · THE DATE ======================= -->

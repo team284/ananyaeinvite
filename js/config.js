@@ -18,6 +18,8 @@ window.CONFIG = {
     {city:"Udaipur", when:"Diwali 2025", art:"udaipur", stamp:"#3a0b12",
      text:"A boat on Lake Pichola at sunset. He asked, and she said yes before he finished. So we're bringing everyone back to the same lake."}
   ],
+  /* Solo portraits beside the envelope (3:4 portrait works best). Leave src empty to hide them. */
+  couple:{groom:"photos/couple/groom.jpg", bride:"photos/couple/bride.jpg"},
   photos:[
     {cap:"The first trip", src:"", hue:[352,8]},
     {cap:"Sunday mornings", src:"", hue:[8,352]},

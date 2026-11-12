@@ -438,6 +438,8 @@ let guest='';try{const h=decodeURIComponent(location.hash.slice(1));if(h)guest=h
 if(guest)$('addr').textContent=guest;
 const ini=`${CONFIG.bride[0]}${CONFIG.groom[0]}`;
 waxSeal($('sealSvg'),ini,'s1');waxSeal($('sealEnd'),ini,'s2');
+/* the couple's portraits beside the envelope */
+[['cpG','groom'],['cpB','bride']].forEach(([id,k])=>{const src=CONFIG.couple&&CONFIG.couple[k];if(!src)return;const f=$(id);f.querySelector('img').src=src;f.querySelector('b').textContent=CONFIG[k];f.hidden=false;});
 function openEnvelope(){
   const env=$('env');if(env.classList.contains('open'))return;
   const [sx,sy]=centerOf($('seal'));burst(sx,sy,18,'petal');
@@ -456,6 +458,8 @@ function openEnvelope(){
         <p class="nm" style="animation-delay:2.1s">${nm(CONFIG.groom,2.1)}</p>
         <p class="rel fadein" style="animation-delay:2.7s">Son of</p><p class="par fadein" style="animation-delay:2.8s">${esc(CONFIG.groomParents)}</p>`;
       const [cx,cy]=centerOf(card);burst(cx,cy-40,60,'spark');
+      $('couple').classList.add('opened');
+      if(innerWidth>=900)['cpG','cpB'].forEach(id=>{const f=$(id);if(!f.hidden){const[x,y]=centerOf(f);burst(x,y,22,'petal');}});
     },650);
   },2100);
 }
