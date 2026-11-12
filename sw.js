@@ -1,5 +1,5 @@
 /* Offline cache for the invite: network first, cache only when offline. Bump VERSION when files change. */
-const VERSION = 'invite-v24';
+const VERSION = 'invite-v25';
 const SHELL = [
   './', 'index.html', 'css/style.css', 'js/config.js', 'js/app.js', 'manifest.webmanifest',
   'photos/events/mehendi.jpg', 'photos/events/sangeet.jpg', 'photos/events/vivah.jpg',
