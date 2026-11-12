@@ -884,3 +884,76 @@ if('serviceWorker' in navigator&&(location.protocol==='https:'||location.hostnam
     sec.insertAdjacentHTML('beforeend',`<div class="diyas l" aria-hidden="true">${g.map(diya).join('')}</div><div class="diyas r" aria-hidden="true">${[...g].reverse().map(diya).join('')}</div>`);
   });
 })();
+
+/* ================= GAJ: a pair of decorated elephants greeting each other over a diya, in the centre of a few slides ================= */
+/* A decorated elephant facing right, in a 130x104 box. id makes gradient ids unique. */
+function elephant(id){
+  return `<g class="el">
+  <defs>
+    <linearGradient id="${id}b" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fbf0d2"/><stop offset="1" stop-color="#e2cfa0"/></linearGradient>
+    <linearGradient id="${id}j" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#a8323e"/><stop offset="1" stop-color="#6e1d27"/></linearGradient>
+  </defs>
+  <g stroke="#b8996a" stroke-width="1.2" stroke-linejoin="round" stroke-linecap="round">
+    <path class="el-tail" d="M21 47 C14 52 14 60 17 66" fill="none" stroke="#b8996a" stroke-width="1.6"/>
+    <path d="M14 63 l3 6 l3 -5 z" fill="#8c2a34" stroke="none"/>
+    <!-- far legs -->
+    <rect x="34" y="60" width="10" height="28" rx="4" fill="#d9c595"/>
+    <rect x="70" y="60" width="10" height="28" rx="4" fill="#d9c595"/>
+    <!-- body -->
+    <path d="M20 46 C20 28 36 19 57 19 C77 19 90 27 92 42 L92 60 C92 66 88 68 82 68 L30 68 C24 68 20 64 20 58 Z" fill="url(#${id}b)"/>
+    <!-- near legs -->
+    <rect x="24" y="60" width="11" height="30" rx="4" fill="url(#${id}b)"/>
+    <rect x="80" y="60" width="11" height="30" rx="4" fill="url(#${id}b)"/>
+    <g fill="#e6cf98" stroke="#9c8050" stroke-width=".6"><rect x="23.5" y="82" width="12" height="3" rx="1.2"/><rect x="79.5" y="82" width="12" height="3" rx="1.2"/><rect x="33.5" y="80" width="11" height="2.6" rx="1.2"/><rect x="69.5" y="80" width="11" height="2.6" rx="1.2"/></g>
+    <g fill="#f6e3b4" stroke="none"><circle cx="27" cy="88.5" r="1.1"/><circle cx="30" cy="89" r="1.1"/><circle cx="83" cy="88.5" r="1.1"/><circle cx="86" cy="89" r="1.1"/></g>
+    <!-- jhool: the decorated cloth on the back -->
+    <path d="M36 21 C48 16 66 16 76 21 L79 50 C66 55 48 55 33 50 Z" fill="url(#${id}j)"/>
+    <path d="M38 26 C50 22 64 22 74 26 L76.5 46 C65 50 49 50 35.5 46 Z" fill="none" stroke="#e6cf98" stroke-width=".8" stroke-dasharray="2 1.6"/>
+    <circle cx="56" cy="36" r="5" fill="#e6cf98" stroke="#9c8050" stroke-width=".7"/><circle cx="56" cy="36" r="2.2" fill="#8c2a34" stroke="none"/>
+    <g fill="#ecbcb4" stroke="none">${[0,1,2,3,4,5,6,7].map(i=>{const a=i*Math.PI/4;return `<circle cx="${(56+Math.cos(a)*7.4).toFixed(1)}" cy="${(36+Math.sin(a)*7.4).toFixed(1)}" r="1.1"/>`}).join('')}</g>
+    <path d="M33 50 C48 55 66 55 79 50" fill="none" stroke="#e6cf98" stroke-width="1.6"/>
+    <g class="el-tas">${[37,45,53,61,69,76].map((x,i)=>`<g><line x1="${x}" y1="${51.6+(i==0||i==5?-1:1)}" x2="${x}" y2="${57.5+(i==0||i==5?-1:1)}" stroke="#e6cf98" stroke-width=".7"/><circle cx="${x}" cy="${59+(i==0||i==5?-1:1)}" r="1.5" fill="#e6cf98" stroke="none"/></g>`).join('')}</g>
+    <!-- head -->
+    <path d="M82 31 C87 21 103 20 109 29 C113 36 112 47 107 53 C104 57 99 59 94 58 L84 55 Z" fill="url(#${id}b)"/>
+    <!-- trunk raised and curled: a sign of good luck -->
+    <g class="el-trunk">
+      <path d="M104 52 C111 58 119 56 121 47 C122.5 40 119 35 115 36 C112 37 112.5 41 115 41.5" fill="none" stroke="#b8996a" stroke-width="8.6"/>
+      <path d="M104 52 C111 58 119 56 121 47 C122.5 40 119 35 115 36 C112 37 112.5 41 115 41.5" fill="none" stroke="url(#${id}b)" stroke-width="6.2"/>
+      <path d="M108.5 55.5 l1.2 -2.2 M113 56.4 l.6 -2.4 M117.6 54.2 l-.2 -2.5 M120.4 49.8 l-1 -2.1" stroke="#b8996a" stroke-width=".7" fill="none"/>
+    </g>
+    <path d="M100 54 C104 58 109 59.5 112 58" fill="none" stroke="#fbf0d2" stroke-width="2.4"/>
+    <!-- ear (flaps) -->
+    <path class="el-ear" d="M88 29 C78 27 72 36 74 46 C75.5 53 82 56 88 52 C91 46 91 36 88 29 Z" fill="#ead7a8"/>
+    <path d="M85 34 C80 35 78 41 80 46" fill="none" stroke="#ecbcb4" stroke-width="1"/>
+    <!-- head jewellery -->
+    <path d="M90 25 C96 20 104 21 108 27 L101 34 C98 30 94 28 90 25 Z" fill="#e6cf98" stroke="#9c8050" stroke-width=".7"/>
+    <circle cx="101" cy="27.5" r="1.8" fill="#8c2a34" stroke="none"/>
+    <line x1="101" y1="34" x2="101" y2="40" stroke="#e6cf98" stroke-width=".8"/><circle cx="101" cy="41.4" r="1.6" fill="#8c2a34" stroke="#e6cf98" stroke-width=".6"/>
+    <!-- eye -->
+    <path d="M97.5 37.5 q2.4 -2 4.8 0" fill="none" stroke="#5c1520" stroke-width="1.1"/>
+    <circle cx="99.9" cy="38.2" r="1" fill="#3a0b12" stroke="none"/>
+    <path d="M96 46 C98 45 100 45.5 101 47" fill="none" stroke="#ecbcb4" stroke-width="1.4"/>
+  </g></g>`;
+}
+function gajPair(n){
+  return `<svg class="gaj" viewBox="0 0 320 110" aria-hidden="true">
+    <g class="gj-in gj-l"><g transform="translate(6 8)">${elephant('gl'+n)}</g></g>
+    <g class="gj-in gj-r"><g transform="translate(314 8) scale(-1 1)">${elephant('gr'+n)}</g></g>
+    <g transform="translate(160 66)">
+      <circle class="gj-glow" cx="0" cy="-12" r="26" fill="url(#dyGlow)"/>
+      <path class="gj-fl" d="M0 -30C-5 -21 -5.5 -16 0 -10C5.5 -16 5 -21 0 -30Z" fill="url(#dyFlame)"/>
+      <path d="M-15 -6Q0 -9 15 -6Q12.5 7 0 8Q-12.5 7 -15 -6Z" fill="url(#dyClay)"/>
+      <path d="M-15 -6Q0 -2.5 15 -6" fill="none" stroke="#e6cf98" stroke-width="1"/>
+      <g fill="#e6cf98"><circle cx="-7" cy="1" r="1"/><circle cx="0" cy="3" r="1"/><circle cx="7" cy="1" r="1"/></g>
+      <path d="M-24 12 H24 L20 18 H-20 Z" fill="#e6cf98" opacity=".85"/>
+      <g fill="#ecbcb4">${[-20,-12,-4,4,12,20].map(x=>`<circle cx="${x}" cy="12" r="2.2"/>`).join('')}</g>
+    </g>
+  </svg>`;
+}
+
+(function(){
+  const spots=[[$('names'),'beforeend'],[document.querySelector('#acts')?.previousElementSibling,'afterbegin'],[document.querySelector('footer.sec'),'afterbegin']];
+  spots.forEach(([el,pos],i)=>{if(el)el.insertAdjacentHTML(pos,`<div class="gaj-wrap">${gajPair(i)}</div>`);});
+  const io='IntersectionObserver' in window?new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target);}}),{threshold:.35}):null;
+  document.querySelectorAll('.gaj-wrap').forEach(w=>io?io.observe(w):w.classList.add('in'));
+})();

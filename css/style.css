@@ -547,3 +547,26 @@ body{min-height:100vh;min-height:100dvh}
   .dy{width:38px}.dy.sm{width:28px}.dy.lg{width:46px}
 }
 @media (prefers-reduced-motion:reduce){.dy-fl,.dy-glow{animation:none}}
+
+/* ---------- elephants: walk in from the sides, then sway trunks, flap ears and swish tails ---------- */
+.gaj-wrap{position:relative;z-index:1;width:min(330px,86%);margin:34px auto 0}
+.gaj{display:block;width:100%;height:auto;overflow:visible}
+footer .gaj-wrap{margin:0 auto 26px}
+.gj-in{transition:transform 1.6s cubic-bezier(.2,.8,.25,1),opacity 1.2s ease}
+.gj-l{transform:translateX(-60px);opacity:0}.gj-r{transform:translateX(60px);opacity:0}
+.gaj-wrap.in .gj-in{transform:none;opacity:1}
+.el{animation:elBob 1.8s ease-in-out infinite alternate}
+.gj-r .el{animation-delay:-.9s}
+@keyframes elBob{to{transform:translateY(-1.6px)}}
+.el-trunk{transform-box:fill-box;transform-origin:12% 75%;animation:elTrunk 3.2s ease-in-out infinite alternate}
+.gj-r .el-trunk{animation-delay:-1.6s}
+@keyframes elTrunk{0%{transform:rotate(4deg)}100%{transform:rotate(-9deg)}}
+.el-ear{transform-box:fill-box;transform-origin:100% 40%;animation:elEar 2.4s ease-in-out infinite}
+.gj-r .el-ear{animation-delay:-1.1s}
+@keyframes elEar{0%,60%,100%{transform:scaleX(1)}75%{transform:scaleX(.82)}88%{transform:scaleX(1.04)}}
+.el-tail{transform-box:fill-box;transform-origin:100% 0;animation:elTail 1.4s ease-in-out infinite alternate}
+@keyframes elTail{from{transform:rotate(-10deg)}to{transform:rotate(12deg)}}
+.gj-fl{transform-box:fill-box;transform-origin:50% 100%;animation:dyF 1.3s ease-in-out infinite alternate}
+.gj-glow{animation:dyG 2.2s ease-in-out infinite alternate}
+@media (min-width:900px){.gaj-wrap{width:430px;margin-top:56px}footer .gaj-wrap{margin-bottom:34px}}
+@media (prefers-reduced-motion:reduce){.el,.el-trunk,.el-ear,.el-tail,.gj-fl,.gj-glow{animation:none}.gj-in{transition:none;transform:none;opacity:1}}
