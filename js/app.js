@@ -860,7 +860,9 @@ if('serviceWorker' in navigator&&(location.protocol==='https:'||location.hostnam
 /* ================= MUSIC: a small on/off button; starts softly when the diya is lit, unless the guest turned it off before ================= */
 (function(){
   const btn=$('music');if(!CONFIG.music||!btn)return;
-  const au=new Audio(CONFIG.music);au.loop=true;au.preload='none';au.volume=0;
+  const list=[].concat(CONFIG.music);let ti=0;
+  const au=new Audio(list[0]);au.loop=list.length===1;au.preload='none';au.volume=0;
+  au.addEventListener('ended',()=>{ti=(ti+1)%list.length;au.src=list[ti];au.play().catch(()=>{});});
   let off=false;try{off=localStorage.getItem('invite-music')==='off';}catch(e){}
   let fadeT=null;
   const fade=(to,ms,done)=>{clearInterval(fadeT);const from=au.volume,t0=performance.now();fadeT=setInterval(()=>{const k=Math.min(1,(performance.now()-t0)/ms);au.volume=from+(to-from)*k;if(k>=1){clearInterval(fadeT);done&&done();}},40);};
@@ -956,4 +958,35 @@ function gajPair(n){
   spots.forEach(([el,pos],i)=>{if(el)el.insertAdjacentHTML(pos,`<div class="gaj-wrap">${gajPair(i)}</div>`);});
   const io='IntersectionObserver' in window?new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target);}}),{threshold:.35}):null;
   document.querySelectorAll('.gaj-wrap').forEach(w=>io?io.observe(w):w.classList.add('in'));
+})();
+
+/* ================= SIDE DIYAS: scattered down the left and right edges at uneven heights; each drifts at its own speed as you scroll ================= */
+(function(){
+  const page=$('page'),scene=$('scene');if(!page)return;
+  const layer=document.createElement('div');layer.className='side-diyas';layer.setAttribute('aria-hidden','true');page.appendChild(layer);
+  const svg=(d,dl,g)=>`<svg viewBox="0 0 40 44" style="--d:${d}s;--dl:${dl}s;--g:${g}s"><circle class="dy-glow" cx="20" cy="17" r="17" fill="url(#dyGlow)"/><path class="dy-fl" d="M20 3C15.6 10.5 15.2 15.2 20 20.5C24.8 15.2 24.4 10.5 20 3Z" fill="url(#dyFlame)"/><path d="M4 24Q20 21 36 24Q33 36.5 20 37.5Q7 36.5 4 24Z" fill="url(#dyClay)"/><path d="M4 24Q20 27.2 36 24" fill="none" stroke="#e6cf98" stroke-width="1"/><g fill="#e6cf98"><circle cx="12.5" cy="30" r="1"/><circle cx="20" cy="32.2" r="1"/><circle cx="27.5" cy="30" r="1"/></g></svg>`;
+  let items=[];let seedN=5;const r=()=>(seedN=(seedN*16807)%2147483647)/2147483647;
+  function build(){
+    seedN=5;layer.innerHTML='';items=[];
+    const H=page.scrollHeight,top=(scene?scene.offsetHeight:0)+120,wide=innerWidth>=900,gap=wide?300:420;
+    let y=top,side=0;
+    while(y<H-200){
+      const s=side%2?'r':'l';side+=r()>.25?1:0;            // mostly alternate, sometimes two on one side
+      const x=wide?(1+r()*7):(r()*2.5);                     // % from the edge
+      const sz=wide?(26+r()*22):(15+r()*8);
+      const sp=(.04+r()*.18).toFixed(3);                    // parallax speed
+      const el=document.createElement('div');el.className='sd '+s+(r()>.6?' bob':'');
+      el.style.cssText=`top:${Math.round(y)}px;${s==='l'?'left':'right'}:${x.toFixed(1)}%;width:${sz.toFixed(0)}px;--bd:${(3+r()*3).toFixed(1)}s`;
+      el.innerHTML=svg((1.1+r()*.7).toFixed(2),(-r()*2).toFixed(2),(1.8+r()*1.2).toFixed(2));
+      layer.appendChild(el);items.push([el,+sp]);
+      y+=gap*(.55+r()*.9);
+    }
+    move();
+  }
+  let ticking=false;
+  function move(){ticking=false;const sy=scrollY;for(const[el,sp]of items)el.style.transform=`translateY(${(-sy*sp).toFixed(1)}px)`;}
+  if(!RM)addEventListener('scroll',()=>{if(!ticking){ticking=true;requestAnimationFrame(move);}},{passive:true});
+  let rt=null;const rb=()=>{clearTimeout(rt);rt=setTimeout(build,250);};
+  if('ResizeObserver' in window)new ResizeObserver(rb).observe(page);else addEventListener('resize',rb);
+  build();
 })();

@@ -570,3 +570,12 @@ footer .gaj-wrap{margin:0 auto 26px}
 .gj-glow{animation:dyG 2.2s ease-in-out infinite alternate}
 @media (min-width:900px){.gaj-wrap{width:430px;margin-top:56px}footer .gaj-wrap{margin-bottom:34px}}
 @media (prefers-reduced-motion:reduce){.el,.el-trunk,.el-ear,.el-tail,.gj-fl,.gj-glow{animation:none}.gj-in{transition:none;transform:none;opacity:1}}
+
+/* ---------- diyas scattered down both edges, drifting at different speeds as you scroll ---------- */
+.side-diyas{position:absolute;inset:0;pointer-events:none;z-index:4;overflow:hidden}
+.sd{position:absolute;will-change:transform}
+.sd svg{display:block;width:100%;height:auto;overflow:visible;opacity:.92}
+.sd.bob svg{animation:sdBob var(--bd,4s) ease-in-out infinite alternate}
+@keyframes sdBob{from{transform:translateY(-4px)}to{transform:translateY(4px)}}
+@media (max-width:899px){.sd svg{opacity:.85}}
+@media (prefers-reduced-motion:reduce){.sd.bob svg{animation:none}}

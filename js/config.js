@@ -8,8 +8,8 @@ window.CONFIG = {
   bride:"Ananya", groom:"Kabir",
   brideFull:"Ananya Kapoor", groomFull:"Kabir Malhotra",
   brideParents:"Smt. Ritu & Shri Rajiv Kapoor", groomParents:"Smt. Meera & Shri Sanjay Malhotra",
-  /* Venue picture (leave empty to use the drawn palace) and the background music (leave empty to hide the music button) */
-  venueImg:"photos/venue/palace.jpg", music:"assets/wedding-shehnai.mp3",
+  /* Venue picture (leave empty to use the drawn palace) and the background music: one file or a list played in turn (leave empty to hide the music button) */
+  venueImg:"photos/venue/palace.jpg", music:["assets/ganesh-vandana.mp3","assets/wedding-shehnai.mp3"],
   city:"Udaipur", venue:"Jharokha Mahal, Lake Pichola", address:"Gangaur Ghat Road, Udaipur, Rajasthan", mapsQuery:"Lake Pichola Udaipur",
   mainDate:{day:"14", month:"February", year:"2027", line:"Sunday · 7:00 PM", sub:"By Lake Pichola, with dinner after the pheras"},
   story:[
