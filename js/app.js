@@ -438,8 +438,8 @@ let guest='';try{const h=decodeURIComponent(location.hash.slice(1));if(h)guest=h
 if(guest)$('addr').textContent=guest;
 const ini=`${CONFIG.bride[0]}${CONFIG.groom[0]}`;
 waxSeal($('sealSvg'),ini,'s1');waxSeal($('sealEnd'),ini,'s2');
-/* the couple's portraits beside the envelope */
-[['cpG','groom'],['cpB','bride']].forEach(([id,k])=>{const src=CONFIG.couple&&CONFIG.couple[k];if(!src)return;const f=$(id);f.querySelector('img').src=src;f.querySelector('b').textContent=CONFIG[k];f.hidden=false;});
+/* the couple's portraits beside the envelope (laptops only) */
+[['cpG','groom'],['cpB','bride']].forEach(([id,k])=>{const src=CONFIG.couple&&CONFIG.couple[k];if(!src)return;const f=$(id);f.querySelector('img').src=src;f.querySelector('figcaption').textContent=CONFIG[k];f.hidden=false;});
 function openEnvelope(){
   const env=$('env');if(env.classList.contains('open'))return;
   const [sx,sy]=centerOf($('seal'));burst(sx,sy,18,'petal');
