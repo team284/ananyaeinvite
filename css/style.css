@@ -425,14 +425,15 @@ body{min-height:100vh;min-height:100dvh}
   .hint{font-size:.72rem}
   .pill{font-size:.8rem;padding:.95rem 1.8rem}
   /* names */
-  .env{width:480px}
+  .env{width:min(480px,100%)}
   .env-stage{min-height:360px}
   .names .nm{font-size:6.4rem}
   .names .par{font-size:.95rem}
   .names .lede{max-width:40ch}
   /* portraits either side of the envelope: bride left, groom right */
-  .couple{grid-template-columns:1fr 480px 1fr;grid-template-areas:"b mid g";column-gap:clamp(24px,4vw,64px);align-items:center}
-  .cp{width:clamp(190px,17vw,260px);padding:12px 12px 8px}
+  .couple{grid-template-columns:minmax(150px,1fr) minmax(0,480px) minmax(150px,1fr);grid-template-areas:"b mid g";column-gap:clamp(24px,4vw,64px);align-items:center}
+  .env{width:min(480px,100%)}
+  .cp{width:min(clamp(190px,17vw,260px),100%);padding:12px 12px 8px}
   .cp figcaption{font-size:2.3rem}
   .couple.opened .cp{box-shadow:0 20px 40px rgba(0,0,0,.5),0 0 44px rgba(246,227,180,.25)}
   #names .str{display:block}
